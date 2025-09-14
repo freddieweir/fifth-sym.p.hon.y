@@ -1,0 +1,51 @@
+# Reminder Messages for ADHD-Friendly Attention Management
+
+gentle:
+  - "Hey there! Just a friendly check-in. {script} is still running smoothly."
+  - "Quick update: {script} is working away in the background."
+  - "All good here! {script} continues to process."
+  - "Status update: {script} is still active and making progress."
+  - "FYI, {script} is still doing its thing."
+
+moderate:
+  - "Attention! {script} has been running for {duration}. Might want to check on it."
+  - "Time check: {script} started {duration} ago and is still going."
+  - "Heads up! {script} is taking longer than usual. Current runtime: {duration}."
+  - "Please note: {script} has been active for {duration} now."
+  - "Extended runtime alert: {script} is at {duration} and counting."
+
+urgent:
+  - "IMPORTANT! {script} has been running for {duration}. Please check now!"
+  - "ALERT! {script} needs your attention. Runtime: {duration}."
+  - "CRITICAL: {script} may be stuck. It's been {duration}!"
+  - "ACTION REQUIRED! {script} has exceeded normal runtime: {duration}."
+  - "WARNING! {script} might need intervention after {duration}!"
+
+stuck_detection:
+  - "Hey! {script} seems stuck. It might be waiting for your input."
+  - "Attention! {script} appears frozen. Check if it needs user input."
+  - "Input needed! {script} is probably waiting for you to type something."
+  - "Heads up! {script} hasn't responded recently. Interactive input required?"
+  - "Check this: {script} might need you to enter data or make a choice."
+
+long_runner:
+  - "Marathon mode: {script} has been going strong for {duration}!"
+  - "Endurance test: {script} is still running after {duration}."
+  - "Long haul: {script} started {duration} ago and shows no signs of stopping."
+  - "Persistence award: {script} continues after {duration} of runtime."
+  - "Still here: {script} is dedicated to the task, {duration} and counting."
+
+first_reminder:
+  - "First check-in: {script} is running and doing well."
+  - "Initial status: {script} has been active for a little while now."
+  - "Early update: {script} is making progress as expected."
+
+escalated:
+  - "This is your final reminder about {script}. Please check immediately!"
+  - "URGENT ESCALATION: {script} requires immediate attention!"
+  - "MAXIMUM PRIORITY: {script} has been ignored too long!"
+
+completion_reminder:
+  - "Don't forget! {script} finished a while ago. Check the results when you can."
+  - "FYI: {script} completed successfully. Results are ready for review."
+  - "Completed task reminder: {script} finished and is waiting for your review."

@@ -1,0 +1,147 @@
+# Output Formatting Rules for Technical-to-Conversational Translation
+
+# Error message formatting
+error:
+  generic: "Error: {message}"
+  file_not_found: "Cannot find file {filename}"
+  permission_denied: "Access denied for {action}"
+  connection_failed: "Connection to {target} failed"
+  timeout: "Operation timed out after {duration} seconds"
+  syntax_error: "Code error in {filename}"
+  import_error: "Missing required module {module}"
+  memory_error: "Not enough memory to continue"
+  disk_space: "Insufficient disk space"
+
+# Success message formatting
+success:
+  generic: "Operation completed successfully"
+  file_created: "Created file {filename}"
+  file_deleted: "Deleted {filename}"
+  download_complete: "Download finished"
+  installation_complete: "Installation successful"
+  backup_complete: "Backup created successfully"
+  update_complete: "Update installed"
+  connection_established: "Connected successfully"
+
+# Progress message formatting
+progress:
+  percentage: "{percent}% complete"
+  step: "Step {current} of {total}"
+  downloading: "Downloading {item}"
+  uploading: "Uploading {item}"
+  processing: "Processing {item}"
+  building: "Building {component}"
+  testing: "Running tests"
+  deploying: "Deploying application"
+
+# Warning message formatting
+warning:
+  generic: "Warning: {message}"
+  deprecated: "{feature} is deprecated"
+  disk_space_low: "Low disk space warning"
+  memory_high: "High memory usage detected"
+  network_slow: "Slow network connection"
+  version_mismatch: "Version compatibility issue"
+
+# Information message formatting
+info:
+  startup: "Starting {application}"
+  shutdown: "Shutting down {application}"
+  config_loaded: "Configuration loaded"
+  database_connected: "Database connection established"
+  server_ready: "Server is ready on port {port}"
+  log_rotated: "Log files rotated"
+
+# Data presentation formatting
+data:
+  list_empty: "No items found"
+  list_single: "Found 1 item: {item}"
+  list_multiple: "Found {count} items"
+  file_size: "{filename} is {size}"
+  duration: "Completed in {time}"
+  count: "Processed {number} items"
+
+# Technical term simplifications
+simplify:
+  patterns:
+    # Programming terms
+    - pattern: "subprocess"
+      replacement: "background process"
+    - pattern: "exception"
+      replacement: "error"
+    - pattern: "traceback"
+      replacement: "error details"
+    - pattern: "stderr"
+      replacement: "error output"
+    - pattern: "stdout"
+      replacement: "program output"
+    - pattern: "stdin"
+      replacement: "input stream"
+    
+    # File system terms
+    - pattern: "directory"
+      replacement: "folder"
+    - pattern: "path"
+      replacement: "location"
+    - pattern: "symlink"
+      replacement: "shortcut"
+    - pattern: "permissions"
+      replacement: "access rights"
+    
+    # Network terms
+    - pattern: "localhost"
+      replacement: "this computer"
+    - pattern: "TCP"
+      replacement: "network connection"
+    - pattern: "HTTP"
+      replacement: "web protocol"
+    - pattern: "API"
+      replacement: "service interface"
+    
+    # Database terms
+    - pattern: "query"
+      replacement: "data request"
+    - pattern: "schema"
+      replacement: "data structure"
+    - pattern: "index"
+      replacement: "data index"
+    
+    # Memory/CPU terms
+    - pattern: "RAM"
+      replacement: "memory"
+    - pattern: "CPU"
+      replacement: "processor"
+    - pattern: "thread"
+      replacement: "execution path"
+    - pattern: "process"
+      replacement: "running program"
+
+# Priority levels for voice output
+voice_priority:
+  critical:
+    - "error"
+    - "failure"
+    - "critical"
+    - "urgent"
+    - "alert"
+  
+  high:
+    - "warning"
+    - "timeout"
+    - "stopped"
+    - "failed"
+    - "denied"
+  
+  normal:
+    - "completed"
+    - "success"
+    - "finished"
+    - "ready"
+    - "started"
+  
+  low:
+    - "progress"
+    - "processing"
+    - "downloading"
+    - "building"
+    - "info"

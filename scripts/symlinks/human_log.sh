@@ -1,0 +1,1 @@
+/Volumes/aetherium/Shared Parallel/macOS Dev Files/Claude Communication/human_log.sh

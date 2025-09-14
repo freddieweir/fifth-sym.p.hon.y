@@ -1,0 +1,56 @@
+# Error Handling Messages for Voice Feedback
+
+file_not_found:
+  - "Oops! I can't find the file {filename}. Double-check the path?"
+  - "File missing: {filename} doesn't exist in the expected location."
+  - "Search failed: {filename} is nowhere to be found."
+
+permission_denied:
+  - "Permission denied! I don't have access to {resource}."
+  - "Access blocked: insufficient permissions for {resource}."
+  - "Security alert: can't access {resource} without proper permissions."
+
+connection_failed:
+  - "Connection failed to {target}. Is it online?"
+  - "Can't reach {target}. Network or server issue?"
+  - "Communication error with {target}. Please retry."
+
+timeout:
+  - "Operation timed out after {seconds} seconds. The process is taking too long."
+  - "Timeout reached! Process exceeded {seconds} second limit."
+  - "Process stalled: no response after {seconds} seconds."
+
+import_error:
+  - "Import failed: {module} is not installed or available."
+  - "Missing dependency: {module} required but not found."
+  - "Module error: can't load {module}. Is it installed?"
+
+syntax_error:
+  - "Syntax error in {filename} at line {line}: {message}"
+  - "Code problem: syntax issue in {filename} needs fixing."
+  - "Parse error: {filename} has invalid Python syntax."
+
+memory_error:
+  - "Out of memory! The process is using too many resources."
+  - "Memory exhausted: process needs more RAM than available."
+  - "Resource limit reached: insufficient memory to continue."
+
+interrupted:
+  - "Process interrupted by user. Operation cancelled."
+  - "Execution stopped: user requested cancellation."
+  - "Manual override: process terminated by user command."
+
+generic_error:
+  - "An unexpected error occurred: {error}"
+  - "Something went wrong: {error}"
+  - "Error encountered: {error}"
+
+script_failed:
+  - "Script {script} failed with an error: {error}"
+  - "{script} encountered a problem: {error}"
+  - "Execution failed in {script}: {error}"
+
+dependency_error:
+  - "Missing dependencies for {script}. Some packages may not be installed."
+  - "Dependency issue with {script}: required modules unavailable."
+  - "{script} needs additional packages to run properly."

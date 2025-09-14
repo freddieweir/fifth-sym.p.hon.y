@@ -1,0 +1,46 @@
+# System Status Messages for Voice Feedback
+
+startup:
+  - "Python Orchestrator is now online and ready to coordinate your scripts."
+  - "System initialized. Ready to manage your Python automation."
+  - "Hello! Your coding assistant is ready to orchestrate your scripts."
+
+shutdown:
+  - "Shutting down the orchestrator. All tasks completed."
+  - "Goodbye! The orchestrator is signing off."
+  - "System shutdown complete. Until next time!"
+
+initialization:
+  - "Initializing the orchestration system..."
+  - "Setting up your Python command center..."
+  - "Loading modules and preparing for action..."
+
+error:
+  - "Alert! An error occurred: {error}"
+  - "System error detected: {error}"
+  - "Something went wrong: {error}"
+
+api_connected:
+  - "Successfully connected to {service} API."
+  - "{service} is ready for use."
+  - "API connection established with {service}."
+
+api_error:
+  - "Could not connect to {service}. Check your API credentials."
+  - "API error with {service}: {error}"
+  - "Connection failed to {service}."
+
+script_discovered:
+  - "Found {count} Python scripts ready to run."
+  - "Discovered {count} scripts in your directory."
+  - "Script library loaded: {count} scripts available."
+
+session_start:
+  - "Starting a new orchestration session."
+  - "Session initialized. What would you like to run today?"
+  - "Ready for commands. Your scripts await!"
+
+session_end:
+  - "Session complete. All scripts finished."
+  - "That's a wrap! All your automation is done."
+  - "Session terminated. Great work today!"

@@ -1,0 +1,45 @@
+# 1Password Vault Configuration
+# Maps different types of secrets to specific vaults
+
+# Default vault mappings
+default_vault: "Development"
+
+# Vault assignments by category
+vault_mappings:
+  api_keys: "Development"
+  certificates: "Infrastructure" 
+  voice_configs: "Development"
+  project_secrets: "Development"
+  database_credentials: "Infrastructure"
+  ssh_keys: "Infrastructure"
+  personal_tokens: "Development"
+
+# Account configuration
+accounts:
+  primary: null  # Will use default account if not specified
+  
+# Vault access patterns
+access_patterns:
+  # API keys follow this naming pattern
+  api_keys: "{service_name} API"
+  
+  # Certificates follow this pattern  
+  certificates: "{cert_name} Certificate"
+  
+  # Voice configurations
+  voice: "{service_name} Config"
+  
+  # Project-specific items
+  project: "{project_name} Secrets"
+  
+  # Database connections
+  database: "{db_name} Database"
+
+# Security settings
+security:
+  session_timeout: 3600  # 1 hour
+  auto_signin: true
+  biometric_unlock: true
+  
+# Backup vault (fallback)
+backup_vault: "Archive"

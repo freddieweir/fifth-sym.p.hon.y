@@ -1,0 +1,65 @@
+# Voice Response Templates for Different Types of Output
+
+# Error message templates
+error_templates:
+  file_not_found: "File {filename} was not found"
+  permission_denied: "Access denied to {resource}"
+  connection_failed: "Could not connect to {target}"
+  timeout: "Operation timed out after {duration}"
+  syntax_error: "Code error in {filename} at line {line}"
+  import_error: "Missing module: {module}"
+
+# Success message templates  
+success_templates:
+  file_created: "Successfully created {filename}"
+  download_complete: "Download finished for {item}"
+  installation_complete: "Installation of {item} complete"
+  connection_established: "Connected to {target}"
+  task_complete: "Task completed: {task}"
+  data_processed: "Processed {count} items successfully"
+
+# Progress message templates
+progress_templates:
+  percentage: "Progress: {percent} percent complete"
+  step_counter: "Step {current} of {total}"
+  downloading: "Downloading {item}"
+  processing: "Processing {item}"
+  building: "Building {component}"
+  installing: "Installing {package}"
+  analyzing: "Analyzing {data}"
+  searching: "Searching for {target}"
+
+# Status message templates
+status_templates:
+  started: "{script} has started"
+  running: "{script} is running normally"
+  waiting: "{script} is waiting for input"
+  paused: "{script} is paused"
+  resumed: "{script} has resumed"
+  stopping: "{script} is shutting down"
+
+# Data format templates
+data_templates:
+  list_summary: "Found {count} items"
+  dict_summary: "Dictionary with {count} entries"
+  file_info: "File {filename} is {size} bytes"
+  time_duration: "Operation took {duration}"
+  memory_usage: "Using {memory} of memory"
+  cpu_usage: "CPU usage at {percent} percent"
+
+# Interactive templates
+interactive_templates:
+  menu_prompt: "Choose from {count} options"
+  input_request: "Please provide {input_type}"
+  confirmation: "Confirm: {action}?"
+  selection_made: "Selected: {choice}"
+  invalid_input: "Invalid input, please try again"
+
+# System event templates  
+system_templates:
+  startup: "System ready"
+  shutdown: "System shutting down"
+  error_recovery: "Recovering from error"
+  backup_created: "Backup saved"
+  update_available: "Update available"
+  maintenance_mode: "Entering maintenance mode"

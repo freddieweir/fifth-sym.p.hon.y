@@ -1,0 +1,64 @@
+# Python Orchestrator Configuration
+
+# Voice Configuration
+voice:
+  enabled: true
+  voice_id: "Albedo"  # ElevenLabs voice ID or name
+  model: "eleven_monolingual_v1"
+  api_key_item: "Eleven Labs API"  # 1Password item name
+  stability: 0.5
+  similarity_boost: 0.75
+  style: 0.0
+  use_speaker_boost: true
+
+# 1Password Configuration
+onepassword:
+  vault: "Development"  # Default vault for API keys
+  signin_account: null  # Account identifier (optional)
+
+# Reminder System Configuration
+reminders:
+  enabled: true
+  interval_seconds: 120  # Base interval between reminders
+  escalation_levels:
+    - after_seconds: 120
+      urgency: "gentle"
+    - after_seconds: 300
+      urgency: "moderate"
+    - after_seconds: 600
+      urgency: "urgent"
+
+# Output Translation Configuration
+translation:
+  technical_to_voice: true
+  simplify_errors: true
+  voice_threshold: 5  # Minimum characters for voice output
+
+# Script Management Configuration
+scripts:
+  auto_discover: true
+  excluded_patterns:
+    - "__pycache__"
+    - "*.pyc"
+    - "test_*"
+    - "*_test.py"
+    - "conftest.py"
+  timeout_seconds: 3600  # Default timeout for scripts
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "orchestrator.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Platform-specific settings
+platform:
+  macos:
+    notifications: true
+    sound_alerts: true
+  linux:
+    notifications: true
+    sound_alerts: false
+  windows:
+    notifications: false
+    sound_alerts: false

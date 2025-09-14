@@ -1,0 +1,93 @@
+# 1Password API Key Item References
+# Maps service names to 1Password item names and fields
+
+# Voice Services
+elevenlabs:
+  item_name: "Eleven Labs API"
+  field: "credential"
+  vault: "Development"
+  
+# AI/LLM Services  
+openai:
+  item_name: "OpenAI API"
+  field: "credential"
+  vault: "Development"
+
+anthropic:
+  item_name: "Anthropic API"
+  field: "credential"
+  vault: "Development"
+
+# Cloud Services
+aws:
+  item_name: "AWS Credentials"
+  fields:
+    access_key: "access_key_id"
+    secret_key: "secret_access_key"
+  vault: "Infrastructure"
+
+google_cloud:
+  item_name: "Google Cloud API"
+  field: "service_account_key"
+  vault: "Infrastructure"
+
+# Development Services
+github:
+  item_name: "GitHub API"
+  field: "personal_token"
+  vault: "Development"
+
+docker_hub:
+  item_name: "Docker Hub"
+  fields:
+    username: "username"
+    token: "access_token"
+  vault: "Development"
+
+# Database Services
+mongodb:
+  item_name: "MongoDB Atlas"
+  field: "connection_string"
+  vault: "Infrastructure"
+
+postgres:
+  item_name: "PostgreSQL"
+  fields:
+    host: "hostname"
+    username: "username"
+    password: "password"
+    database: "database"
+  vault: "Infrastructure"
+
+# Communication Services
+slack:
+  item_name: "Slack Bot Token"
+  field: "bot_token"
+  vault: "Development"
+
+discord:
+  item_name: "Discord Bot"
+  field: "bot_token"
+  vault: "Development"
+
+# Monitoring Services
+datadog:
+  item_name: "Datadog API"
+  fields:
+    api_key: "api_key"
+    app_key: "application_key"
+  vault: "Infrastructure"
+
+# Email Services
+sendgrid:
+  item_name: "SendGrid API"
+  field: "api_key"
+  vault: "Development"
+
+# Payment Services
+stripe:
+  item_name: "Stripe API"
+  fields:
+    publishable_key: "publishable_key"
+    secret_key: "secret_key"
+  vault: "Development"
