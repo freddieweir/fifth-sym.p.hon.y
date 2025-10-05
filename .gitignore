@@ -22,6 +22,15 @@ INTERNAL_*.md
 PERSONAL_*.md
 TODO_*.md
 NOTES_*.md
+BRAIN-DUMP.md
+**/BRAIN-DUMP.md
+IDEAS.md
+THOUGHTS.md
+**/IDEAS.md
+**/THOUGHTS.md
+
+# Allow only the README to explain internal/ directory exists
+!docs/internal/README.md
 
 # =============================================================================
 # CRITICAL SECURITY - SSL/TLS CERTIFICATES AND PRIVATE KEYS
