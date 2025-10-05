@@ -90,6 +90,18 @@ secrets/
 credentials/
 
 # =============================================================================
+# CRITICAL SECURITY - CLASSIFIED CONTENT
+# =============================================================================
+# Highly confidential content requiring YubiKey access
+scripts/classified/
+**/classified/
+!scripts/classified/.gitignore
+!scripts/classified/README.md
+
+# Classified access logs
+memory/logs/classified-access.log
+
+# =============================================================================
 # PYTHON DEVELOPMENT
 # =============================================================================
 __pycache__/
