@@ -1,4 +1,88 @@
-# Python
+# =============================================================================
+# FIFTH SYMPHONY - ENTERPRISE-GRADE SECURITY .GITIGNORE
+# =============================================================================
+# Template-based script security system for AI automation conductor
+# Zero sensitive data exposure pattern for public repository readiness
+
+# =============================================================================
+# CRITICAL SECURITY - DEVELOPMENT GUIDANCE FILES
+# =============================================================================
+# Never commit internal development guidance (contains specific domains/paths)
+CLAUDE.md
+/CLAUDE.md
+**/CLAUDE.md
+
+# Personal/internal documentation (not for public repos)
+docs/internal/
+docs/private/
+**/internal-docs/
+**/private-docs/
+TEMPLATE_SECURITY.md
+INTERNAL_*.md
+PERSONAL_*.md
+TODO_*.md
+NOTES_*.md
+
+# =============================================================================
+# CRITICAL SECURITY - SSL/TLS CERTIFICATES AND PRIVATE KEYS
+# =============================================================================
+# Never commit any cryptographic material
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+*.cert
+*.cer
+*.der
+*.ca-bundle
+*.ca-crt
+*.csr
+*.req
+
+# Certificate directories
+ssl_cert/
+certs/
+certificates/
+ssl/
+tls/
+
+# =============================================================================
+# CRITICAL SECURITY - CONFIGURATION WITH SECRETS
+# =============================================================================
+# Environment files (contain real paths/domains)
+.env
+.env.local
+.env.production
+.env.development
+.env.private
+*.env*
+!.env.example
+!.env.template
+
+# Allow templates but not processed configs
+local_config.yaml
+personal_settings.yaml
+**/configuration.yml
+!**/configuration.yml.template
+!**/configuration.yml.example
+
+# =============================================================================
+# CRITICAL SECURITY - AUTHENTICATION AND USER DATA
+# =============================================================================
+# Never commit user databases or session information
+*.sqlite
+*.sqlite3
+*.db
+session_*
+auth_state*
+token_cache*
+secrets/
+credentials/
+
+# =============================================================================
+# PYTHON DEVELOPMENT
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,57 +104,328 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
 # Virtual environments
-.env
-.venv
+.env/
+.venv/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 
-# IDEs
-.vscode/
+# =============================================================================
+# IDE AND EDITOR FILES
+# =============================================================================
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDE files
+.vscode/settings.json
+.vscode/launch.json
 .idea/
+*.code-workspace
 *.swp
 *.swo
 *~
+.vim/
+.emacs.d/
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Claude IDE settings (personal)
+.claude/
 
-# Project specific
+# =============================================================================
+# OPERATIONAL FILES
+# =============================================================================
+# Log files
+**/logs/
 *.log
-temp/
-tmp/
+*.log.*
+access.log*
+error.log*
+auth.log*
+
+# Runtime and temporary
+**/tmp/
+**/temp/
+**/runtime/
+**/var/
+**/run/
 .cache/
 
-# Security - Never commit these
-*.env*
-*.key
-*.pem
-*.p12
-*.pfx
-*.crt
-*.csr
-secrets/
-credentials/
+# Process IDs and lock files
+*.pid
+*.lock
+.lockfile
 
-# OPSEC - Never commit personal paths or usernames
-local_config.yaml
-personal_settings.yaml
+# =============================================================================
+# 🔒 TEMPLATE-BASED SCRIPT SECURITY SYSTEM
+# =============================================================================
+# CRITICAL: Generated files contain real domains/paths and must NEVER be committed
 
-# Git
-.git/
+# Generated scripts with real domains (use templates instead)
+*.sh
+!*.sh.template
+!create-scripts.sh
+!run.sh
+!run_gui.sh
 
-# Backup files
-*.bak
+# Generated configuration files with real values
+*.yaml
+*.yml
+!*.yaml.template
+!*.yml.template
+!config/settings.yaml
+!config/prompts/*.yaml
+!config/templates/*.yaml
+!config/onepassword/*.yaml
+!pyproject.toml
+!.pre-commit-config.yaml
+!.github/workflows/*.yml
+
+# Symlink metadata with real paths
+scripts/symlinks/.symlink_metadata.json
+!scripts/symlinks/.symlink_metadata.json.template
+
+# Generated files from templates
+**/.generated_*
+**/generated_*
+
+# =============================================================================
+# BACKUP AND STATE FILES
+# =============================================================================
+# Backup files (often contain sensitive data)
 *.backup
+*.backup-*
+*.bak
 *.orig
+.backup-*
+backup/
+backup_originals/
+
+# Recycled directory (temporary storage for old/outdated scripts)
+recycled/
+/recycled/
+**/recycled/
+!recycled/.gitignore
+!recycled/README.md
+
+# Migration state
+.migration-state
+.migration-config
+
+# =============================================================================
+# 1PASSWORD INTEGRATION SECURITY
+# =============================================================================
+# Temporary files from 1Password CLI operations
+.env.backup.*
+/tmp/.env.*
+**/op-session-*
+**/1password-temp-*
+1password_template.json
+
+# 1Password Connect Server credentials
+1password-credentials.json
+**/1password-credentials.json
+
+# Processed environment files (contain real secrets)
+.env.processed
+.env.secrets
+.env.injected
+
+# =============================================================================
+# APPLICATION DATA AND RUNTIME FILES
+# =============================================================================
+# Application data directories
+data/
+runtime-data/
+app-data/
+
+# Cache directories
+**/cache/
+**/tmp_cache/
+
+# Upload directories
+**/uploads/
+**/files/
+**/attachments/
+
+# Voice synthesis cache
+**/speech/
+**/audio_cache/
+**/voice_cache/
+
+# =============================================================================
+# MEDIA FILES - AUDIO, VIDEO, IMAGES
+# =============================================================================
+# CRITICAL: Never commit generated media files (logs, prompts, output)
+# These files can contain sensitive information or be very large
+
+# Audio files (voice synthesis output, recordings, prompts)
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.aac
+*.m4a
+*.wma
+*.aiff
+*.ape
+*.opus
+*.webm
+
+# Video files (screen recordings, demos, logs)
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+*.m4v
+*.mpg
+*.mpeg
+*.3gp
+*.webm
+
+# Image files (screenshots, generated images, logs)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.tif
+*.svg
+*.ico
+*.webp
+*.heic
+*.heif
+
+# Media directories
+media/
+audio/
+video/
+images/
+recordings/
+screenshots/
+output/
+generated/
+prompts/
+voice_output/
+tts_output/
+elevenlabs_output/
+
+# Temporary media processing
+**/temp_media/
+**/media_cache/
+**/media_tmp/
+
+# Allow specific assets needed for documentation (add back with ! if needed)
+# !docs/assets/*.png
+# !README_assets/*.jpg
+
+# =============================================================================
+# ORCHESTRATOR MEMORY AND STATE
+# =============================================================================
+# Never commit orchestrator runtime data or permission history
+memory/
+/memory/
+**/memory/
+!memory/.gitignore
+!memory/README.md
+
+# Permission approval history (contains user decisions)
+**/permissions/
+**/approval-history/
+permission_cache.json
+auto_approve_rules.json
+
+# Session data
+**/sessions/
+session_*.json
+orchestrator_state.json
+
+# =============================================================================
+# PRIVATE PLANNING AND NOTES (OPSEC)
+# =============================================================================
+# Never commit private planning directories
+todos/
+/todos/
+**/todos/
+
+# Personal notes and documentation
+personal_notes/
+private_docs/
+
+# =============================================================================
+# PATTERN-BASED SECURITY EXCLUSIONS
+# =============================================================================
+# Any file that might contain passwords or secrets
+*password*
+*secret*
+*private*
+*credential*
+*auth*
+*token*
+*apikey*
+*api_key*
+
+# But allow these common exceptions:
+!LICENSE
+!CHANGELOG.md
+!package.json
+!Dockerfile*
+!docker-compose*.yml
+!Makefile
+!*.template
+!*.example
+!*.sample
+!scripts/
+
+# =============================================================================
+# GIT AUXILIARY FILES
+# =============================================================================
+.git/
+.gitignore.old
+.gitignore.backup*
+
+# =============================================================================
+# FINAL SAFETY NET
+# =============================================================================
+# Catch any missed sensitive patterns
+**/admin
+**/private
+**/secret
+**/confidential
+**/sensitive
+*personal*
+!**/personal_assistant.py
+
+# Database connection strings
+*connection_string*
+*database_url*
+*db_url*
+
+# This .gitignore provides comprehensive security for the Fifth Symphony project
+# Template system ensures zero exposure of personal domains and paths
+# Review patterns before committing to public repositories
