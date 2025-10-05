@@ -1,18 +1,31 @@
 # 1Password Vault Configuration
 # Maps different types of secrets to specific vaults
 
+# IMPORTANT: Fifth Symphony uses the "Services" Collection
+# Collection: Services → Contains multiple vaults (API, ElevenLabs Voice IDs, SSL, Webhooks)
+
 # Default vault mappings
 default_vault: "Development"
 
+# Collection and Vault Structure
+# Services Collection:
+#   - API vault: API keys and tokens
+#   - ElevenLabs Voice IDs vault: Voice configurations
+#   - SSL vault: Certificates and private keys
+#   - Webhooks vault: Webhook URLs and secrets
+
 # Vault assignments by category
 vault_mappings:
-  api_keys: "Development"
-  certificates: "Infrastructure" 
-  voice_configs: "Development"
-  project_secrets: "Development"
-  database_credentials: "Infrastructure"
-  ssh_keys: "Infrastructure"
-  personal_tokens: "Development"
+  api_keys: "API"  # Services → API vault
+  certificates: "SSL"  # Services → SSL vault
+  voice_configs: "ElevenLabs Voice IDs"  # Services → ElevenLabs Voice IDs vault
+  voice_ids: "ElevenLabs Voice IDs"  # Services → ElevenLabs Voice IDs vault
+  webhooks: "Webhooks"  # Services → Webhooks vault
+  project_secrets: "Development"  # Default vault
+  database_credentials: "Infrastructure"  # Infrastructure vault
+  ssh_keys: "Infrastructure"  # Infrastructure vault
+  personal_tokens: "Development"  # Default vault
+  prompts: "Development"  # Fifth Symphony prompts (TODO: move to Services collection)
 
 # Account configuration
 accounts:
@@ -22,18 +35,25 @@ accounts:
 access_patterns:
   # API keys follow this naming pattern
   api_keys: "{service_name} API"
-  
-  # Certificates follow this pattern  
+
+  # Certificates follow this pattern
   certificates: "{cert_name} Certificate"
-  
+
   # Voice configurations
   voice: "{service_name} Config"
-  
+
   # Project-specific items
   project: "{project_name} Secrets"
-  
+
   # Database connections
   database: "{db_name} Database"
+
+# Known API Items (Services → API vault)
+known_api_items:
+  elevenlabs: "ElevenLabs API Key"
+  anilist: "AniList API"
+  openai: "OpenAI API Key"
+  anthropic: "Anthropic API Key"
 
 # Security settings
 security:
