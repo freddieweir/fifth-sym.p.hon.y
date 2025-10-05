@@ -1,0 +1,12 @@
+{
+  "description": "{{PROJECT_NAME}} Symlink Configuration",
+  "last_updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "symlinks": {
+    "human_log.sh": "${HUMAN_LOG_SCRIPT_PATH}"
+  },
+  "notes": [
+    "This file is generated from template by create-scripts.sh",
+    "Symlinks point to external scripts and tools",
+    "Update .env file to configure actual paths"
+  ]
+}
