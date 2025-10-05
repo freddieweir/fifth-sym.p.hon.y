@@ -1,0 +1,4 @@
+# Backups directory - exclude all backup archives
+*
+!.gitignore
+!README.md
