@@ -12,19 +12,18 @@ Run this while using Claude Code in the fifth-symphony project to see
 real-time feedback about what Claude is doing.
 """
 
-import asyncio
-import sys
 import signal
+import sys
 from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QTextEdit
 from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow, QTextEdit, QVBoxLayout, QWidget
 
 from modules.claude_integration import ClaudeIntegration
-from modules.visual_novel_widget import VisualNovelWidget, AvatarState
+from modules.visual_novel_widget import VisualNovelWidget
 
 
 class ClaudeMonitorDemo(QMainWindow):
@@ -155,7 +154,7 @@ class ClaudeMonitorDemo(QMainWindow):
             lambda event: self.log(f"⚡ Bash command: {event.summary}")
         )
         self.claude_integration.assistant_response_detected.connect(
-            lambda event: self.log(f"🔵 Claude responding...")
+            lambda event: self.log("🔵 Claude responding...")
         )
         self.claude_integration.web_fetch_detected.connect(
             lambda event: self.log(f"🌐 Web fetch: {event.summary}")
@@ -254,7 +253,6 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
 
     # Allow Ctrl+C to work with Qt
-    import signal as sig_module
     timer = QTimer()
     timer.timeout.connect(lambda: None)
     timer.start(100)  # Process signals every 100ms

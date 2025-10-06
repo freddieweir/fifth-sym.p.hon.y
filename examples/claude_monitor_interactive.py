@@ -23,20 +23,24 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll
-from textual.widgets import (
-    Header, Footer, Static, Input, Button,
-    Label, ListView, ListItem, RichLog, TabbedContent, TabPane
-)
-from textual.binding import Binding
-from textual.reactive import reactive
-from textual.message import Message
+from datetime import datetime
 
 from rich.text import Text
-from rich.panel import Panel
-from datetime import datetime
-from collections import deque
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Container, Horizontal, Vertical, VerticalScroll
+from textual.reactive import reactive
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    RichLog,
+    Static,
+    TabbedContent,
+    TabPane,
+)
 
 from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEventType
 
@@ -335,12 +339,12 @@ class ClaudeMonitorApp(App):
             return
 
         for session_dir in claude_projects_dir.iterdir():
-            if session_dir.is_dir() and not session_dir.name.startswith('.'):
+            if session_dir.is_dir() and not session_dir.name.startswith("."):
                 # Check for .jsonl files
                 jsonl_files = list(session_dir.glob("*.jsonl"))
                 if jsonl_files:
                     # Extract project name
-                    parts = session_dir.name.split('-')
+                    parts = session_dir.name.split("-")
                     project_name = parts[-1] if len(parts) > 3 else session_dir.name
 
                     # Create monitor panel

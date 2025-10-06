@@ -11,23 +11,23 @@ Rich TUI (Text User Interface) with multiple panels:
 Beautiful, CLI-friendly dashboard for monitoring Claude Code activity.
 """
 
-import sys
 import signal
+import sys
 import time
-from pathlib import Path
-from datetime import datetime
 from collections import deque
+from datetime import datetime
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from rich.align import Align
 from rich.console import Console
-from rich.live import Live
 from rich.layout import Layout
+from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.align import Align
 
 from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEventType
 

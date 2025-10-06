@@ -12,21 +12,23 @@ If output file is not specified, outputs to stdout.
 """
 
 import sys
+import warnings
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 try:
-    from defusedxml.ElementTree import parse as safe_parse, fromstring
-    import defusedxml.ElementTree as ET
+    from defusedxml import ElementTree
+    from defusedxml.ElementTree import fromstring, parse as safe_parse
 except ImportError:
     # Fallback to standard library with warning
-    import xml.etree.ElementTree as ET
+    from xml import etree
     from xml.etree.ElementTree import parse as safe_parse
-    import warnings
+
+    ElementTree = etree.ElementTree
     warnings.warn(
         "defusedxml not installed. Using standard xml library. "
         "Install defusedxml for better security: pip install defusedxml",
-        SecurityWarning
+        SecurityWarning,
+        stacklevel=2
     )
 
 
@@ -40,38 +42,38 @@ class OPMLParser:
         self.categories = {}
         self.title = ""
 
-    def parse(self) -> Tuple[str, Dict[str, List[Dict]]]:
+    def parse(self) -> tuple[str, dict[str, list[dict]]]:
         """Parse the OPML file and return title and categorized feeds."""
         try:
             tree = safe_parse(self.opml_path)
             root = tree.getroot()
 
             # Extract title from head
-            head = root.find('head')
+            head = root.find("head")
             if head is not None:
-                title_elem = head.find('title')
+                title_elem = head.find("title")
                 if title_elem is not None:
                     self.title = title_elem.text or "OPML Feeds"
 
             # Parse body for feeds
-            body = root.find('body')
+            body = root.find("body")
             if body is not None:
                 self._parse_outlines(body, category="Uncategorized")
 
             return self.title, self.categories
 
-        except ET.ParseError as e:
+        except ElementTree.ParseError as e:
             raise ValueError(f"Invalid OPML file: {e}")
         except FileNotFoundError:
             raise FileNotFoundError(f"OPML file not found: {self.opml_path}")
 
-    def _parse_outlines(self, element: ET.Element, category: str = "Uncategorized"):
+    def _parse_outlines(self, element: ElementTree.Element, category: str = "Uncategorized"):
         """Recursively parse outline elements."""
-        for outline in element.findall('outline'):
+        for outline in element.findall("outline"):
             # Check if this is a category/folder
-            if outline.get('type') != 'rss' and outline.get('xmlUrl') is None:
+            if outline.get("type") != "rss" and outline.get("xmlUrl") is None:
                 # This is a category/folder
-                category_name = outline.get('text') or outline.get('title') or category
+                category_name = outline.get("text") or outline.get("title") or category
                 # Parse children with this category
                 self._parse_outlines(outline, category_name)
             else:
@@ -82,18 +84,18 @@ class OPMLParser:
                         self.categories[category] = []
                     self.categories[category].append(feed_info)
 
-    def _extract_feed_info(self, outline: ET.Element) -> Optional[Dict]:
+    def _extract_feed_info(self, outline: ElementTree.Element) -> dict | None:
         """Extract feed information from an outline element."""
-        xml_url = outline.get('xmlUrl')
+        xml_url = outline.get("xmlUrl")
         if not xml_url:
             return None
 
         return {
-            'title': outline.get('text') or outline.get('title') or 'Untitled Feed',
-            'xml_url': xml_url,
-            'html_url': outline.get('htmlUrl', ''),
-            'description': outline.get('description', ''),
-            'type': outline.get('type', 'rss')
+            "title": outline.get("text") or outline.get("title") or "Untitled Feed",
+            "xml_url": xml_url,
+            "html_url": outline.get("htmlUrl", ""),
+            "description": outline.get("description", ""),
+            "type": outline.get("type", "rss")
         }
 
 
@@ -101,7 +103,7 @@ class TextFormatter:
     """Formats parsed OPML data into readable text."""
 
     @staticmethod
-    def format_feeds(title: str, categories: Dict[str, List[Dict]],
+    def format_feeds(title: str, categories: dict[str, list[dict]],
                      show_urls: bool = True, show_descriptions: bool = True) -> str:
         """Format feeds into readable text output."""
         lines = []
@@ -131,11 +133,11 @@ class TextFormatter:
                 lines.append(f"  {feed_idx}. 📰 {feed['title']}")
 
                 if show_urls:
-                    if feed['html_url']:
+                    if feed["html_url"]:
                         lines.append(f"     🌐 Website: {feed['html_url']}")
                     lines.append(f"     📡 RSS: {feed['xml_url']}")
 
-                if show_descriptions and feed['description']:
+                if show_descriptions and feed["description"]:
                     lines.append(f"     📝 {feed['description']}")
 
                 lines.append("")
@@ -149,7 +151,7 @@ class TextFormatter:
         return "\n".join(lines)
 
     @staticmethod
-    def format_simple(categories: Dict[str, List[Dict]]) -> str:
+    def format_simple(categories: dict[str, list[dict]]) -> str:
         """Format feeds in a simple, compact format."""
         lines = []
 
@@ -187,7 +189,7 @@ def main():
         # Write output
         if output_file:
             output_path = Path(output_file)
-            output_path.write_text(output, encoding='utf-8')
+            output_path.write_text(output, encoding="utf-8")
             print(f"✅ Successfully wrote {sum(len(feeds) for feeds in categories.values())} feeds to {output_file}")
         else:
             print(output)

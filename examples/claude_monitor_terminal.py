@@ -8,11 +8,11 @@ No GUI, just clean terminal output with activity logging.
 Run this to see Claude's activities in real-time without the avatar window.
 """
 
-import sys
 import signal
+import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))

@@ -20,19 +20,17 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PySide6.QtCore import QTimer
-
 import yaml
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 
-from modules.voice_handler import VoiceHandler
-from modules.onepassword_manager import OnePasswordManager
-from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionResponse
-from modules.visual_novel_widget import VisualNovelWidget, AvatarState
 from modules.avatar_emotion_engine import AvatarEmotionEngine
-from modules.folder_manager import FolderManager, FileEvent
-from modules.hud_overlay import SystemHUD
 from modules.claude_integration import ClaudeIntegration
+from modules.folder_manager import FileEvent, FolderManager
+from modules.onepassword_manager import OnePasswordManager
+from modules.visual_novel_widget import AvatarState, VisualNovelWidget
+from modules.voice_handler import VoiceHandler
+from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionResponse
 
 
 class IntegratedFifthSymphony(QMainWindow):
@@ -205,7 +203,7 @@ class IntegratedFifthSymphony(QMainWindow):
         layout.addWidget(self.status_label)
 
         # Controls
-        from PySide6.QtWidgets import QPushButton, QHBoxLayout
+        from PySide6.QtWidgets import QHBoxLayout, QPushButton
         controls = QHBoxLayout()
 
         btn_speak = QPushButton("🎤 Test Voice Output")

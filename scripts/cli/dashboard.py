@@ -12,20 +12,17 @@ Attention-friendly TUI with multiple synchronized views:
 
 import asyncio
 import json
-from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from pathlib import Path
 
-import yaml
 import websockets
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import Header, Footer, Static, Tree, RichLog, Input, DataTable
-from textual.reactive import reactive
-from textual.binding import Binding
-from rich.text import Text
+import yaml
 from rich.panel import Panel
-from rich.table import Table
+from rich.text import Text
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Container
+from textual.widgets import DataTable, Footer, Header, Input, RichLog, Static, Tree
 
 from modules.docker_monitor import DockerMonitor
 
@@ -55,7 +52,7 @@ class ChatPane(Static):
     def __init__(self, server_url: str = "ws://localhost:8765"):
         super().__init__()
         self.server_url = server_url
-        self.websocket: Optional[websockets.WebSocketClientProtocol] = None
+        self.websocket: websockets.WebSocketClientProtocol | None = None
         self.messages = []
 
     async def on_mount(self):
@@ -93,7 +90,7 @@ class ChatPane(Static):
         try:
             dt = datetime.fromisoformat(timestamp)
             time_str = dt.strftime("%H:%M:%S")
-        except:
+        except (ValueError, AttributeError):
             time_str = "??:??:??"
 
         # Get color and emoji
@@ -322,7 +319,7 @@ class FifthSymphonyDashboard(App):
     - Ctrl+R: Refresh directory tree
     """
 
-    chat_websocket: Optional[websockets.WebSocketClientProtocol] = None
+    chat_websocket: websockets.WebSocketClientProtocol | None = None
 
     CSS = """
     Screen {

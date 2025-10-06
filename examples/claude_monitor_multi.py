@@ -12,24 +12,23 @@ Features:
 - Real-time activity tracking across all projects
 """
 
-import sys
 import signal
+import sys
 import time
-from pathlib import Path
+from collections import defaultdict, deque
 from datetime import datetime
-from collections import deque, defaultdict
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from rich.align import Align
 from rich.console import Console
-from rich.live import Live
 from rich.layout import Layout
+from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.align import Align
-from rich.columns import Columns
 
 from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEventType
 
@@ -139,13 +138,13 @@ class MultiProjectMonitor:
 
         discovered = []
         for session_dir in self.claude_projects_dir.iterdir():
-            if session_dir.is_dir() and not session_dir.name.startswith('.'):
+            if session_dir.is_dir() and not session_dir.name.startswith("."):
                 # Check if there are any .jsonl files (active sessions)
                 jsonl_files = list(session_dir.glob("*.jsonl"))
                 if jsonl_files:
                     # Extract project name from directory name
                     # Format: -Users-username-path-to-project
-                    parts = session_dir.name.split('-')
+                    parts = session_dir.name.split("-")
                     if len(parts) > 3:
                         project_name = parts[-1]  # Last part is usually project name
                     else:

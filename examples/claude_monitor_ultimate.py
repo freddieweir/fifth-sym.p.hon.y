@@ -18,25 +18,30 @@ Keybindings:
 - Ctrl+T: Switch between tabs within panels
 """
 
-import sys
 import asyncio
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll, ScrollableContainer
-from textual.widgets import (
-    Header, Footer, Static, Input, Button,
-    Label, RichLog, TabbedContent, TabPane, Markdown
-)
-from textual.binding import Binding
-from textual.reactive import reactive
-
 from rich.text import Text
-from rich.panel import Panel
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Container, Horizontal, Vertical, VerticalScroll
+from textual.reactive import reactive
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    RichLog,
+    Static,
+    TabbedContent,
+    TabPane,
+)
 
 try:
     import ollama
@@ -314,8 +319,8 @@ class OllamaChat(Container):
             # Call Ollama
             response = await asyncio.to_thread(
                 ollama.chat,
-                model='llama3.2',  # Adjust model as needed
-                messages=[{'role': 'user', 'content': message}]
+                model="llama3.2",  # Adjust model as needed
+                messages=[{"role": "user", "content": message}]
             )
 
             # Remove thinking indicator
@@ -325,7 +330,7 @@ class OllamaChat(Container):
             chat = self.query_one("#ollama_messages", ChatMessages)
             timestamp = datetime.now().strftime("%H:%M:%S")
 
-            response_text = response['message']['content']
+            response_text = response["message"]["content"]
             response_msg = Static(f"[{timestamp}] [bold green]Ollama:[/] {response_text}")
             chat.mount(response_msg)
 
@@ -471,7 +476,7 @@ class ClaudeMonitorUltimate(App):
 
         projects = []
         for session_dir in claude_dir.iterdir():
-            if session_dir.is_dir() and not session_dir.name.startswith('.'):
+            if session_dir.is_dir() and not session_dir.name.startswith("."):
                 # Check for .jsonl files
                 jsonl_files = list(session_dir.glob("*.jsonl"))
                 if jsonl_files:
@@ -479,7 +484,7 @@ class ClaudeMonitorUltimate(App):
                     most_recent = max(f.stat().st_mtime for f in jsonl_files)
 
                     # Extract project name (get last 2 parts for better names)
-                    parts = session_dir.name.split('-')
+                    parts = session_dir.name.split("-")
                     if len(parts) > 4:
                         # Take last 2 parts: repos/fifth-symphony
                         project_name = f"{parts[-2]}/{parts[-1]}"

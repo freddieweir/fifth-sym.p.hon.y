@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.folder_manager import FolderManager, FileEvent
+from modules.folder_manager import FileEvent, FolderManager
 
 
 def on_file_event(event: FileEvent):
@@ -43,7 +43,7 @@ async def main():
         manager.add_folder("downloads", downloads)
         print(f"✅ Added: {downloads}")
     else:
-        print(f"⚠️  Downloads folder not found")
+        print("⚠️  Downloads folder not found")
         return
 
     # Get folder summary
@@ -58,7 +58,7 @@ async def main():
     print(f"💾 Total Size: {manager.format_size(summary.total_size)}")
 
     # File types
-    print(f"\n📝 File Types (Top 10):")
+    print("\n📝 File Types (Top 10):")
     sorted_types = sorted(
         summary.file_types.items(),
         key=lambda x: x[1],
@@ -93,7 +93,7 @@ async def main():
             print(f"  {path.name} ({size})")
 
     # Find files demo
-    print(f"\n🔍 Finding PDF files...")
+    print("\n🔍 Finding PDF files...")
     pdfs = await manager.find_files("downloads", "*.pdf", max_results=10)
     print(f"Found {len(pdfs)} PDF files:")
     for pdf in pdfs[:5]:
@@ -101,7 +101,7 @@ async def main():
         print(f"  {pdf.name} ({size})")
 
     # Watch folder for changes
-    print(f"\n👀 Starting folder watch...")
+    print("\n👀 Starting folder watch...")
     print("  (Create/modify files in Downloads to see events)")
     print("  (Press Ctrl+C to stop)")
 

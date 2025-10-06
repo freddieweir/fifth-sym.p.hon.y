@@ -117,7 +117,7 @@ def chat_client(username, server):
     """
     from modules.chat.chat_client import main as client_main
 
-    console.print(f"[bold magenta]🎵 Fifth Symphony Chat Client[/bold magenta]")
+    console.print("[bold magenta]🎵 Fifth Symphony Chat Client[/bold magenta]")
     console.print(f"   Connecting to {server}")
     console.print(f"   Username: {username}")
     console.print()
@@ -139,7 +139,7 @@ def mcp_chat():
     from modules.mcp.chat_tool import main as mcp_main
 
     console.print("[bold magenta]🎵 Fifth Symphony MCP Chat Tool[/bold magenta]")
-    console.print(f"   Starting MCP server for Claude Code integration")
+    console.print("   Starting MCP server for Claude Code integration")
     console.print()
 
     asyncio.run(mcp_main())
@@ -156,8 +156,8 @@ def status():
     - YubiKey session
     - 1Password session
     """
-    import subprocess
     import socket
+    import subprocess
 
     console.print("[bold magenta]🎵 Fifth Symphony Status[/bold magenta]")
     console.print()
@@ -185,7 +185,7 @@ def status():
             timeout=5
         )
         if result.returncode == 0:
-            container_count = len([l for l in result.stdout.strip().split("\n") if l])
+            container_count = len([line for line in result.stdout.strip().split("\n") if line])
             console.print(f"✅ Docker: [green]{container_count} containers running[/green]")
         else:
             console.print("❌ Docker: [red]Not available[/red]")

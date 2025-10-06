@@ -11,10 +11,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionResponse
-from modules.voice_handler import VoiceHandler
 from modules.onepassword_manager import OnePasswordManager
 from modules.response_voice_adapter import ResponseVoiceAdapter
+from modules.voice_handler import VoiceHandler
+from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionResponse
 
 
 async def permission_callback(request):
@@ -101,25 +101,25 @@ retries: 3
         print(f"{'='*60}\n")
 
         print("📥 Original Response:")
-        print(test['response'])
+        print(test["response"])
         print()
 
         # Process through voice adapter
         adapter = ResponseVoiceAdapter()
-        parsed = adapter.parse_response(test['response'])
+        parsed = adapter.parse_response(test["response"])
 
         print("🎤 Voice-Friendly Version:")
         print(parsed.voice)
         print()
 
-        print(f"📊 Analysis:")
+        print("📊 Analysis:")
         print(f"  - Complexity: {parsed.complexity_score}/10")
         print(f"  - Has code: {parsed.has_code}")
         print(f"  - Code summary: {parsed.code_summary or 'N/A'}")
         print(f"  - Should voice: {adapter.should_voice_response(parsed)}")
 
         # Process through permission hook
-        await voice_hook.on_response(test['response'])
+        await voice_hook.on_response(test["response"])
 
         await asyncio.sleep(1)
 
