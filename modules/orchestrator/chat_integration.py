@@ -74,7 +74,9 @@ class OrchestratorChatClient:
         except Exception as e:
             logger.error(f"Error posting message: {e}")
 
-    async def announce_permission_request(self, action: str, risk_level: str, agent: str = "Claude Code"):
+    async def announce_permission_request(
+        self, action: str, risk_level: str, agent: str = "Claude Code"
+    ):
         """
         Announce permission request to chat.
 
@@ -83,12 +85,7 @@ class OrchestratorChatClient:
             risk_level: Risk level (LOW/MEDIUM/HIGH/CRITICAL)
             agent: Agent requesting permission
         """
-        risk_emoji = {
-            "LOW": "🟢",
-            "MEDIUM": "🟡",
-            "HIGH": "🟠",
-            "CRITICAL": "🔴"
-        }
+        risk_emoji = {"LOW": "🟢", "MEDIUM": "🟡", "HIGH": "🟠", "CRITICAL": "🔴"}
 
         emoji = risk_emoji.get(risk_level, "⚠️")
         message = f"{emoji} Permission requested: {action} (Risk: {risk_level}) by {agent}"

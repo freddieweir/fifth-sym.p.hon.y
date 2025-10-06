@@ -179,10 +179,7 @@ def status():
     # Check Docker
     try:
         result = subprocess.run(
-            ["docker", "ps", "--format", "{{.Names}}"],
-            capture_output=True,
-            text=True,
-            timeout=5
+            ["docker", "ps", "--format", "{{.Names}}"], capture_output=True, text=True, timeout=5
         )
         if result.returncode == 0:
             container_count = len([line for line in result.stdout.strip().split("\n") if line])
@@ -201,12 +198,7 @@ def status():
 
     # Check 1Password
     try:
-        result = subprocess.run(
-            ["op", "whoami"],
-            capture_output=True,
-            text=True,
-            timeout=2
-        )
+        result = subprocess.run(["op", "whoami"], capture_output=True, text=True, timeout=2)
         if result.returncode == 0:
             console.print("✅ 1Password: [green]Signed in[/green]")
         else:

@@ -20,7 +20,7 @@ from modules.visual_novel_widget import AvatarState, VisualNovelWidget
 def main():
     """Run avatar demo."""
     print("🎨 Fifth Symphony - Avatar System Demo")
-    print("="*60)
+    print("=" * 60)
 
     app = QApplication(sys.argv)
 
@@ -46,11 +46,11 @@ def main():
         ("Microphone Recording", AvatarState.LISTENING, [("mic", True, True)]),
         ("AI Processing", AvatarState.PROCESSING, [("processing", True, True)]),
         ("Error State", AvatarState.ERROR, [("error", True, True)]),
-        ("Multiple LEDs", AvatarState.IDLE, [
-            ("voice", True, False),
-            ("mic", True, False),
-            ("processing", True, False)
-        ])
+        (
+            "Multiple LEDs",
+            AvatarState.IDLE,
+            [("voice", True, False), ("mic", True, False), ("processing", True, False)],
+        ),
     ]
 
     current_index = [0]
@@ -86,15 +86,15 @@ def main():
     # Emotion demo
     def demo_emotions():
         """Demonstrate emotion detection."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🤖 EMOTION DETECTION DEMO")
-        print("="*60)
+        print("=" * 60)
 
         test_messages = [
             "Success! Deployment complete!",
             "Error: Connection failed.",
             "Wow! Found something amazing!",
-            "Analyzing repository structure..."
+            "Analyzing repository structure...",
         ]
 
         for msg in test_messages:

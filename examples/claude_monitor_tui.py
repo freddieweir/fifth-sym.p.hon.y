@@ -51,7 +51,7 @@ class TUIMonitor:
             "files_edited": 0,
             "bash_commands": 0,
             "web_fetches": 0,
-            "assistant_responses": 0
+            "assistant_responses": 0,
         }
 
         self.start_time = datetime.now()
@@ -115,11 +115,20 @@ class TUIMonitor:
         """Start monitoring Claude Code sessions."""
         if session_dir is None:
             # Auto-detect session directory
-            session_dir = Path.home() / ".claude" / "projects" / "-path-to-git-internal-repos-project-name"
+            session_dir = (
+                Path.home()
+                / ".claude"
+                / "projects"
+                / "-path-to-git-internal-repos-project-name"
+            )
 
         if not session_dir.exists():
-            self.console.print(f"[bold red]❌ Session directory not found:[/bold red] {session_dir}")
-            self.console.print("   Make sure Claude Code has been used in this project at least once!")
+            self.console.print(
+                f"[bold red]❌ Session directory not found:[/bold red] {session_dir}"
+            )
+            self.console.print(
+                "   Make sure Claude Code has been used in this project at least once!"
+            )
             return False
 
         self.monitor.start_monitoring(session_dir, "Fifth Symphony")
@@ -146,11 +155,7 @@ class TUIMonitor:
         header_text.append("Claude Code Monitor", style="bold white")
         header_text.append(f"\nRuntime: {hours:02d}:{minutes:02d}:{seconds:02d}", style="dim")
 
-        return Panel(
-            Align.center(header_text),
-            style="cyan",
-            border_style="bright_cyan"
-        )
+        return Panel(Align.center(header_text), style="cyan", border_style="bright_cyan")
 
     def create_stats_panel(self) -> Panel:
         """Create statistics panel."""
@@ -172,10 +177,7 @@ class TUIMonitor:
         table.add_row("📊 Total Events", str(total), style="bold green")
 
         return Panel(
-            table,
-            title="[bold cyan]📊 Statistics[/bold cyan]",
-            border_style="cyan",
-            padding=(1, 2)
+            table, title="[bold cyan]📊 Statistics[/bold cyan]", border_style="cyan", padding=(1, 2)
         )
 
     def create_activity_panel(self) -> Panel:
@@ -188,7 +190,7 @@ class TUIMonitor:
                 # Truncate long messages
                 max_msg_len = 60
                 if len(message) > max_msg_len:
-                    message = message[:max_msg_len-3] + "..."
+                    message = message[: max_msg_len - 3] + "..."
 
                 content.append(f"[{timestamp}] ", style="dim")
                 content.append(f"{icon} ", style=style)
@@ -198,7 +200,7 @@ class TUIMonitor:
             content,
             title="[bold cyan]📋 Activity Log[/bold cyan]",
             border_style="cyan",
-            padding=(1, 2)
+            padding=(1, 2),
         )
 
     def create_session_panel(self) -> Panel:
@@ -233,7 +235,7 @@ class TUIMonitor:
             table,
             title="[bold cyan]🔍 Session Info[/bold cyan]",
             border_style="cyan",
-            padding=(1, 2)
+            padding=(1, 2),
         )
 
     def create_footer(self) -> Panel:
@@ -243,11 +245,7 @@ class TUIMonitor:
         footer_text.append("Ctrl+C", style="bold yellow")
         footer_text.append(" to stop monitoring", style="dim")
 
-        return Panel(
-            Align.center(footer_text),
-            style="dim",
-            border_style="dim"
-        )
+        return Panel(Align.center(footer_text), style="dim", border_style="dim")
 
     def create_layout(self) -> Layout:
         """Create the main layout."""
@@ -255,21 +253,15 @@ class TUIMonitor:
 
         # Main structure
         layout.split_column(
-            Layout(name="header", size=4),
-            Layout(name="body"),
-            Layout(name="footer", size=3)
+            Layout(name="header", size=4), Layout(name="body"), Layout(name="footer", size=3)
         )
 
         # Body split into left and right
-        layout["body"].split_row(
-            Layout(name="left", ratio=2),
-            Layout(name="right", ratio=1)
-        )
+        layout["body"].split_row(Layout(name="left", ratio=2), Layout(name="right", ratio=1))
 
         # Left side split into activity and session
         layout["left"].split_column(
-            Layout(name="activity", ratio=3),
-            Layout(name="session", size=9)
+            Layout(name="activity", ratio=3), Layout(name="session", size=9)
         )
 
         # Right side is stats

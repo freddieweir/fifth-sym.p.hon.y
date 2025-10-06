@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PromptTemplate:
     """Represents a prompt template from 1Password"""
+
     name: str
     category: str  # permission_request, risk_warning, approval_response, etc.
     template: str
@@ -52,12 +53,7 @@ class PromptManager:
             "system_status": "Fifth Symphony Prompts - System Status",
         }
 
-    async def get_prompt(
-        self,
-        category: str,
-        prompt_key: str,
-        **format_args
-    ) -> str:
+    async def get_prompt(self, category: str, prompt_key: str, **format_args) -> str:
         """
         Retrieve and format a prompt from 1Password.
 
@@ -118,15 +114,10 @@ class PromptManager:
             # Retrieve from 1Password
             # Prompts are stored as JSON in a single secure note per category
             result = subprocess.run(
-                [
-                    "op", "item", "get",
-                    item_name,
-                    "--vault", self.vault,
-                    "--format", "json"
-                ],
+                ["op", "item", "get", item_name, "--vault", self.vault, "--format", "json"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
 
             item_data = json.loads(result.stdout)
@@ -223,7 +214,7 @@ class PromptManager:
             ["op", "item", "get", item_name, "--vault", self.vault, "--format", "json"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
 
         item_data = json.loads(result.stdout)

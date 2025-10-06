@@ -48,11 +48,11 @@ class SystemHUD(Widget):
 
         # LED status indicators (macOS/iOS-style)
         self.led_status = {
-            "voice_active": False,      # 🔵 Blue - Voice speaking
-            "mic_active": False,         # 🟢 Green - Microphone recording
-            "processing": False,         # 🟡 Yellow - AI processing
-            "error": False,             # 🔴 Red - Error state
-            "screen_share": False,      # 🟣 Purple - Screen sharing / special state
+            "voice_active": False,  # 🔵 Blue - Voice speaking
+            "mic_active": False,  # 🟢 Green - Microphone recording
+            "processing": False,  # 🟡 Yellow - AI processing
+            "error": False,  # 🔴 Red - Error state
+            "screen_share": False,  # 🟣 Purple - Screen sharing / special state
         }
 
     def update_model(self, name: str, context_used: int, context_max: int):
@@ -129,9 +129,7 @@ class SystemHUD(Widget):
 
         # Model Status
         model_bar = self._create_progress_bar(
-            "MODEL CONTEXT",
-            self.model_context,
-            self._parse_context_percentage()
+            "MODEL CONTEXT", self.model_context, self._parse_context_percentage()
         )
 
         # Voice Status
@@ -147,9 +145,7 @@ class SystemHUD(Widget):
         # Battery
         battery_icon = "🔌" if self.is_charging else "🔋"
         battery_bar = self._create_progress_bar(
-            f"BATTERY {battery_icon}",
-            f"{self.battery_level}%",
-            self.battery_level
+            f"BATTERY {battery_icon}", f"{self.battery_level}%", self.battery_level
         )
 
         # Active Tasks
@@ -163,7 +159,7 @@ class SystemHUD(Widget):
         # Row 1: Model + Voice
         hud_table.add_row(
             Text(f"🧠 {self.model_name}", style="bold cyan"),
-            Text(f"🎤 {self.voice_name}", style="bold magenta")
+            Text(f"🎤 {self.voice_name}", style="bold magenta"),
         )
 
         # Row 2: Context + Status
@@ -187,7 +183,7 @@ class SystemHUD(Widget):
             hud_table,
             title=f"[bold green]⚡ FIFTH SYMPHONY HUD[/bold green]  {led_display}  {datetime.now().strftime('%H:%M:%S')}",
             border_style="green",
-            padding=(0, 1)
+            padding=(0, 1),
         )
 
     def _parse_context_percentage(self) -> float:
@@ -225,7 +221,7 @@ class SystemHUD(Widget):
             "Active": "🟢",
             "Processing": "🟡",
             "Error": "🔴",
-            "Starting": "🔵"
+            "Starting": "🔵",
         }
 
         emoji = status_emoji.get(status, "⚪")
@@ -292,7 +288,7 @@ class CompactHUD(Widget):
         """Render compact HUD."""
         return Text(
             f"🎮 Model: {self.model} | Status: {self.status} | Voice: {self.voice}",
-            style="bold green on black"
+            style="bold green on black",
         )
 
 

@@ -20,8 +20,13 @@ from typing import Optional, Dict
 from enum import Enum
 
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QHBoxLayout,
-    QFrame, QPushButton, QSizePolicy
+    QWidget,
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QFrame,
+    QPushButton,
+    QSizePolicy,
 )
 from PySide6.QtCore import Qt, QTimer, Signal, Slot, QSize
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPen
@@ -31,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 class AvatarState(Enum):
     """Avatar display states."""
+
     IDLE = "idle"
     TALKING = "talking"
     LISTENING = "listening"
@@ -40,12 +46,13 @@ class AvatarState(Enum):
 
 class LEDColor(Enum):
     """LED indicator colors (matches HUD)."""
-    BLUE = "#0066FF"      # Voice speaking
-    GREEN = "#00FF66"     # Microphone recording
-    YELLOW = "#FFCC00"    # AI processing
-    RED = "#FF3333"       # Error state
-    PURPLE = "#9933FF"    # Special state
-    OFF = "#333333"       # LED off
+
+    BLUE = "#0066FF"  # Voice speaking
+    GREEN = "#00FF66"  # Microphone recording
+    YELLOW = "#FFCC00"  # AI processing
+    RED = "#FF3333"  # Error state
+    PURPLE = "#9933FF"  # Special state
+    OFF = "#333333"  # LED off
 
 
 class LEDIndicator(QWidget):
@@ -136,10 +143,7 @@ class VisualNovelWidget(QWidget):
     led_changed = Signal(LEDColor)
 
     def __init__(
-        self,
-        assets_path: Optional[Path] = None,
-        always_on_top: bool = False,
-        parent=None
+        self, assets_path: Optional[Path] = None, always_on_top: bool = False, parent=None
     ):
         super().__init__(parent)
 
@@ -162,11 +166,7 @@ class VisualNovelWidget(QWidget):
 
         # Window flags
         if always_on_top:
-            self.setWindowFlags(
-                Qt.WindowStaysOnTopHint |
-                Qt.FramelessWindowHint |
-                Qt.Tool
-            )
+            self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
 
     def _setup_ui(self):
         """Setup user interface."""
@@ -324,7 +324,7 @@ class VisualNovelWidget(QWidget):
         painter.drawText(
             pixmap.rect(),
             Qt.AlignCenter,
-            f"{state.upper()}\n\nPlace image at:\nassets/visual_novel/{state}.png"
+            f"{state.upper()}\n\nPlace image at:\nassets/visual_novel/{state}.png",
         )
 
         painter.end()
@@ -353,9 +353,7 @@ class VisualNovelWidget(QWidget):
 
             # Scale to fit while preserving aspect ratio
             scaled_pixmap = pixmap.scaled(
-                self.image_label.size(),
-                Qt.KeepAspectRatio,
-                Qt.SmoothTransformation
+                self.image_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
 
             self.image_label.setPixmap(scaled_pixmap)
@@ -366,7 +364,7 @@ class VisualNovelWidget(QWidget):
             AvatarState.TALKING: "Speaking...",
             AvatarState.LISTENING: "Listening...",
             AvatarState.PROCESSING: "Thinking...",
-            AvatarState.ERROR: "Error occurred"
+            AvatarState.ERROR: "Error occurred",
         }
 
         self.status_label.setText(status_texts.get(self.current_state, "Unknown"))
@@ -390,7 +388,7 @@ class VisualNovelWidget(QWidget):
                     "mic": LEDColor.GREEN,
                     "processing": LEDColor.YELLOW,
                     "error": LEDColor.RED,
-                    "special": LEDColor.PURPLE
+                    "special": LEDColor.PURPLE,
                 }
                 color = colors.get(led_name, LEDColor.OFF)
                 led.set_color(color, pulsing=pulsing)

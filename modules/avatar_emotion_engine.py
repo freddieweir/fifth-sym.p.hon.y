@@ -22,16 +22,17 @@ class Emotion(Enum):
 
     Each emotion maps to a specific avatar image in the emotions/ directory.
     """
-    NEUTRAL = "neutral"        # Default state
-    HAPPY = "happy"           # Success, completion, positive feedback
-    SAD = "sad"               # Errors, failures, problems
-    SURPRISED = "surprised"    # Unexpected events, discoveries
-    THINKING = "thinking"      # Deep processing, complex queries
-    EXCITED = "excited"        # New downloads, achievements
-    CONFUSED = "confused"      # Unclear input, need clarification
-    WORRIED = "worried"        # Warnings, potential issues
-    PROUD = "proud"           # Major accomplishments
-    CALM = "calm"             # Meditation, waiting states
+
+    NEUTRAL = "neutral"  # Default state
+    HAPPY = "happy"  # Success, completion, positive feedback
+    SAD = "sad"  # Errors, failures, problems
+    SURPRISED = "surprised"  # Unexpected events, discoveries
+    THINKING = "thinking"  # Deep processing, complex queries
+    EXCITED = "excited"  # New downloads, achievements
+    CONFUSED = "confused"  # Unclear input, need clarification
+    WORRIED = "worried"  # Warnings, potential issues
+    PROUD = "proud"  # Major accomplishments
+    CALM = "calm"  # Meditation, waiting states
 
 
 @dataclass
@@ -44,6 +45,7 @@ class EmotionScore:
         confidence: Confidence level (0.0-1.0)
         triggers: What triggered this emotion
     """
+
     emotion: Emotion
     confidence: float
     triggers: List[str]
@@ -65,61 +67,61 @@ class AvatarEmotionEngine:
         Emotion.HAPPY: [
             r"\b(success|complete|done|finished|ready|great|perfect|excellent)\b",
             r"✅|✓",
-            r"\b(deployed|created|built|implemented)\b"
+            r"\b(deployed|created|built|implemented)\b",
         ],
         Emotion.SAD: [
             r"\b(error|fail|failed|failure|problem|issue|broken)\b",
             r"❌|✗",
-            r"\b(cannot|unable|couldn't|can't)\b"
+            r"\b(cannot|unable|couldn't|can't)\b",
         ],
         Emotion.SURPRISED: [
             r"!{2,}",
             r"\b(wow|whoa|amazing|unexpected|discovered|found)\b",
-            r"\b(new|novel|unique|rare)\b"
+            r"\b(new|novel|unique|rare)\b",
         ],
         Emotion.THINKING: [
             r"\b(analyzing|processing|calculating|computing|thinking)\b",
             r"🤔",
-            r"\b(consider|evaluate|assess|review)\b"
+            r"\b(consider|evaluate|assess|review)\b",
         ],
         Emotion.EXCITED: [
             r"!",
             r"\b(new download|achievement|milestone|breakthrough)\b",
-            r"\b(awesome|fantastic|incredible)\b"
+            r"\b(awesome|fantastic|incredible)\b",
         ],
         Emotion.CONFUSED: [
             r"\?{2,}",
             r"\b(unclear|confusing|confused|unsure|uncertain)\b",
-            r"\b(what|which|clarify|explain)\b"
+            r"\b(what|which|clarify|explain)\b",
         ],
         Emotion.WORRIED: [
             r"\b(warning|caution|careful|attention|alert)\b",
             r"⚠️",
-            r"\b(might|may|could|potential)\b"
+            r"\b(might|may|could|potential)\b",
         ],
         Emotion.PROUD: [
             r"\b(accomplished|achieved|succeeded|completed successfully)\b",
             r"🎉|🎊",
-            r"\b(milestone|victory|triumph)\b"
+            r"\b(milestone|victory|triumph)\b",
         ],
         Emotion.CALM: [
             r"\b(waiting|idle|rest|calm|peaceful|quiet)\b",
-            r"\b(standby|ready|available)\b"
-        ]
+            r"\b(standby|ready|available)\b",
+        ],
     }
 
     # Emotion priorities (higher = more important)
     EMOTION_PRIORITY = {
-        Emotion.SAD: 10,        # Errors are critical
-        Emotion.WORRIED: 9,     # Warnings are important
-        Emotion.EXCITED: 8,     # Excitement overrides most
-        Emotion.SURPRISED: 7,   # Surprise is notable
-        Emotion.HAPPY: 6,       # Happiness is positive
-        Emotion.PROUD: 6,       # Pride is positive
-        Emotion.THINKING: 5,    # Thinking is moderate
-        Emotion.CONFUSED: 5,    # Confusion is moderate
-        Emotion.CALM: 3,        # Calm is low priority
-        Emotion.NEUTRAL: 1      # Neutral is default
+        Emotion.SAD: 10,  # Errors are critical
+        Emotion.WORRIED: 9,  # Warnings are important
+        Emotion.EXCITED: 8,  # Excitement overrides most
+        Emotion.SURPRISED: 7,  # Surprise is notable
+        Emotion.HAPPY: 6,  # Happiness is positive
+        Emotion.PROUD: 6,  # Pride is positive
+        Emotion.THINKING: 5,  # Thinking is moderate
+        Emotion.CONFUSED: 5,  # Confusion is moderate
+        Emotion.CALM: 3,  # Calm is low priority
+        Emotion.NEUTRAL: 1,  # Neutral is default
     }
 
     def __init__(self):
@@ -128,11 +130,7 @@ class AvatarEmotionEngine:
         self.emotion_history: List[EmotionScore] = []
         self.max_history = 10
 
-    def detect_emotion(
-        self,
-        text: str,
-        context: Optional[Dict] = None
-    ) -> EmotionScore:
+    def detect_emotion(self, text: str, context: Optional[Dict] = None) -> EmotionScore:
         """
         Detect emotion from text and context.
 
@@ -170,24 +168,17 @@ class AvatarEmotionEngine:
 
         # If no emotions detected, default to NEUTRAL
         if not scores:
-            return EmotionScore(
-                emotion=Emotion.NEUTRAL,
-                confidence=1.0,
-                triggers=["default"]
-            )
+            return EmotionScore(emotion=Emotion.NEUTRAL, confidence=1.0, triggers=["default"])
 
         # Select emotion with highest score (weighted by priority)
         best_emotion = max(
-            scores.items(),
-            key=lambda x: x[1] * (self.EMOTION_PRIORITY.get(x[0], 1) / 10)
+            scores.items(), key=lambda x: x[1] * (self.EMOTION_PRIORITY.get(x[0], 1) / 10)
         )
 
         emotion, confidence = best_emotion
 
         result = EmotionScore(
-            emotion=emotion,
-            confidence=confidence,
-            triggers=triggers.get(emotion, [])
+            emotion=emotion, confidence=confidence, triggers=triggers.get(emotion, [])
         )
 
         # Update history
@@ -202,10 +193,7 @@ class AvatarEmotionEngine:
         return result
 
     def _apply_context(
-        self,
-        scores: Dict[Emotion, float],
-        triggers: Dict[Emotion, List[str]],
-        context: Dict
+        self, scores: Dict[Emotion, float], triggers: Dict[Emotion, List[str]], context: Dict
     ):
         """
         Apply context-based adjustments to emotion scores.
@@ -247,10 +235,10 @@ class AvatarEmotionEngine:
         """
         state_emotions = {
             "idle": Emotion.NEUTRAL,
-            "talking": Emotion.HAPPY,      # Usually speaking good news
-            "listening": Emotion.CALM,     # Attentive listening
+            "talking": Emotion.HAPPY,  # Usually speaking good news
+            "listening": Emotion.CALM,  # Attentive listening
             "processing": Emotion.THINKING,
-            "error": Emotion.SAD
+            "error": Emotion.SAD,
         }
 
         return state_emotions.get(state.lower(), Emotion.NEUTRAL)
@@ -304,7 +292,7 @@ def demo():
         "Analyzing the repository structure... This might take a moment.",
         "Warning: This operation might cause data loss. Proceed with caution?",
         "I'm not sure what you mean. Could you clarify your request?",
-        "🎉 Congratulations! You've reached 1000 commits!"
+        "🎉 Congratulations! You've reached 1000 commits!",
     ]
 
     for text in test_texts:

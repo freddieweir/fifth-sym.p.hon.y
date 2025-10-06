@@ -29,8 +29,7 @@ async def get_db_pool() -> asyncpg.Pool:
 
     if _db_pool is None:
         database_url = os.getenv(
-            "DATABASE_URL",
-            "postgresql://symphony:changeme@localhost:5432/fifth_symphony"
+            "DATABASE_URL", "postgresql://symphony:changeme@localhost:5432/fifth_symphony"
         )
         _db_pool = await asyncpg.create_pool(database_url, min_size=2, max_size=10)
         logger.info("Created database connection pool")
@@ -50,27 +49,27 @@ async def list_tools() -> List[Tool]:
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "Search query (supports full-text search)"
+                        "description": "Search query (supports full-text search)",
                     },
                     "category": {
                         "type": "string",
                         "description": "Filter by category (optional)",
-                        "enum": ["personal", "technical", "project", "anime", None]
+                        "enum": ["personal", "technical", "project", "anime", None],
                     },
                     "min_importance": {
                         "type": "integer",
                         "description": "Minimum importance level (1-10, optional)",
                         "minimum": 1,
-                        "maximum": 10
+                        "maximum": 10,
                     },
                     "limit": {
                         "type": "integer",
                         "description": "Maximum number of results",
-                        "default": 10
-                    }
+                        "default": 10,
+                    },
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         ),
         Tool(
             name="get_anime_preferences",
@@ -81,19 +80,19 @@ async def list_tools() -> List[Tool]:
                     "status": {
                         "type": "string",
                         "description": "Filter by watch status",
-                        "enum": ["WATCHING", "COMPLETED", "PLANNING", "PAUSED", "DROPPED", None]
+                        "enum": ["WATCHING", "COMPLETED", "PLANNING", "PAUSED", "DROPPED", None],
                     },
                     "min_score": {
                         "type": "integer",
-                        "description": "Minimum score (0-100, optional)"
+                        "description": "Minimum score (0-100, optional)",
                     },
                     "limit": {
                         "type": "integer",
                         "description": "Maximum number of results",
-                        "default": 20
-                    }
-                }
-            }
+                        "default": 20,
+                    },
+                },
+            },
         ),
         Tool(
             name="get_voice_ids",
@@ -104,10 +103,10 @@ async def list_tools() -> List[Tool]:
                     "use_case": {
                         "type": "string",
                         "description": "Filter by use case (optional)",
-                        "enum": ["orchestrator", "narrator", "assistant", None]
+                        "enum": ["orchestrator", "narrator", "assistant", None],
                     }
-                }
-            }
+                },
+            },
         ),
         Tool(
             name="search_chat_logs",
@@ -115,27 +114,24 @@ async def list_tools() -> List[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query for chat content"
-                    },
+                    "query": {"type": "string", "description": "Search query for chat content"},
                     "role": {
                         "type": "string",
                         "description": "Filter by message role",
-                        "enum": ["user", "assistant", "system", None]
+                        "enum": ["user", "assistant", "system", None],
                     },
                     "has_thinking": {
                         "type": "boolean",
-                        "description": "Filter messages with thinking content"
+                        "description": "Filter messages with thinking content",
                     },
                     "limit": {
                         "type": "integer",
                         "description": "Maximum number of results",
-                        "default": 20
-                    }
+                        "default": 20,
+                    },
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         ),
         Tool(
             name="get_ai_personalities",
@@ -146,10 +142,10 @@ async def list_tools() -> List[Tool]:
                     "active_only": {
                         "type": "boolean",
                         "description": "Only return active personalities",
-                        "default": True
+                        "default": True,
                     }
-                }
-            }
+                },
+            },
         ),
         Tool(
             name="add_memory",
@@ -157,36 +153,33 @@ async def list_tools() -> List[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "content": {
-                        "type": "string",
-                        "description": "Memory content"
-                    },
+                    "content": {"type": "string", "description": "Memory content"},
                     "category": {
                         "type": "string",
                         "description": "Memory category",
-                        "enum": ["personal", "technical", "project", "anime"]
+                        "enum": ["personal", "technical", "project", "anime"],
                     },
                     "tags": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Tags for categorization"
+                        "description": "Tags for categorization",
                     },
                     "importance": {
                         "type": "integer",
                         "description": "Importance level (1-10)",
                         "minimum": 1,
                         "maximum": 10,
-                        "default": 5
+                        "default": 5,
                     },
                     "source": {
                         "type": "string",
                         "description": "Source of the memory",
-                        "default": "manual"
-                    }
+                        "default": "manual",
+                    },
                 },
-                "required": ["content", "category"]
-            }
-        )
+                "required": ["content", "category"],
+            },
+        ),
     ]
 
 
@@ -227,7 +220,7 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
             for row in rows:
                 result += f"**{row['category'].upper()}** (Importance: {row['importance']}/10)\n"
                 result += f"{row['content']}\n"
-                if row['tags']:
+                if row["tags"]:
                     result += f"*Tags: {', '.join(row['tags'])}*\n"
                 result += f"*Created: {row['created_at'].strftime('%Y-%m-%d')}*\n\n"
 
@@ -260,12 +253,12 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
 
             result = "## Anime Preferences\n\n"
             for row in rows:
-                title = row['title_english'] or row['title']
+                title = row["title_english"] or row["title"]
                 result += f"**{title}** ({row['status']})\n"
-                if row['score']:
+                if row["score"]:
                     result += f"Score: {row['score']}/100 | "
                 result += f"Progress: {row['progress']}/{row['episodes'] or '?'}\n"
-                if row['genres']:
+                if row["genres"]:
                     result += f"*Genres: {', '.join(row['genres'])}*\n"
                 result += "\n"
 
@@ -293,9 +286,9 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
             for row in rows:
                 result += f"**{row['name']}** ({row['use_case']})\n"
                 result += f"ID: `{row['elevenlabs_voice_id']}`\n"
-                if row['description']:
+                if row["description"]:
                     result += f"{row['description']}\n"
-                if row['personality_traits']:
+                if row["personality_traits"]:
                     result += f"*Traits: {', '.join(row['personality_traits'])}*\n"
                 result += "\n"
 
@@ -334,7 +327,7 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
             result = "## Chat Log Search Results\n\n"
             for row in rows:
                 result += f"**{row['role'].upper()} #{row['message_number']}**\n"
-                if row['timestamp']:
+                if row["timestamp"]:
                     result += f"*{row['timestamp'].strftime('%Y-%m-%d %H:%M')}*\n"
                 result += f"{row['content'][:500]}{'...' if len(row['content']) > 500 else ''}\n\n"
 
@@ -359,11 +352,11 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
             result = "## AI Personalities\n\n"
             for row in rows:
                 result += f"**{row['name']}**\n"
-                if row['description']:
+                if row["description"]:
                     result += f"{row['description']}\n"
-                if row['voice_name']:
+                if row["voice_name"]:
                     result += f"Voice: {row['voice_name']}\n"
-                if row['anime_influences']:
+                if row["anime_influences"]:
                     result += f"*Anime influences: {', '.join(row['anime_influences'])}*\n"
                 result += "\n"
 
@@ -385,10 +378,9 @@ async def call_tool(name: str, arguments: dict) -> List[TextContent]:
             async with pool.acquire() as conn:
                 row = await conn.fetchrow(sql, content, category, tags, importance, source)
 
-            return [TextContent(
-                type="text",
-                text=f"Memory added successfully with ID: {row['id']}"
-            )]
+            return [
+                TextContent(type="text", text=f"Memory added successfully with ID: {row['id']}")
+            ]
 
         else:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]

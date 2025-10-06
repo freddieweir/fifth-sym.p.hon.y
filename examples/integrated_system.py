@@ -96,21 +96,16 @@ class IntegratedFifthSymphony(QMainWindow):
         print("🎤 Initializing voice system...")
 
         # 1Password manager
-        self.op_manager = OnePasswordManager(
-            self.config.get("onepassword", {})
-        )
+        self.op_manager = OnePasswordManager(self.config.get("onepassword", {}))
 
         # Voice handler
-        self.voice_handler = VoiceHandler(
-            self.config.get("voice", {}),
-            self.op_manager
-        )
+        self.voice_handler = VoiceHandler(self.config.get("voice", {}), self.op_manager)
 
         # Voice permission hook
         self.voice_hook = VoicePermissionHook(
             voice_handler=self.voice_handler,
             config=self.config.get("voice_permission", {}),
-            permission_callback=self._voice_permission_callback
+            permission_callback=self._voice_permission_callback,
         )
 
         print("  ✅ Voice system ready")
@@ -148,7 +143,7 @@ class IntegratedFifthSymphony(QMainWindow):
         self.claude_integration = ClaudeIntegration(
             avatar=self.avatar,
             voice=self.voice_handler,
-            enable_voice=False  # Disable voice to avoid noise
+            enable_voice=False,  # Disable voice to avoid noise
         )
 
         # Start monitoring (auto-detects session directory)
@@ -161,7 +156,7 @@ class IntegratedFifthSymphony(QMainWindow):
         common_folders = {
             "downloads": Path.home() / "Downloads",
             "documents": Path.home() / "Documents",
-            "desktop": Path.home() / "Desktop"
+            "desktop": Path.home() / "Desktop",
         }
 
         for name, path in common_folders.items():
@@ -190,6 +185,7 @@ class IntegratedFifthSymphony(QMainWindow):
 
         # Status label
         from PySide6.QtWidgets import QLabel
+
         self.status_label = QLabel("System: Ready")
         self.status_label.setStyleSheet("""
             QLabel {
@@ -204,6 +200,7 @@ class IntegratedFifthSymphony(QMainWindow):
 
         # Controls
         from PySide6.QtWidgets import QHBoxLayout, QPushButton
+
         controls = QHBoxLayout()
 
         btn_speak = QPushButton("🎤 Test Voice Output")
@@ -226,6 +223,7 @@ class IntegratedFifthSymphony(QMainWindow):
 
         # Event log
         from PySide6.QtWidgets import QTextEdit
+
         self.event_log = QTextEdit()
         self.event_log.setReadOnly(True)
         self.event_log.setStyleSheet("""
@@ -248,6 +246,7 @@ class IntegratedFifthSymphony(QMainWindow):
     def log(self, message: str):
         """Add message to event log."""
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.event_log.append(f"[{timestamp}] {message}")
 
@@ -293,10 +292,7 @@ Hello! I'm Fifth Symphony, your Attention-friendly AI assistant.
 I can help you with automation, voice feedback, and file management.
 """
 
-        await self.voice_hook.on_response(
-            test_response,
-            context={"source": "demo", "test": True}
-        )
+        await self.voice_hook.on_response(test_response, context={"source": "demo", "test": True})
 
         # Reset avatar
         await asyncio.sleep(2)
@@ -368,11 +364,7 @@ I can help you with automation, voice feedback, and file management.
             self.log(f"  💾 Total size: {self.folder_manager.format_size(summary.total_size)}")
 
             # Top file types
-            sorted_types = sorted(
-                summary.file_types.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:3]
+            sorted_types = sorted(summary.file_types.items(), key=lambda x: x[1], reverse=True)[:3]
 
             self.log("  📝 Top file types:")
             for ext, count in sorted_types:
@@ -426,6 +418,7 @@ I can help you with automation, voice feedback, and file management.
 # =============================================================================
 # Main Application
 # =============================================================================
+
 
 def main():
     """Run integrated system."""

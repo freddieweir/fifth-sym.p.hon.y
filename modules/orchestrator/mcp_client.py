@@ -50,7 +50,7 @@ class MCPClient:
                 ["op", "item", "get", self.api_key_vault_item, "--fields", "credential"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -58,10 +58,7 @@ class MCPClient:
             raise
 
     async def synthesize_speech(
-        self,
-        text: str,
-        output_path: Optional[Path] = None,
-        voice_id: Optional[str] = None
+        self, text: str, output_path: Optional[Path] = None, voice_id: Optional[str] = None
     ) -> Path:
         """
         Synthesize speech using ElevenLabs MCP server.
@@ -90,22 +87,19 @@ class MCPClient:
                 "method": "tools/call",
                 "params": {
                     "name": "elevenlabs_text_to_speech",
-                    "arguments": {
-                        "text": text,
-                        "voice_id": voice,
-                        "output_path": str(output_path)
-                    }
+                    "arguments": {"text": text, "voice_id": voice, "output_path": str(output_path)},
                 },
-                "id": 1
+                "id": 1,
             }
 
             # Run MCP server with request
             process = await asyncio.create_subprocess_exec(
-                "uvx", "elevenlabs-mcp",
+                "uvx",
+                "elevenlabs-mcp",
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                env={"ELEVENLABS_API_KEY": api_key}
+                env={"ELEVENLABS_API_KEY": api_key},
             )
 
             stdout, stderr = await process.communicate(json.dumps(mcp_request).encode())
@@ -135,6 +129,7 @@ class MCPClient:
 
             # Play audio (macOS uses afplay, Linux uses aplay/paplay)
             import platform
+
             system = platform.system()
 
             if system == "Darwin":  # macOS
@@ -155,12 +150,7 @@ class MCPClient:
             self.logger.error(f"Failed to speak text: {e}")
             # Don't raise - voice is nice-to-have, not critical
 
-    async def speak_permission_request(
-        self,
-        action: str,
-        risk_level: str,
-        agent: str
-    ) -> None:
+    async def speak_permission_request(self, action: str, risk_level: str, agent: str) -> None:
         """
         Speak permission request with appropriate tone.
 

@@ -48,18 +48,15 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "message": {
-                        "type": "string",
-                        "description": "The message to post to chat"
-                    },
+                    "message": {"type": "string", "description": "The message to post to chat"},
                     "username": {
                         "type": "string",
                         "description": "Display name (Nazarick-Agent, Code-Assistant, VM-Claude)",
-                        "default": "Nazarick-Agent"
-                    }
+                        "default": "Nazarick-Agent",
+                    },
                 },
-                "required": ["message"]
-            }
+                "required": ["message"],
+            },
         )
     ]
 
@@ -79,23 +76,18 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             ws = await _connect_to_chat()
 
             # Send message
-            chat_message = {
-                "username": username,
-                "content": message
-            }
+            chat_message = {"username": username, "content": message}
             await ws.send(json.dumps(chat_message))
 
-            return [TextContent(
-                type="text",
-                text=f"Message posted to Fifth Symphony chat as {username}"
-            )]
+            return [
+                TextContent(
+                    type="text", text=f"Message posted to Fifth Symphony chat as {username}"
+                )
+            ]
 
         except Exception as e:
             logger.error(f"Error posting to chat: {e}")
-            return [TextContent(
-                type="text",
-                text=f"Error posting to chat: {str(e)}"
-            )]
+            return [TextContent(type="text", text=f"Error posting to chat: {str(e)}")]
 
     return [TextContent(type="text", text=f"Unknown tool: {name}")]
 

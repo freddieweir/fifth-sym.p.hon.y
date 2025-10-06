@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AnimeEntry:
     """Represents an anime entry"""
+
     id: int
     title: str
     status: str  # CURRENT, PLANNING, COMPLETED, DROPPED, PAUSED
@@ -28,6 +29,7 @@ class AnimeEntry:
 @dataclass
 class MangaEntry:
     """Represents a manga entry"""
+
     id: int
     title: str
     status: str
@@ -75,14 +77,18 @@ class AniListClient:
         try:
             result = subprocess.run(
                 [
-                    "op", "item", "get",
+                    "op",
+                    "item",
+                    "get",
                     self.api_token_item,
-                    "--vault", self.vault,
-                    "--fields", "credential"
+                    "--vault",
+                    self.vault,
+                    "--fields",
+                    "credential",
                 ],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
 
             self._token = result.stdout.strip()
@@ -93,7 +99,9 @@ class AniListClient:
             self.logger.error(f"Failed to retrieve API token: {e.stderr}")
             raise RuntimeError(f"Cannot access AniList API token: {e.stderr}") from e
 
-    async def _query(self, query: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def _query(
+        self, query: str, variables: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Execute GraphQL query against AniList API.
 
@@ -112,17 +120,10 @@ class AniListClient:
             "Accept": "application/json",
         }
 
-        payload = {
-            "query": query,
-            "variables": variables or {}
-        }
+        payload = {"query": query, "variables": variables or {}}
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(
-                self.API_URL,
-                json=payload,
-                headers=headers
-            ) as response:
+            async with session.post(self.API_URL, json=payload, headers=headers) as response:
                 if response.status != 200:
                     error_text = await response.text()
                     self.logger.error(f"AniList API error: {error_text}")
@@ -132,9 +133,7 @@ class AniListClient:
                 return data
 
     async def get_user_anime_list(
-        self,
-        username: str,
-        status: Optional[str] = None
+        self, username: str, status: Optional[str] = None
     ) -> List[AnimeEntry]:
         """
         Get user's anime list.
@@ -185,14 +184,16 @@ class AniListClient:
                 title_data = media.get("title", {})
                 title = title_data.get("english") or title_data.get("romaji")
 
-                entries.append(AnimeEntry(
-                    id=entry.get("id"),
-                    title=title,
-                    status=entry.get("status"),
-                    progress=entry.get("progress", 0),
-                    score=entry.get("score"),
-                    episodes=media.get("episodes")
-                ))
+                entries.append(
+                    AnimeEntry(
+                        id=entry.get("id"),
+                        title=title,
+                        status=entry.get("status"),
+                        progress=entry.get("progress", 0),
+                        score=entry.get("score"),
+                        episodes=media.get("episodes"),
+                    )
+                )
 
         return entries
 
@@ -209,10 +210,7 @@ class AniListClient:
         return await self.get_user_anime_list(username, status="CURRENT")
 
     async def update_anime_progress(
-        self,
-        media_id: int,
-        progress: int,
-        score: Optional[float] = None
+        self, media_id: int, progress: int, score: Optional[float] = None
     ) -> Dict[str, Any]:
         """
         Update anime progress.
@@ -236,10 +234,7 @@ class AniListClient:
         }
         """
 
-        variables = {
-            "mediaId": media_id,
-            "progress": progress
-        }
+        variables = {"mediaId": media_id, "progress": progress}
 
         if score is not None:
             variables["score"] = score * 10  # AniList uses 0-100 scale
@@ -343,4 +338,5 @@ async def example_usage():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(example_usage())

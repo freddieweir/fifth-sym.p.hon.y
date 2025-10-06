@@ -22,15 +22,18 @@ except ImportError:
     # Fallback to standard library with warning
     # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
     from xml import etree  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
+
     # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
-    from xml.etree.ElementTree import parse as safe_parse  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
+    from xml.etree.ElementTree import (
+        parse as safe_parse,
+    )  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
 
     ElementTree = etree.ElementTree
     warnings.warn(
         "defusedxml not installed. Using standard xml library. "
         "Install defusedxml for better security: pip install defusedxml",
         UserWarning,
-        stacklevel=2
+        stacklevel=2,
     )
 
 
@@ -97,7 +100,7 @@ class OPMLParser:
             "xml_url": xml_url,
             "html_url": outline.get("htmlUrl", ""),
             "description": outline.get("description", ""),
-            "type": outline.get("type", "rss")
+            "type": outline.get("type", "rss"),
         }
 
 
@@ -105,8 +108,12 @@ class TextFormatter:
     """Formats parsed OPML data into readable text."""
 
     @staticmethod
-    def format_feeds(title: str, categories: dict[str, list[dict]],
-                     show_urls: bool = True, show_descriptions: bool = True) -> str:
+    def format_feeds(
+        title: str,
+        categories: dict[str, list[dict]],
+        show_urls: bool = True,
+        show_descriptions: bool = True,
+    ) -> str:
         """Format feeds into readable text output."""
         lines = []
 
@@ -192,7 +199,9 @@ def main():
         if output_file:
             output_path = Path(output_file)
             output_path.write_text(output, encoding="utf-8")
-            print(f"✅ Successfully wrote {sum(len(feeds) for feeds in categories.values())} feeds to {output_file}")
+            print(
+                f"✅ Successfully wrote {sum(len(feeds) for feeds in categories.values())} feeds to {output_file}"
+            )
         else:
             print(output)
 

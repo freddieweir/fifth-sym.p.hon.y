@@ -27,11 +27,7 @@ class ShellWidget(Widget):
     """
 
     def __init__(
-        self,
-        shell_cmd: str = "/bin/zsh",
-        name: str = "shell",
-        title: str = "Shell",
-        **kwargs
+        self, shell_cmd: str = "/bin/zsh", name: str = "shell", title: str = "Shell", **kwargs
     ):
         """
         Initialize shell widget.
@@ -94,7 +90,7 @@ class ShellWidget(Widget):
                         data = os.read(self.master_fd, 1024)
                         if data:
                             # Decode and add to output
-                            text = data.decode('utf-8', errors='ignore')
+                            text = data.decode("utf-8", errors="ignore")
                             self.add_output(text)
                             self.refresh()
                     except OSError:
@@ -111,14 +107,14 @@ class ShellWidget(Widget):
     def add_output(self, text: str):
         """Add output text to buffer."""
         # Split into lines
-        lines = text.split('\n')
+        lines = text.split("\n")
 
         # Add to buffer
         self.output_lines.extend(lines)
 
         # Trim if too long
         if len(self.output_lines) > self.max_lines:
-            self.output_lines = self.output_lines[-self.max_lines:]
+            self.output_lines = self.output_lines[-self.max_lines :]
 
     async def send_command(self, command: str):
         """
@@ -130,11 +126,11 @@ class ShellWidget(Widget):
         if self.master_fd:
             try:
                 # Add newline if not present
-                if not command.endswith('\n'):
-                    command += '\n'
+                if not command.endswith("\n"):
+                    command += "\n"
 
                 # Write to shell
-                os.write(self.master_fd, command.encode('utf-8'))
+                os.write(self.master_fd, command.encode("utf-8"))
             except Exception as e:
                 self.output_lines.append(f"Send error: {e}")
 
@@ -142,7 +138,7 @@ class ShellWidget(Widget):
         """Render shell output."""
         # Join last N lines for display
         display_lines = self.output_lines[-50:]  # Show last 50 lines
-        output = '\n'.join(display_lines)
+        output = "\n".join(display_lines)
 
         return Text(output, style="white on black")
 
@@ -169,11 +165,7 @@ class OllamaShellWidget(ShellWidget):
     """
 
     def __init__(self, **kwargs):
-        super().__init__(
-            title="🧠 Ollama Analysis Shell",
-            name="ollama-shell",
-            **kwargs
-        )
+        super().__init__(title="🧠 Ollama Analysis Shell", name="ollama-shell", **kwargs)
 
     async def on_mount(self):
         """Start shell and set up environment."""
@@ -196,11 +188,7 @@ class UserShellWidget(ShellWidget):
     """
 
     def __init__(self, **kwargs):
-        super().__init__(
-            title="💻 Your ZSH Shell",
-            name="user-shell",
-            **kwargs
-        )
+        super().__init__(title="💻 Your ZSH Shell", name="user-shell", **kwargs)
 
     async def on_mount(self):
         """Start user shell."""

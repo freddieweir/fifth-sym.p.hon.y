@@ -50,9 +50,7 @@ class FolderSummaryWidget(Static):
     async def refresh_summary(self):
         """Refresh folder summary."""
         try:
-            self.summary = await self.folder_manager.get_folder_summary(
-                self.current_folder
-            )
+            self.summary = await self.folder_manager.get_folder_summary(self.current_folder)
             self.refresh()
         except Exception as e:
             logger.error(f"Failed to get folder summary: {e}")
@@ -68,69 +66,43 @@ class FolderSummaryWidget(Static):
         table.add_column(justify="left", style="white")
 
         # Overview
-        table.add_row(
-            "📁 Folder:",
-            str(self.summary.path.name)
-        )
-        table.add_row(
-            "📊 Total Files:",
-            str(self.summary.total_files)
-        )
-        table.add_row(
-            "💾 Total Size:",
-            self.folder_manager.format_size(self.summary.total_size)
-        )
+        table.add_row("📁 Folder:", str(self.summary.path.name))
+        table.add_row("📊 Total Files:", str(self.summary.total_files))
+        table.add_row("💾 Total Size:", self.folder_manager.format_size(self.summary.total_size))
 
         table.add_row("", "")  # Spacer
 
         # File types
-        table.add_row(
-            "📝 File Types:",
-            ""
-        )
+        table.add_row("📝 File Types:", "")
 
         # Top 5 file types
-        sorted_types = sorted(
-            self.summary.file_types.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )[:5]
+        sorted_types = sorted(self.summary.file_types.items(), key=lambda x: x[1], reverse=True)[:5]
 
         for ext, count in sorted_types:
-            table.add_row(
-                "",
-                f"  {ext}: {count} files"
-            )
+            table.add_row("", f"  {ext}: {count} files")
 
         table.add_row("", "")  # Spacer
 
         # Recent files
         if self.summary.recent_files:
-            table.add_row(
-                "🕐 Recent Files:",
-                f"{len(self.summary.recent_files)} files"
-            )
+            table.add_row("🕐 Recent Files:", f"{len(self.summary.recent_files)} files")
 
         # Old files (cleanup suggestion)
         if self.summary.old_files:
             table.add_row(
-                "🗑️  Old Files:",
-                f"{len(self.summary.old_files)} files (cleanup?)",
-                style="yellow"
+                "🗑️  Old Files:", f"{len(self.summary.old_files)} files (cleanup?)", style="yellow"
             )
 
         # Large files
         if self.summary.large_files:
             table.add_row(
-                "📦 Large Files:",
-                f"{len(self.summary.large_files)} files",
-                style="yellow"
+                "📦 Large Files:", f"{len(self.summary.large_files)} files", style="yellow"
             )
 
         return Panel(
             table,
             title=f"[bold cyan]📁 {self.current_folder.upper()} SUMMARY[/bold cyan]",
-            border_style="cyan"
+            border_style="cyan",
         )
 
     async def set_folder(self, folder_name: str):
@@ -182,12 +154,7 @@ class FolderEventsWidget(Static):
             events_text.append(f"[{time_str}] ", style="dim")
 
             # Action icon
-            action_icons = {
-                "created": "✨",
-                "modified": "📝",
-                "deleted": "🗑️",
-                "moved": "📦"
-            }
+            action_icons = {"created": "✨", "modified": "📝", "deleted": "🗑️", "moved": "📦"}
             icon = action_icons.get(event.action.value, "📄")
             events_text.append(f"{icon} ", style="white")
 
@@ -196,7 +163,7 @@ class FolderEventsWidget(Static):
                 "created": "green",
                 "modified": "yellow",
                 "deleted": "red",
-                "moved": "cyan"
+                "moved": "cyan",
             }
             color = action_colors.get(event.action.value, "white")
             events_text.append(f"{event.action.value.upper()}: ", style=color)
@@ -205,9 +172,7 @@ class FolderEventsWidget(Static):
             events_text.append(f"{event.path.name}\n", style="white")
 
         return Panel(
-            events_text,
-            title="[bold yellow]🔔 RECENT EVENTS[/bold yellow]",
-            border_style="yellow"
+            events_text, title="[bold yellow]🔔 RECENT EVENTS[/bold yellow]", border_style="yellow"
         )
 
 
@@ -238,7 +203,7 @@ class QuickAccessWidget(Static):
             ("(r) Refresh", "Refresh folder summary"),
             ("(f) Find Files", "Search for files"),
             ("(g) Organize", "Auto-organize by type"),
-            ("(c) Cleanup", "Suggest old files for cleanup")
+            ("(c) Cleanup", "Suggest old files for cleanup"),
         ]
 
         for shortcut, description in actions:
@@ -246,9 +211,7 @@ class QuickAccessWidget(Static):
             menu_text.append(f" - {description}\n", style="dim")
 
         return Panel(
-            menu_text,
-            title="[bold green]⚡ QUICK ACCESS[/bold green]",
-            border_style="green"
+            menu_text, title="[bold green]⚡ QUICK ACCESS[/bold green]", border_style="green"
         )
 
 
@@ -283,10 +246,7 @@ class FolderDashboardPane(Static):
         for name, folder_config in folders.items():
             if folder_config.get("watch", False):
                 try:
-                    self.folder_manager.start_watching(
-                        name,
-                        callback=self._on_file_event
-                    )
+                    self.folder_manager.start_watching(name, callback=self._on_file_event)
                     logger.info(f"Watching folder: {name}")
                 except Exception as e:
                     logger.error(f"Failed to watch folder {name}: {e}")
@@ -348,9 +308,7 @@ class FolderDashboardPane(Static):
         import subprocess
         import sys
 
-        folder = self.folder_manager.get_folder(
-            self.summary_widget.current_folder
-        )
+        folder = self.folder_manager.get_folder(self.summary_widget.current_folder)
 
         if folder:
             if sys.platform == "darwin":
@@ -364,8 +322,7 @@ class FolderDashboardPane(Static):
         """Auto-organize files by extension."""
         # Show preview first
         organized = await self.folder_manager.organize_by_extension(
-            self.summary_widget.current_folder,
-            dry_run=True
+            self.summary_widget.current_folder, dry_run=True
         )
 
         logger.info(f"Would organize {sum(len(files) for files in organized.values())} files")
@@ -389,10 +346,8 @@ async def demo():
         def compose(self):
             # Load config
             config = {
-                "folders": {
-                    "downloads": {"path": "~/Downloads", "watch": True}
-                },
-                "watcher": {"enabled": True}
+                "folders": {"downloads": {"path": "~/Downloads", "watch": True}},
+                "watcher": {"enabled": True},
             }
 
             manager = FolderManager(config)

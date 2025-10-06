@@ -49,7 +49,7 @@ class ProjectMonitor:
             "files_edited": 0,
             "bash_commands": 0,
             "web_fetches": 0,
-            "assistant_responses": 0
+            "assistant_responses": 0,
         }
 
         self.last_event_time = None
@@ -133,7 +133,9 @@ class MultiProjectMonitor:
     def discover_projects(self):
         """Auto-discover all Claude Code project sessions."""
         if not self.claude_projects_dir.exists():
-            self.console.print(f"[bold red]❌ Claude projects directory not found:[/bold red] {self.claude_projects_dir}")
+            self.console.print(
+                f"[bold red]❌ Claude projects directory not found:[/bold red] {self.claude_projects_dir}"
+            )
             return []
 
         discovered = []
@@ -160,7 +162,9 @@ class MultiProjectMonitor:
 
         if not projects:
             self.console.print("[bold red]❌ No Claude Code projects found![/bold red]")
-            self.console.print("   Use Claude Code in at least one project to create session files.")
+            self.console.print(
+                "   Use Claude Code in at least one project to create session files."
+            )
             return False
 
         for project_name, session_dir in projects:
@@ -188,11 +192,7 @@ class MultiProjectMonitor:
         header_text.append(f"\nMonitoring {len(self.projects)} project(s) ", style="dim")
         header_text.append(f"│ Runtime: {hours:02d}:{minutes:02d}:{seconds:02d}", style="dim")
 
-        return Panel(
-            Align.center(header_text),
-            style="cyan",
-            border_style="bright_cyan"
-        )
+        return Panel(Align.center(header_text), style="cyan", border_style="bright_cyan")
 
     def create_global_stats_panel(self) -> Panel:
         """Create global statistics panel."""
@@ -222,7 +222,7 @@ class MultiProjectMonitor:
             table,
             title="[bold cyan]📊 Global Statistics[/bold cyan]",
             border_style="cyan",
-            padding=(1, 1)
+            padding=(1, 1),
         )
 
     def create_project_panel(self, project_name: str, monitor: ProjectMonitor) -> Panel:
@@ -244,11 +244,14 @@ class MultiProjectMonitor:
                 # Truncate to fit panel
                 max_len = 35
                 if len(message) > max_len:
-                    message = message[:max_len-3] + "..."
+                    message = message[: max_len - 3] + "..."
                 content.append(f"{icon} {message}\n", style=style)
 
         # Determine border color based on activity
-        if monitor.last_event_time and (datetime.now() - monitor.last_event_time).total_seconds() < 10:
+        if (
+            monitor.last_event_time
+            and (datetime.now() - monitor.last_event_time).total_seconds() < 10
+        ):
             border_style = "green"
         else:
             border_style = "dim"
@@ -257,7 +260,7 @@ class MultiProjectMonitor:
             content,
             title=f"[bold white]🎯 {project_name}[/bold white]",
             border_style=border_style,
-            padding=(1, 1)
+            padding=(1, 1),
         )
 
     def create_footer(self) -> Panel:
@@ -270,27 +273,18 @@ class MultiProjectMonitor:
         footer_text.append("🟡 Idle ", style="yellow")
         footer_text.append("⚪ Waiting", style="dim")
 
-        return Panel(
-            Align.center(footer_text),
-            style="dim",
-            border_style="dim"
-        )
+        return Panel(Align.center(footer_text), style="dim", border_style="dim")
 
     def create_layout(self) -> Layout:
         """Create the main layout."""
         layout = Layout()
 
         layout.split_column(
-            Layout(name="header", size=4),
-            Layout(name="body"),
-            Layout(name="footer", size=3)
+            Layout(name="header", size=4), Layout(name="body"), Layout(name="footer", size=3)
         )
 
         # Split body into projects and stats
-        layout["body"].split_row(
-            Layout(name="projects", ratio=3),
-            Layout(name="stats", ratio=1)
-        )
+        layout["body"].split_row(Layout(name="projects", ratio=3), Layout(name="stats", ratio=1))
 
         # Populate header and footer
         layout["header"].update(self.create_header())
@@ -308,20 +302,14 @@ class MultiProjectMonitor:
                 layout["projects"].update(self.create_project_panel(project_name, monitor))
             elif num_projects == 2:
                 # Two projects - split vertically
-                layout["projects"].split_column(
-                    Layout(name="project_0"),
-                    Layout(name="project_1")
-                )
+                layout["projects"].split_column(Layout(name="project_0"), Layout(name="project_1"))
                 for i, (project_name, monitor) in enumerate(self.projects.items()):
                     layout["projects"][f"project_{i}"].update(
                         self.create_project_panel(project_name, monitor)
                     )
             else:
                 # Three or more - grid layout
-                layout["projects"].split_column(
-                    Layout(name="top_row"),
-                    Layout(name="bottom_row")
-                )
+                layout["projects"].split_column(Layout(name="top_row"), Layout(name="bottom_row"))
 
                 # Split rows
                 projects_list = list(self.projects.items())
@@ -358,9 +346,7 @@ class MultiProjectMonitor:
                             self.create_project_panel(project_name, monitor)
                         )
         else:
-            layout["projects"].update(
-                Panel("No active projects", style="dim", border_style="dim")
-            )
+            layout["projects"].update(Panel("No active projects", style="dim", border_style="dim"))
 
         return layout
 

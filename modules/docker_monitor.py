@@ -63,8 +63,9 @@ class DockerMonitor:
 
                 # Filter by watched patterns
                 if self.watched_containers:
-                    if not any(self._matches_pattern(name, pattern)
-                             for pattern in self.watched_containers):
+                    if not any(
+                        self._matches_pattern(name, pattern) for pattern in self.watched_containers
+                    ):
                         continue
 
                 # Get container details
@@ -75,13 +76,15 @@ class DockerMonitor:
                 if container.attrs.get("State", {}).get("Health"):
                     health = container.attrs["State"]["Health"]["Status"]
 
-                statuses.append({
-                    "name": name,
-                    "status": status,
-                    "health": health,
-                    "id": container.short_id,
-                    "image": container.image.tags[0] if container.image.tags else "unknown"
-                })
+                statuses.append(
+                    {
+                        "name": name,
+                        "status": status,
+                        "health": health,
+                        "id": container.short_id,
+                        "image": container.image.tags[0] if container.image.tags else "unknown",
+                    }
+                )
 
         except DockerException as e:
             logger.error(f"Error getting container status: {e}")
@@ -118,10 +121,7 @@ class DockerMonitor:
         return name == pattern
 
     async def stream_logs(
-        self,
-        container_name: str,
-        lines: int = 50,
-        follow: bool = True
+        self, container_name: str, lines: int = 50, follow: bool = True
     ) -> AsyncIterator[str]:
         """
         Stream logs from container.
@@ -142,11 +142,7 @@ class DockerMonitor:
             container = self.client.containers.get(container_name)
 
             # Stream logs
-            for log_line in container.logs(
-                stream=follow,
-                tail=lines,
-                timestamps=True
-            ):
+            for log_line in container.logs(stream=follow, tail=lines, timestamps=True):
                 # Decode bytes to string
                 line = log_line.decode("utf-8", errors="ignore").strip()
                 yield line

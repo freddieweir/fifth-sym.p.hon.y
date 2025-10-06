@@ -106,23 +106,13 @@ class ProjectMonitorPanel(Container):
         """Create child widgets."""
         with TabbedContent(initial="activity"):
             with TabPane("Activity", id="activity"):
-                yield ActivityLog(
-                    self.project_name,
-                    id=f"log_{self.project_name}",
-                    max_lines=100
-                )
+                yield ActivityLog(self.project_name, id=f"log_{self.project_name}", max_lines=100)
 
             with TabPane("Chat", id="chat"):
-                yield ChatWindow(
-                    f"💬 Chat: {self.project_name}",
-                    id=f"chat_{self.project_name}"
-                )
+                yield ChatWindow(f"💬 Chat: {self.project_name}", id=f"chat_{self.project_name}")
 
             with TabPane("Stats", id="stats"):
-                yield Static(
-                    self._render_stats(),
-                    id=f"stats_{self.project_name}"
-                )
+                yield Static(self._render_stats(), id=f"stats_{self.project_name}")
 
     def on_mount(self) -> None:
         """Start monitoring when mounted."""
@@ -178,11 +168,11 @@ class ProjectMonitorPanel(Container):
         return f"""
 📊 Statistics
 
-🟣 User Prompts:    {self.stats['user_prompts']}
-📖 Files Read:      {self.stats['files_read']}
-✍️  Files Written:   {self.stats['files_written']}
-✏️  Files Edited:    {self.stats['files_edited']}
-⚡ Bash Commands:   {self.stats['bash_commands']}
+🟣 User Prompts:    {self.stats["user_prompts"]}
+📖 Files Read:      {self.stats["files_read"]}
+✍️  Files Written:   {self.stats["files_written"]}
+✏️  Files Edited:    {self.stats["files_edited"]}
+⚡ Bash Commands:   {self.stats["bash_commands"]}
 
 📊 Total Events:    {total}
 """

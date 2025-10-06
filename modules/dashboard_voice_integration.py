@@ -17,7 +17,7 @@ from rich.text import Text
 from modules.voice_permission_hook import (
     VoicePermissionHook,
     VoicePermissionRequest,
-    VoicePermissionResponse
+    VoicePermissionResponse,
 )
 from modules.voice_handler import VoiceHandler
 
@@ -80,15 +80,10 @@ class VoicePermissionPrompt(Static):
         content.append("  (v) Never - Auto-deny similar\n", style="magenta")
         content.append("  (m) Mute - Mute voice system\n", style="dim")
 
-        return Panel(
-            content,
-            title="[bold]🔊 Voice System[/bold]",
-            border_style="cyan"
-        )
+        return Panel(content, title="[bold]🔊 Voice System[/bold]", border_style="cyan")
 
     async def show_permission_request(
-        self,
-        request: VoicePermissionRequest
+        self, request: VoicePermissionRequest
     ) -> VoicePermissionResponse:
         """
         Show permission request and wait for user response.
@@ -151,11 +146,7 @@ class VoiceDashboardIntegration:
     - Voice system status display
     """
 
-    def __init__(
-        self,
-        voice_handler: VoiceHandler,
-        config: Optional[dict] = None
-    ):
+    def __init__(self, voice_handler: VoiceHandler, config: Optional[dict] = None):
         """
         Initialize dashboard voice integration.
 
@@ -173,12 +164,11 @@ class VoiceDashboardIntegration:
         self.voice_hook = VoicePermissionHook(
             voice_handler=voice_handler,
             config=config,
-            permission_callback=self._permission_callback
+            permission_callback=self._permission_callback,
         )
 
     async def _permission_callback(
-        self,
-        request: VoicePermissionRequest
+        self, request: VoicePermissionRequest
     ) -> VoicePermissionResponse:
         """
         Permission callback for voice hook.
@@ -204,18 +194,12 @@ class VoiceDashboardIntegration:
             username: Message sender
         """
         # Only voice LLM responses (not user messages)
-        llm_usernames = [
-            "Fifth-Symphony",
-            "Nazarick-Agent",
-            "Code-Assistant",
-            "VM-Claude"
-        ]
+        llm_usernames = ["Fifth-Symphony", "Nazarick-Agent", "Code-Assistant", "VM-Claude"]
 
         if username in llm_usernames:
             # Process through voice hook
             await self.voice_hook.on_response(
-                message,
-                context={"username": username, "source": "dashboard_chat"}
+                message, context={"username": username, "source": "dashboard_chat"}
             )
 
     def get_permission_prompt_widget(self) -> VoicePermissionPrompt:
@@ -241,7 +225,7 @@ class VoiceDashboardIntegration:
         return {
             "muted": self.voice_hook.is_muted,
             "auto_approve_patterns": len(self.voice_hook.get_auto_approve_patterns()),
-            "complexity_threshold": self.voice_hook.complexity_threshold
+            "complexity_threshold": self.voice_hook.complexity_threshold,
         }
 
 
@@ -253,11 +237,7 @@ class VoiceIntegratedChatPane(Static):
     Extends standard ChatPane with voice output capabilities.
     """
 
-    def __init__(
-        self,
-        server_url: str,
-        voice_integration: VoiceDashboardIntegration
-    ):
+    def __init__(self, server_url: str, voice_integration: VoiceDashboardIntegration):
         super().__init__()
         self.server_url = server_url
         self.voice_integration = voice_integration

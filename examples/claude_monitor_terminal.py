@@ -32,7 +32,7 @@ class TerminalMonitor:
             "files_edited": 0,
             "bash_commands": 0,
             "web_fetches": 0,
-            "assistant_responses": 0
+            "assistant_responses": 0,
         }
         self.start_time = datetime.now()
         self._register_callbacks()
@@ -91,7 +91,12 @@ class TerminalMonitor:
         """Start monitoring Claude Code sessions."""
         if session_dir is None:
             # Auto-detect session directory
-            session_dir = Path.home() / ".claude" / "projects" / "-path-to-git-internal-repos-project-name"
+            session_dir = (
+                Path.home()
+                / ".claude"
+                / "projects"
+                / "-path-to-git-internal-repos-project-name"
+            )
 
         if not session_dir.exists():
             print(f"❌ Session directory not found: {session_dir}")

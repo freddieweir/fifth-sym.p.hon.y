@@ -58,15 +58,22 @@ class ProjectCard(Container):
 
     def _register_callbacks(self):
         """Register callbacks."""
-        self.monitor.add_callback(ClaudeEventType.USER_PROMPT, self._on_event("🟣", "User", "magenta"))
+        self.monitor.add_callback(
+            ClaudeEventType.USER_PROMPT, self._on_event("🟣", "User", "magenta")
+        )
         self.monitor.add_callback(ClaudeEventType.FILE_READ, self._on_event("📖", "Read", "cyan"))
         self.monitor.add_callback(ClaudeEventType.FILE_WRITE, self._on_event("✍️", "Write", "green"))
         self.monitor.add_callback(ClaudeEventType.FILE_EDIT, self._on_event("✏️", "Edit", "yellow"))
-        self.monitor.add_callback(ClaudeEventType.BASH_COMMAND, self._on_event("⚡", "Bash", "yellow"))
-        self.monitor.add_callback(ClaudeEventType.ASSISTANT_RESPONSE, self._on_event("🔵", "Claude", "blue"))
+        self.monitor.add_callback(
+            ClaudeEventType.BASH_COMMAND, self._on_event("⚡", "Bash", "yellow")
+        )
+        self.monitor.add_callback(
+            ClaudeEventType.ASSISTANT_RESPONSE, self._on_event("🔵", "Claude", "blue")
+        )
 
     def _on_event(self, icon: str, label: str, style: str):
         """Create event handler."""
+
         def handler(event: ClaudeEvent):
             self.event_count += 1
 
@@ -168,7 +175,7 @@ Events update in real-time as Claude works.[/dim]
 • [bold]Ctrl+Q[/bold] - Quit
 
 [dim]Scroll to see all projects ↓[/dim]""",
-                id="welcome"
+                id="welcome",
             )
 
             # Discover and show projects
@@ -178,7 +185,7 @@ Events update in real-time as Claude works.[/dim]
                 yield Static(
                     "\n\n[bold red]No Claude Code projects found[/bold red]\n\n"
                     "[dim]Use Claude Code in a project to create session files.[/dim]\n\n",
-                    classes="error"
+                    classes="error",
                 )
             else:
                 for project_name, session_dir in projects:

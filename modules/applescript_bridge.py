@@ -42,7 +42,7 @@ class AppleScriptBridge:
                 "-e",
                 script,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
 
             stdout, stderr = await result.communicate()
@@ -67,7 +67,7 @@ class AppleScriptBridge:
         Returns:
             List of event dicts with 'title', 'start', 'end'
         """
-        script = '''
+        script = """
         tell application "Calendar"
             set todayStart to (current date)
             set time of todayStart to 0
@@ -82,7 +82,7 @@ class AppleScriptBridge:
 
             return eventList
         end tell
-        '''
+        """
 
         try:
             await self.run_applescript(script)
@@ -95,11 +95,7 @@ class AppleScriptBridge:
             return []
 
     async def create_calendar_event(
-        self,
-        title: str,
-        start_time: datetime,
-        duration_minutes: int = 60,
-        notes: str = ""
+        self, title: str, start_time: datetime, duration_minutes: int = 60, notes: str = ""
     ) -> bool:
         """
         Create calendar event.
@@ -164,13 +160,10 @@ class AppleScriptBridge:
             output = await self.run_applescript(script)
             reminders = []
 
-            for line in output.split('\n'):
-                if '|' in line:
-                    name, completed = line.split('|')
-                    reminders.append({
-                        "name": name,
-                        "completed": completed == "true"
-                    })
+            for line in output.split("\n"):
+                if "|" in line:
+                    name, completed = line.split("|")
+                    reminders.append({"name": name, "completed": completed == "true"})
 
             return reminders
 
@@ -183,7 +176,7 @@ class AppleScriptBridge:
         title: str,
         list_name: str = "Fifth Symphony",
         due_date: Optional[datetime] = None,
-        notes: str = ""
+        notes: str = "",
     ) -> bool:
         """
         Create reminder.
@@ -200,7 +193,7 @@ class AppleScriptBridge:
         script_parts = [
             'tell application "Reminders"',
             f'    tell list "{list_name}"',
-            f'        set newReminder to make new reminder with properties {{name:"{title}"}}'
+            f'        set newReminder to make new reminder with properties {{name:"{title}"}}',
         ]
 
         if due_date:
@@ -210,12 +203,9 @@ class AppleScriptBridge:
         if notes:
             script_parts.append(f'        set body of newReminder to "{notes}"')
 
-        script_parts.extend([
-            '    end tell',
-            'end tell'
-        ])
+        script_parts.extend(["    end tell", "end tell"])
 
-        script = '\n'.join(script_parts)
+        script = "\n".join(script_parts)
 
         try:
             await self.run_applescript(script)
@@ -228,12 +218,7 @@ class AppleScriptBridge:
 
     # Notifications
 
-    async def send_notification(
-        self,
-        title: str,
-        message: str,
-        subtitle: str = ""
-    ):
+    async def send_notification(self, title: str, message: str, subtitle: str = ""):
         """
         Send macOS notification.
 
@@ -308,9 +293,9 @@ class AppleScriptBridge:
         Returns:
             Battery percentage (0-100)
         """
-        script = '''
+        script = """
         do shell script "pmset -g batt | grep -Eo '\\d+%' | cut -d% -f1"
-        '''
+        """
 
         try:
             output = await self.run_applescript(script)
@@ -328,9 +313,7 @@ async def main():
 
     # Send notification
     await bridge.send_notification(
-        "Fifth Symphony",
-        "AppleScript bridge is working!",
-        "System Integration"
+        "Fifth Symphony", "AppleScript bridge is working!", "System Integration"
     )
 
     # Get reminders

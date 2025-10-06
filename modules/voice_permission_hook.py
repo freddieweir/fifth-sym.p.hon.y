@@ -27,11 +27,12 @@ logger = logging.getLogger(__name__)
 
 class VoicePermissionResponse(Enum):
     """User response to voice permission request."""
-    YES = "yes"           # Speak this time
-    NO = "no"             # Don't speak this time
-    ALWAYS = "always"     # Auto-speak similar responses
-    NEVER = "never"       # Never speak similar responses
-    MUTE = "mute"         # Mute voice system temporarily
+
+    YES = "yes"  # Speak this time
+    NO = "no"  # Don't speak this time
+    ALWAYS = "always"  # Auto-speak similar responses
+    NEVER = "never"  # Never speak similar responses
+    MUTE = "mute"  # Mute voice system temporarily
 
 
 @dataclass
@@ -45,6 +46,7 @@ class VoicePermissionRequest:
         context: Optional context about the response
         session_id: Session identifier
     """
+
     response_text: str
     parsed: ParsedResponse
     context: Dict[str, Any]
@@ -67,7 +69,7 @@ class VoicePermissionHook:
         self,
         voice_handler: VoiceHandler,
         config: Optional[Dict[str, Any]] = None,
-        permission_callback: Optional[Callable[[VoicePermissionRequest], asyncio.Future]] = None
+        permission_callback: Optional[Callable[[VoicePermissionRequest], asyncio.Future]] = None,
     ):
         """
         Initialize voice permission hook.
@@ -91,10 +93,12 @@ class VoicePermissionHook:
 
         # Attention sounds
         self.attention_sounds_enabled = self.config.get("attention_sounds_enabled", True)
-        self.attention_sound_path = Path(self.config.get(
-            "attention_sound_path",
-            Path(__file__).parent.parent / "config" / "audio" / "attention_normal.wav"
-        ))
+        self.attention_sound_path = Path(
+            self.config.get(
+                "attention_sound_path",
+                Path(__file__).parent.parent / "config" / "audio" / "attention_normal.wav",
+            )
+        )
 
         # Complexity threshold for auto-voice (0-10)
         self.complexity_threshold = self.config.get("complexity_threshold", 7)
@@ -103,11 +107,7 @@ class VoicePermissionHook:
         self.auto_approve_threshold = self.config.get("auto_approve_threshold", 3)
         self.pattern_counts: Dict[str, int] = {}
 
-    async def on_response(
-        self,
-        response: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> None:
+    async def on_response(self, response: str, context: Optional[Dict[str, Any]] = None) -> None:
         """
         Called when LLM generates response.
 
@@ -133,15 +133,14 @@ class VoicePermissionHook:
 
         # Check if response should be voiced (complexity check)
         if not self.voice_adapter.should_voice_response(parsed, self.complexity_threshold):
-            logger.info(f"Response complexity too high ({parsed.complexity_score}/10), skipping voice")
+            logger.info(
+                f"Response complexity too high ({parsed.complexity_score}/10), skipping voice"
+            )
             return
 
         # Create permission request
         request = VoicePermissionRequest(
-            response_text=response,
-            parsed=parsed,
-            context=context or {},
-            session_id=self.session_id
+            response_text=response, parsed=parsed, context=context or {}, session_id=self.session_id
         )
 
         # Check auto-approve rules
@@ -167,8 +166,7 @@ class VoicePermissionHook:
         await self._handle_permission_response(request, permission)
 
     async def _check_auto_approve(
-        self,
-        request: VoicePermissionRequest
+        self, request: VoicePermissionRequest
     ) -> Optional[VoicePermissionResponse]:
         """
         Check if request matches auto-approve rules.
@@ -195,7 +193,9 @@ class VoicePermissionHook:
 
         # If seen pattern multiple times, suggest auto-approve
         if self.pattern_counts[pattern_hash] >= self.auto_approve_threshold:
-            logger.info(f"Pattern seen {self.pattern_counts[pattern_hash]} times, consider auto-approving")
+            logger.info(
+                f"Pattern seen {self.pattern_counts[pattern_hash]} times, consider auto-approving"
+            )
 
         return None
 
@@ -217,12 +217,18 @@ class VoicePermissionHook:
         parsed = request.parsed
 
         # Categorize length
-        length_category = "short" if len(parsed.voice) < 100 else \
-                         "medium" if len(parsed.voice) < 300 else "long"
+        length_category = (
+            "short" if len(parsed.voice) < 100 else "medium" if len(parsed.voice) < 300 else "long"
+        )
 
         # Complexity category
-        complexity_category = "simple" if parsed.complexity_score < 4 else \
-                             "moderate" if parsed.complexity_score < 7 else "complex"
+        complexity_category = (
+            "simple"
+            if parsed.complexity_score < 4
+            else "moderate"
+            if parsed.complexity_score < 7
+            else "complex"
+        )
 
         return f"{length_category}_{complexity_category}_{'code' if parsed.has_code else 'text'}"
 
@@ -238,7 +244,7 @@ class VoicePermissionHook:
             sound_files = {
                 "gentle": "attention_gentle.wav",
                 "normal": "attention_normal.wav",
-                "urgent": "attention_urgent.wav"
+                "urgent": "attention_urgent.wav",
             }
 
             sound_file = sound_files.get(sound_type, "attention_normal.wav")
@@ -250,37 +256,37 @@ class VoicePermissionHook:
 
             # Platform-specific audio playback
             import sys
+
             if sys.platform == "darwin":
                 # macOS - use afplay
                 import subprocess
+
                 subprocess.Popen(
                     ["afplay", str(sound_path)],
                     stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
+                    stderr=subprocess.DEVNULL,
                 )
             elif sys.platform == "linux":
                 # Linux - use aplay or paplay
                 import subprocess
+
                 try:
                     subprocess.Popen(
                         ["paplay", str(sound_path)],
                         stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL
+                        stderr=subprocess.DEVNULL,
                     )
                 except FileNotFoundError:
                     subprocess.Popen(
                         ["aplay", str(sound_path)],
                         stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL
+                        stderr=subprocess.DEVNULL,
                     )
 
         except Exception as e:
             logger.error(f"Failed to play attention sound: {e}")
 
-    async def _request_permission(
-        self,
-        request: VoicePermissionRequest
-    ) -> VoicePermissionResponse:
+    async def _request_permission(self, request: VoicePermissionRequest) -> VoicePermissionResponse:
         """
         Request permission from user to speak response.
 
@@ -304,9 +310,7 @@ class VoicePermissionHook:
         return VoicePermissionResponse.YES
 
     async def _handle_permission_response(
-        self,
-        request: VoicePermissionRequest,
-        response: VoicePermissionResponse
+        self, request: VoicePermissionRequest, response: VoicePermissionResponse
     ):
         """
         Handle user's permission response.
@@ -415,8 +419,7 @@ async def demo():
     # Initialize (would normally use real voice handler)
     voice_handler = VoiceHandler({"enabled": False})
     hook = VoicePermissionHook(
-        voice_handler=voice_handler,
-        permission_callback=mock_permission_callback
+        voice_handler=voice_handler, permission_callback=mock_permission_callback
     )
 
     # Test response

@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ClaudeEventType(Enum):
     """Types of Claude Code events."""
+
     USER_PROMPT = "user"
     ASSISTANT_RESPONSE = "assistant"
     TOOL_USE = "tool_use"
@@ -53,7 +54,7 @@ class ClaudeEvent:
         timestamp: datetime,
         session_id: str,
         data: Dict,
-        summary: str
+        summary: str,
     ):
         self.event_type = event_type
         self.timestamp = timestamp
@@ -199,7 +200,7 @@ class ClaudeCodeMonitor:
             last_line = self.last_processed_line.get(file_path, 0)
 
             # Read new lines only
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 lines = f.readlines()
 
             new_lines = lines[last_line:]
@@ -236,13 +237,13 @@ class ClaudeCodeMonitor:
         if not timestamp_str:
             return
 
-        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
 
         # Update active session tracking
         self.active_sessions[session_id] = {
             "last_activity": timestamp,
             "cwd": entry.get("cwd"),
-            "branch": entry.get("gitBranch")
+            "branch": entry.get("gitBranch"),
         }
 
         # Parse user prompts
@@ -259,7 +260,7 @@ class ClaudeCodeMonitor:
                         timestamp=timestamp,
                         session_id=session_id,
                         data={"prompt": text},
-                        summary=f"User: {text[:80]}{'...' if len(text) > 80 else ''}"
+                        summary=f"User: {text[:80]}{'...' if len(text) > 80 else ''}",
                     )
                     self._notify_callbacks(event)
 
@@ -281,7 +282,7 @@ class ClaudeCodeMonitor:
                             timestamp=timestamp,
                             session_id=session_id,
                             data={"response": text},
-                            summary=f"Claude: {text[:80]}{'...' if len(text) > 80 else ''}"
+                            summary=f"Claude: {text[:80]}{'...' if len(text) > 80 else ''}",
                         )
                         self._notify_callbacks(event)
 
@@ -295,7 +296,7 @@ class ClaudeCodeMonitor:
         # File read detection
         if isinstance(content, str) and content.startswith("     1→"):
             # This is a file read (cat -n format)
-            lines = content.split('\n')
+            lines = content.split("\n")
             num_lines = len([line for line in lines if line.strip()])
 
             event = ClaudeEvent(
@@ -303,7 +304,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"content": content, "num_lines": num_lines},
-                summary=f"Read file ({num_lines} lines)"
+                summary=f"Read file ({num_lines} lines)",
             )
             self._notify_callbacks(event)
 
@@ -314,7 +315,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"output": content},
-                summary="Bash command executed"
+                summary="Bash command executed",
             )
             self._notify_callbacks(event)
 
@@ -331,7 +332,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"file_path": file_path},
-                summary=f"Reading: {Path(file_path).name}"
+                summary=f"Reading: {Path(file_path).name}",
             )
             self._notify_callbacks(event)
 
@@ -342,7 +343,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"file_path": file_path},
-                summary=f"Writing: {Path(file_path).name}"
+                summary=f"Writing: {Path(file_path).name}",
             )
             self._notify_callbacks(event)
 
@@ -353,7 +354,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"file_path": file_path},
-                summary=f"Editing: {Path(file_path).name}"
+                summary=f"Editing: {Path(file_path).name}",
             )
             self._notify_callbacks(event)
 
@@ -364,7 +365,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"command": command},
-                summary=f"Running: {command[:50]}{'...' if len(command) > 50 else ''}"
+                summary=f"Running: {command[:50]}{'...' if len(command) > 50 else ''}",
             )
             self._notify_callbacks(event)
 
@@ -375,7 +376,7 @@ class ClaudeCodeMonitor:
                 timestamp=timestamp,
                 session_id=session_id,
                 data={"url": url},
-                summary=f"Fetching: {url}"
+                summary=f"Fetching: {url}",
             )
             self._notify_callbacks(event)
 
@@ -397,13 +398,12 @@ class ClaudeCodeMonitor:
                     # Try to schedule in event loop if one exists
                     try:
                         loop = asyncio.get_running_loop()
-                        loop.call_soon_threadsafe(
-                            asyncio.create_task,
-                            callback(event)
-                        )
+                        loop.call_soon_threadsafe(asyncio.create_task, callback(event))
                     except RuntimeError:
                         # No event loop running, skip async callback
-                        logger.warning(f"Cannot call async callback {callback.__name__} - no event loop")
+                        logger.warning(
+                            f"Cannot call async callback {callback.__name__} - no event loop"
+                        )
                 else:
                     # Synchronous callback - call directly
                     callback(event)

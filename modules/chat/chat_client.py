@@ -75,7 +75,7 @@ class ChatClient:
                         f"Username: [bold {self.COLORS.get(self.username, 'white')}]{self.EMOJIS.get(self.username, '')} {self.username}[/bold {self.COLORS.get(self.username, 'white')}]\n"
                         f"Server: {self.server_url}",
                         title="🎵 Fifth Symphony Multi-Agent Chat",
-                        border_style="magenta"
+                        border_style="magenta",
                     )
                 )
 
@@ -87,8 +87,7 @@ class ChatClient:
 
                 # Wait for either task to complete
                 done, pending = await asyncio.wait(
-                    [receiver_task, sender_task],
-                    return_when=asyncio.FIRST_COMPLETED
+                    [receiver_task, sender_task], return_when=asyncio.FIRST_COMPLETED
                 )
 
                 # Cancel pending tasks
@@ -96,7 +95,9 @@ class ChatClient:
                     task.cancel()
 
         except websockets.exceptions.ConnectionRefused:
-            self.console.print("[bold red]❌ Connection refused. Is the chat server running?[/bold red]")
+            self.console.print(
+                "[bold red]❌ Connection refused. Is the chat server running?[/bold red]"
+            )
             self.console.print(f"   Try: python -m modules.chat.chat_server")
         except Exception as e:
             self.console.print(f"[bold red]❌ Connection error: {e}[/bold red]")
@@ -132,7 +133,7 @@ class ChatClient:
                     continue
 
                 # Handle exit commands
-                if user_input.lower() in ['/quit', '/exit', '/q']:
+                if user_input.lower() in ["/quit", "/exit", "/q"]:
                     self.console.print("[dim]Disconnecting...[/dim]")
                     self.running = False
                     break
@@ -203,19 +204,14 @@ async def main():
     parser.add_argument(
         "--username",
         default="User",
-        help="Display name (User, Fifth-Symphony, Nazarick-Agent, Code-Assistant, VM-Claude)"
+        help="Display name (User, Fifth-Symphony, Nazarick-Agent, Code-Assistant, VM-Claude)",
     )
-    parser.add_argument(
-        "--server",
-        default="ws://localhost:8765",
-        help="WebSocket server URL"
-    )
+    parser.add_argument("--server", default="ws://localhost:8765", help="WebSocket server URL")
 
     args = parser.parse_args()
 
     logging.basicConfig(
-        level=logging.WARNING,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     client = ChatClient(username=args.username, server_url=args.server)

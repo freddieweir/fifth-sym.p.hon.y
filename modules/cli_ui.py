@@ -23,6 +23,7 @@ from enum import Enum
 
 class RiskLevel(Enum):
     """Visual risk levels with colors and emojis"""
+
     LOW = ("🟢", "green", "LOW")
     MEDIUM = ("🟡", "yellow", "MEDIUM")
     HIGH = ("🟠", "bright_red", "HIGH")
@@ -64,7 +65,7 @@ class CLIUI:
             Text(banner_text, style="bold cyan", justify="center"),
             box=HEAVY,
             border_style="bright_magenta",
-            padding=(1, 2)
+            padding=(1, 2),
         )
 
         self.console.print(panel)
@@ -75,7 +76,7 @@ class CLIUI:
         action: str,
         risk_level: RiskLevel,
         agent: str,
-        details: Optional[Dict[str, Any]] = None
+        details: Optional[Dict[str, Any]] = None,
     ):
         """
         Display eye-grabbing permission request.
@@ -139,7 +140,7 @@ class CLIUI:
             title=header,
             box=box_type,
             border_style=border_style,
-            padding=(1, 2)
+            padding=(1, 2),
         )
 
         self.console.print(panel)
@@ -153,12 +154,7 @@ class CLIUI:
         text.append(f"📋 Action: {action}\n\n", style="yellow")
         text.append("⏳ Proceeding with execution...", style="dim white")
 
-        panel = Panel(
-            text,
-            box=ROUNDED,
-            border_style="green",
-            padding=(1, 2)
-        )
+        panel = Panel(text, box=ROUNDED, border_style="green", padding=(1, 2))
 
         self.console.print(panel)
 
@@ -175,12 +171,7 @@ class CLIUI:
 
         text.append("\n🛑 Operation cancelled.", style="bold red")
 
-        panel = Panel(
-            text,
-            box=ROUNDED,
-            border_style="red",
-            padding=(1, 2)
-        )
+        panel = Panel(text, box=ROUNDED, border_style="red", padding=(1, 2))
 
         self.console.print(panel)
 
@@ -225,7 +216,7 @@ class CLIUI:
                 title="📜 Recent Changes",
                 box=ROUNDED,
                 border_style="bright_cyan",
-                padding=(1, 2)
+                padding=(1, 2),
             )
 
             self.console.print(panel)
@@ -249,10 +240,12 @@ class CLIUI:
             TextColumn("[bold cyan]{task.description}"),
             BarColumn(complete_style="green", finished_style="bold green"),
             TextColumn("[bold]{task.percentage:>3.0f}%"),
-            console=self.console
+            console=self.console,
         )
 
-    def show_table(self, title: str, headers: List[str], rows: List[List[str]], style: str = "cyan"):
+    def show_table(
+        self, title: str, headers: List[str], rows: List[List[str]], style: str = "cyan"
+    ):
         """
         Display data in a table.
 
@@ -281,12 +274,7 @@ class CLIUI:
             text.append(f"  {key}: ", style="dim cyan")
             text.append(f"{value}\n", style="white")
 
-        panel = Panel(
-            text,
-            box=ROUNDED,
-            border_style="cyan",
-            padding=(1, 2)
-        )
+        panel = Panel(text, box=ROUNDED, border_style="cyan", padding=(1, 2))
 
         self.console.print(panel)
 
@@ -325,8 +313,8 @@ if __name__ == "__main__":
         details={
             "File Type": "System credentials",
             "Impact": "System-wide authentication failure",
-            "Reversible": "No"
-        }
+            "Reversible": "No",
+        },
     )
     time.sleep(2)
 

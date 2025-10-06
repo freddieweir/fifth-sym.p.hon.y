@@ -34,7 +34,7 @@ class VoiceInput:
         self,
         model_size: str = "base",
         sample_rate: int = 16000,
-        callback: Optional[Callable[[str], None]] = None
+        callback: Optional[Callable[[str], None]] = None,
     ):
         """
         Initialize voice input.
@@ -96,6 +96,7 @@ class VoiceInput:
 
     async def _record_audio(self):
         """Record audio in background."""
+
         def audio_callback(indata, frames, time, status):
             """Callback for audio stream."""
             if status:
@@ -105,11 +106,7 @@ class VoiceInput:
                 self.recording_data.append(indata.copy())
 
         # Start audio stream
-        with sd.InputStream(
-            channels=1,
-            samplerate=self.sample_rate,
-            callback=audio_callback
-        ):
+        with sd.InputStream(channels=1, samplerate=self.sample_rate, callback=audio_callback):
             # Keep stream open while recording
             while self.is_recording:
                 await asyncio.sleep(0.1)
@@ -135,11 +132,7 @@ class VoiceInput:
                 sf.write(temp_path, audio, self.sample_rate)
 
             # Transcribe with Whisper
-            result = await asyncio.to_thread(
-                self.model.transcribe,
-                temp_path,
-                language="en"
-            )
+            result = await asyncio.to_thread(self.model.transcribe, temp_path, language="en")
 
             # Clean up temp file
             Path(temp_path).unlink()

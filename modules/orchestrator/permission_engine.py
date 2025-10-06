@@ -16,30 +16,33 @@ logger = logging.getLogger(__name__)
 
 class RiskLevel(Enum):
     """Risk levels for permission requests"""
-    LOW = "low"           # Read operations, safe commands
-    MEDIUM = "medium"     # Write operations, non-destructive changes
-    HIGH = "high"         # System modifications, network operations
-    CRITICAL = "critical" # Destructive operations, security-sensitive
+
+    LOW = "low"  # Read operations, safe commands
+    MEDIUM = "medium"  # Write operations, non-destructive changes
+    HIGH = "high"  # System modifications, network operations
+    CRITICAL = "critical"  # Destructive operations, security-sensitive
 
 
 class ApprovalResponse(Enum):
     """User approval responses"""
-    YES = "yes"                    # Approve this time
-    NO = "no"                      # Deny this time
-    ALWAYS = "always"              # Auto-approve this pattern
-    NEVER = "never"                # Auto-deny this pattern
-    CUSTOM = "custom"              # Provide custom instructions
+
+    YES = "yes"  # Approve this time
+    NO = "no"  # Deny this time
+    ALWAYS = "always"  # Auto-approve this pattern
+    NEVER = "never"  # Auto-deny this pattern
+    CUSTOM = "custom"  # Provide custom instructions
 
 
 @dataclass
 class PermissionRequest:
     """Represents a permission request from Claude Code"""
-    action: str                    # Description of action
-    command: Optional[str]         # Actual command if applicable
-    risk_level: RiskLevel          # Assessed risk level
-    agent: str                     # Which Nazarick agent is requesting
-    context: Dict[str, Any]        # Additional context
-    session_id: str                # Session identifier
+
+    action: str  # Description of action
+    command: Optional[str]  # Actual command if applicable
+    risk_level: RiskLevel  # Assessed risk level
+    agent: str  # Which Nazarick agent is requesting
+    context: Dict[str, Any]  # Additional context
+    session_id: str  # Session identifier
 
 
 class PermissionEngine:
@@ -124,7 +127,9 @@ class PermissionEngine:
             patterns = self.risk_patterns.get(risk_level, [])
             for pattern in patterns:
                 if re.search(pattern, text_to_check, re.IGNORECASE):
-                    self.logger.info(f"Risk assessment: {risk_level.value} (matched pattern: {pattern})")
+                    self.logger.info(
+                        f"Risk assessment: {risk_level.value} (matched pattern: {pattern})"
+                    )
                     return risk_level
 
         # Default to medium risk if no patterns match
@@ -168,7 +173,7 @@ class PermissionEngine:
         self,
         request: PermissionRequest,
         response: ApprovalResponse,
-        custom_message: Optional[str] = None
+        custom_message: Optional[str] = None,
     ):
         """
         Record user decision for future reference.

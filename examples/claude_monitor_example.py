@@ -47,7 +47,7 @@ class ClaudeMonitorDemo(QMainWindow):
         self.claude_integration = ClaudeIntegration(
             avatar=self.avatar,
             voice=None,  # Set to voice_handler to enable voice
-            enable_voice=False
+            enable_voice=False,
         )
 
         # Setup UI
@@ -165,7 +165,9 @@ class ClaudeMonitorDemo(QMainWindow):
         self.log("🔍 Starting Claude Code monitoring...")
 
         # Auto-detect session directory
-        session_dir = Path.home() / ".claude" / "projects" / "-path-to-git-internal-repos-project-name"
+        session_dir = (
+            Path.home() / ".claude" / "projects" / "-path-to-git-internal-repos-project-name"
+        )
 
         if not session_dir.exists():
             self.log(f"❌ Session directory not found: {session_dir}")
@@ -173,8 +175,7 @@ class ClaudeMonitorDemo(QMainWindow):
             return
 
         self.claude_integration.start_monitoring(
-            session_dir=session_dir,
-            project_name="Fifth Symphony"
+            session_dir=session_dir, project_name="Fifth Symphony"
         )
 
         self.log(f"✅ Monitoring active: {session_dir.name}")
@@ -191,12 +192,12 @@ class ClaudeMonitorDemo(QMainWindow):
         sessions = self.claude_integration.get_active_sessions()
 
         stats_text = f"""📊 Activity Statistics:
-  User Prompts: {stats['user_prompts']}
-  Files Read: {stats['files_read']}
-  Files Written: {stats['files_written']}
-  Files Edited: {stats['files_edited']}
-  Bash Commands: {stats['bash_commands']}
-  Web Fetches: {stats['web_fetches']}
+  User Prompts: {stats["user_prompts"]}
+  Files Read: {stats["files_read"]}
+  Files Written: {stats["files_written"]}
+  Files Edited: {stats["files_edited"]}
+  Bash Commands: {stats["bash_commands"]}
+  Web Fetches: {stats["web_fetches"]}
 
 🎭 Active Sessions: {len(sessions)}
 """
@@ -206,6 +207,7 @@ class ClaudeMonitorDemo(QMainWindow):
     def log(self, message: str):
         """Add message to activity log."""
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.activity_log.append(f"[{timestamp}] {message}")
 

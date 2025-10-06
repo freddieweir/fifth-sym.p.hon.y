@@ -45,6 +45,7 @@ from textual.widgets import (
 
 try:
     import ollama
+
     OLLAMA_AVAILABLE = True
 except ImportError:
     OLLAMA_AVAILABLE = False
@@ -67,6 +68,7 @@ class ActivityLog(RichLog):
 
 class ChatMessages(VerticalScroll):
     """Scrollable chat message container."""
+
     pass
 
 
@@ -96,11 +98,7 @@ class ProjectMonitor(Container):
         with TabbedContent(initial="activity"):
             # Activity tab
             with TabPane("📋 Activity", id="activity"):
-                yield ActivityLog(
-                    max_lines=200,
-                    highlight=True,
-                    markup=True
-                )
+                yield ActivityLog(max_lines=200, highlight=True, markup=True)
 
             # Chat tab
             with TabPane("💬 Chat", id="chat"):
@@ -108,16 +106,13 @@ class ProjectMonitor(Container):
                 with Horizontal(classes="chat-input-row"):
                     yield Input(
                         placeholder="Chat with this Claude instance...",
-                        id=f"chat_input_{self.safe_id}"
+                        id=f"chat_input_{self.safe_id}",
                     )
                     yield Button("Send", id=f"chat_send_{self.safe_id}", variant="primary")
 
             # Stats tab
             with TabPane("📊 Stats", id="stats"):
-                yield Static(
-                    self._render_stats(),
-                    id=f"stats_{self.safe_id}"
-                )
+                yield Static(self._render_stats(), id=f"stats_{self.safe_id}")
 
     def on_mount(self) -> None:
         """Start monitoring on mount."""
@@ -187,12 +182,12 @@ class ProjectMonitor(Container):
 
 **{self.project_name}**
 
-- 🟣 **User Prompts**: {self.stats['user_prompts']}
-- 📖 **Files Read**: {self.stats['files_read']}
-- ✍️ **Files Written**: {self.stats['files_written']}
-- ✏️ **Files Edited**: {self.stats['files_edited']}
-- ⚡ **Bash Commands**: {self.stats['bash_commands']}
-- 🌐 **Web Fetches**: {self.stats['web_fetches']}
+- 🟣 **User Prompts**: {self.stats["user_prompts"]}
+- 📖 **Files Read**: {self.stats["files_read"]}
+- ✍️ **Files Written**: {self.stats["files_written"]}
+- ✏️ **Files Edited**: {self.stats["files_edited"]}
+- ⚡ **Bash Commands**: {self.stats["bash_commands"]}
+- 🌐 **Web Fetches**: {self.stats["web_fetches"]}
 
 ---
 
@@ -251,19 +246,14 @@ class OllamaChat(Container):
 
         if not OLLAMA_AVAILABLE:
             yield Static(
-                "[bold red]Ollama not available[/]\n"
-                "Install with: uv add ollama",
-                classes="error"
+                "[bold red]Ollama not available[/]\nInstall with: uv add ollama", classes="error"
             )
             return
 
         yield ChatMessages(id="ollama_messages")
 
         with Horizontal(classes="chat-input-row"):
-            yield Input(
-                placeholder="Ask Ollama anything...",
-                id="ollama_input"
-            )
+            yield Input(placeholder="Ask Ollama anything...", id="ollama_input")
             yield Button("Send", id="ollama_send", variant="primary")
 
     def on_mount(self) -> None:
@@ -320,7 +310,7 @@ class OllamaChat(Container):
             response = await asyncio.to_thread(
                 ollama.chat,
                 model="llama3.2",  # Adjust model as needed
-                messages=[{"role": "user", "content": message}]
+                messages=[{"role": "user", "content": message}],
             )
 
             # Remove thinking indicator
@@ -454,7 +444,7 @@ class ClaudeMonitorUltimate(App):
                     yield Static(
                         "\n[dim]No Claude Code projects found.\n\n"
                         "Use Claude Code in a project to create session files.[/]",
-                        classes="error"
+                        classes="error",
                     )
                 else:
                     for project_name, session_dir in projects:

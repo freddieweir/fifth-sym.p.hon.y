@@ -26,6 +26,7 @@ from enum import Enum
 try:
     from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler, FileSystemEvent
+
     WATCHDOG_AVAILABLE = True
 except ImportError:
     WATCHDOG_AVAILABLE = False
@@ -36,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 class FileAction(Enum):
     """File system action types."""
+
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
@@ -54,6 +56,7 @@ class FileEvent:
         timestamp: When event occurred
         metadata: Optional additional metadata
     """
+
     action: FileAction
     path: Path
     is_directory: bool
@@ -75,6 +78,7 @@ class FolderSummary:
         old_files: Files not modified in 30+ days
         large_files: Files > 10MB
     """
+
     path: Path
     total_files: int
     total_size: int
@@ -91,11 +95,7 @@ class FolderWatcher(FileSystemEventHandler):
     Integrates with watchdog for real-time monitoring.
     """
 
-    def __init__(
-        self,
-        folder_path: Path,
-        callback: Optional[Callable[[FileEvent], None]] = None
-    ):
+    def __init__(self, folder_path: Path, callback: Optional[Callable[[FileEvent], None]] = None):
         """
         Initialize folder watcher.
 
@@ -136,7 +136,7 @@ class FolderWatcher(FileSystemEventHandler):
             path=Path(event.src_path),
             is_directory=event.is_directory,
             timestamp=datetime.now(),
-            metadata={"event_type": event.event_type}
+            metadata={"event_type": event.event_type},
         )
 
         if self.callback:
@@ -239,11 +239,7 @@ class FolderManager:
         """
         return self.watched_folders.copy()
 
-    def start_watching(
-        self,
-        name: str,
-        callback: Optional[Callable[[FileEvent], None]] = None
-    ):
+    def start_watching(self, name: str, callback: Optional[Callable[[FileEvent], None]] = None):
         """
         Start watching folder for changes.
 
@@ -295,11 +291,7 @@ class FolderManager:
             self.stop_watching(name)
 
     async def get_folder_summary(
-        self,
-        name: str,
-        recent_days: int = 7,
-        old_days: int = 30,
-        large_file_mb: int = 10
+        self, name: str, recent_days: int = 7, old_days: int = 30, large_file_mb: int = 10
     ) -> FolderSummary:
         """
         Get summary of folder contents.
@@ -369,16 +361,11 @@ class FolderManager:
             total_size=total_size,
             file_types=file_types,
             recent_files=recent_files[:10],  # Top 10 most recent
-            old_files=old_files[:10],        # Top 10 oldest
-            large_files=large_files[:10]     # Top 10 largest
+            old_files=old_files[:10],  # Top 10 oldest
+            large_files=large_files[:10],  # Top 10 largest
         )
 
-    async def find_files(
-        self,
-        name: str,
-        pattern: str = "*",
-        max_results: int = 100
-    ) -> List[Path]:
+    async def find_files(self, name: str, pattern: str = "*", max_results: int = 100) -> List[Path]:
         """
         Find files in folder matching pattern.
 
@@ -398,11 +385,7 @@ class FolderManager:
 
         return matches
 
-    async def organize_by_extension(
-        self,
-        name: str,
-        dry_run: bool = True
-    ) -> Dict[str, List[Path]]:
+    async def organize_by_extension(self, name: str, dry_run: bool = True) -> Dict[str, List[Path]]:
         """
         Organize files into folders by extension.
 

@@ -169,9 +169,7 @@ class DockerPane(Static):
     def __init__(self, docker_config: dict):
         super().__init__()
         self.docker_config = docker_config
-        self.monitor = DockerMonitor(
-            watched_containers=docker_config.get("watched_containers", [])
-        )
+        self.monitor = DockerMonitor(watched_containers=docker_config.get("watched_containers", []))
         self.current_log_container = docker_config.get("default_log_container")
 
     def compose(self) -> ComposeResult:
@@ -214,13 +212,15 @@ class DockerPane(Static):
 
                     # Get emoji
                     status_icon = status_emoji.get(status, "⚪")
-                    health_icon = health_emoji.get(health.lower(), "➖") if health != "N/A" else "➖"
+                    health_icon = (
+                        health_emoji.get(health.lower(), "➖") if health != "N/A" else "➖"
+                    )
 
                     table.add_row(
                         f"{status_icon} {status}",
                         container["name"],
                         f"{health_icon} {health}",
-                        container["id"]
+                        container["id"],
                     )
 
                 await asyncio.sleep(interval)
@@ -242,9 +242,7 @@ class DockerPane(Static):
 
         try:
             async for log_line in self.monitor.stream_logs(
-                self.current_log_container,
-                lines=tail_lines,
-                follow=follow
+                self.current_log_container, lines=tail_lines, follow=follow
             ):
                 logs.write(log_line)
 
@@ -269,12 +267,14 @@ class OllamaPane(Static):
         """Write model output to log"""
         log = self.query_one("#ollama-log", RichLog)
 
-        log.write(Panel(
-            f"[bold cyan]Prompt:[/bold cyan] {prompt}\n\n"
-            f"[bold green]Response:[/bold green] {response}",
-            title=f"🧠 {model}",
-            border_style="magenta"
-        ))
+        log.write(
+            Panel(
+                f"[bold cyan]Prompt:[/bold cyan] {prompt}\n\n"
+                f"[bold green]Response:[/bold green] {response}",
+                title=f"🧠 {model}",
+                border_style="magenta",
+            )
+        )
 
 
 class StatusPane(Static):
@@ -456,10 +456,7 @@ class FifthSymphonyDashboard(App):
 
         try:
             # Send message to chat server
-            chat_message = {
-                "username": "User",
-                "content": message
-            }
+            chat_message = {"username": "User", "content": message}
             await self.chat_websocket.send(json.dumps(chat_message))
             input_widget.value = ""
             status_pane.write_status(f"Sent: {message}", "green")

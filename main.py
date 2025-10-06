@@ -199,8 +199,7 @@ class NeuralOrchestra:
 
         try:
             # Run the script
-            async for output_type, output in self.script_runner.run_script_async(
-                script_path, args):
+            async for output_type, output in self.script_runner.run_script_async(script_path, args):
                 # Display output
                 if output_type == "stdout":
                     self.console.print(output, style="green", end="")
@@ -430,7 +429,9 @@ class NeuralOrchestra:
         parser.add_argument("-a", "--args", nargs="+", help="Arguments to pass to the script")
         parser.add_argument("-q", "--quiet", action="store_true", help="Disable voice feedback")
         parser.add_argument("--no-reminders", action="store_true", help="Disable reminder system")
-        parser.add_argument("--with-chat", action="store_true", help="Enable multi-agent chat integration")
+        parser.add_argument(
+            "--with-chat", action="store_true", help="Enable multi-agent chat integration"
+        )
         parser.add_argument(
             "--add-symlink", metavar="PATH", help="Add a symlink to an external script"
         )
@@ -460,7 +461,7 @@ class NeuralOrchestra:
             chat_config = self.config.get("chat", {})
             chat_context = OrchestratorChatContext(
                 server_url=chat_config.get("server_url", "ws://localhost:8765"),
-                username=chat_config.get("username", "Fifth-Symphony")
+                username=chat_config.get("username", "Fifth-Symphony"),
             )
 
         try:
@@ -499,8 +500,7 @@ class NeuralOrchestra:
             await self.voice_handler.speak("Neural Orchestra interrupted")
         except Exception as e:
             await self.voice_handler.speak(
-                f"Fatal error: {self.output_translator.simplify_error(str(e))}",
-                priority="high"
+                f"Fatal error: {self.output_translator.simplify_error(str(e))}", priority="high"
             )
         finally:
             # Cleanup

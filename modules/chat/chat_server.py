@@ -50,10 +50,12 @@ class ChatServer:
         logger.info(f"Client connected from {client_addr}. Total clients: {len(self.clients)}")
 
         # Send system message about client connection
-        await self.broadcast({
-            "username": "System",
-            "content": f"Agent connected from {client_addr[0]}",
-        })
+        await self.broadcast(
+            {
+                "username": "System",
+                "content": f"Agent connected from {client_addr[0]}",
+            }
+        )
 
         # Send recent history to new client
         for msg in self.message_history[-50:]:
@@ -68,13 +70,17 @@ class ChatServer:
         if websocket in self.clients:
             self.clients.remove(websocket)
             client_addr = websocket.remote_address
-            logger.info(f"Client disconnected from {client_addr}. Total clients: {len(self.clients)}")
+            logger.info(
+                f"Client disconnected from {client_addr}. Total clients: {len(self.clients)}"
+            )
 
             # Announce disconnection
-            await self.broadcast({
-                "username": "System",
-                "content": f"Agent disconnected from {client_addr[0]}",
-            })
+            await self.broadcast(
+                {
+                    "username": "System",
+                    "content": f"Agent disconnected from {client_addr[0]}",
+                }
+            )
 
     async def broadcast(self, message: dict):
         """
@@ -84,7 +90,7 @@ class ChatServer:
             message: Message dict with 'username' and 'content' keys
         """
         # Add timestamp
-        message['timestamp'] = datetime.now().isoformat()
+        message["timestamp"] = datetime.now().isoformat()
 
         # Store in history
         self.message_history.append(message)
@@ -122,7 +128,11 @@ class ChatServer:
                     data = json.loads(message)
 
                     # Validate message structure
-                    if not isinstance(data, dict) or 'username' not in data or 'content' not in data:
+                    if (
+                        not isinstance(data, dict)
+                        or "username" not in data
+                        or "content" not in data
+                    ):
                         logger.warning(f"Invalid message format: {data}")
                         continue
 
@@ -152,10 +162,12 @@ class ChatServer:
         logger.info("Stopping chat server...")
 
         # Notify all clients
-        await self.broadcast({
-            "username": "System",
-            "content": "Chat server shutting down",
-        })
+        await self.broadcast(
+            {
+                "username": "System",
+                "content": "Chat server shutting down",
+            }
+        )
 
         # Close all client connections
         for client in list(self.clients):
@@ -168,8 +180,7 @@ class ChatServer:
 async def main():
     """Run standalone chat server."""
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     server = ChatServer()

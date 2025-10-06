@@ -19,9 +19,9 @@ from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionRe
 
 async def permission_callback(request):
     """Simple permission callback for demo."""
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("🎤 VOICE PERMISSION REQUEST")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"📝 Voice Output: {request.parsed.voice[:100]}...")
     print(f"📊 Complexity: {request.parsed.complexity_score}/10")
     print(f"💻 Has Code: {request.parsed.has_code}")
@@ -29,9 +29,9 @@ async def permission_callback(request):
     if request.parsed.has_code:
         print(f"🔧 Code Summary: {request.parsed.code_summary}")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("Options: (y)es, (n)o, (a)lways, (v)never, (m)ute")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Auto-approve for demo
     print("✅ Auto-approved for demo\n")
@@ -41,7 +41,7 @@ async def permission_callback(request):
 async def main():
     """Run voice system demo."""
     print("🎵 Fifth Symphony - Voice System Demo")
-    print("="*60)
+    print("=" * 60)
 
     # Initialize components
     print("\n📦 Initializing...")
@@ -51,17 +51,14 @@ async def main():
     voice_hook = VoicePermissionHook(
         voice_handler=voice_handler,
         config={"complexity_threshold": 7},
-        permission_callback=permission_callback
+        permission_callback=permission_callback,
     )
 
     print("✅ Voice system ready!\n")
 
     # Test cases
     test_cases = [
-        {
-            "name": "Simple Text",
-            "response": "Hello! This is a simple response."
-        },
+        {"name": "Simple Text", "response": "Hello! This is a simple response."},
         {
             "name": "Code Response",
             "response": """
@@ -73,7 +70,7 @@ def calculate_total(items):
 ```
 
 This function adds up all items in a list.
-"""
+""",
         },
         {
             "name": "Complex Technical",
@@ -91,14 +88,14 @@ Configure the timeout in settings.yaml:
 timeout: 30
 retries: 3
 ```
-"""
-        }
+""",
+        },
     ]
 
     for i, test in enumerate(test_cases, 1):
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"TEST {i}/{len(test_cases)}: {test['name']}")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         print("📥 Original Response:")
         print(test["response"])
@@ -123,9 +120,9 @@ retries: 3
 
         await asyncio.sleep(1)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✅ Voice system demo complete!")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     print("💡 Key Features Demonstrated:")
     print("  - Code blocks removed from voice output")

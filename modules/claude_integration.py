@@ -17,12 +17,14 @@ from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEv
 # Optional imports (may not be available in all contexts)
 try:
     from modules.visual_novel_widget import VisualNovelWidget, AvatarState
+
     AVATAR_AVAILABLE = True
 except ImportError:
     AVATAR_AVAILABLE = False
 
 try:
     from modules.voice_handler import VoiceHandler
+
     VOICE_AVAILABLE = True
 except ImportError:
     VOICE_AVAILABLE = False
@@ -55,9 +57,9 @@ class ClaudeIntegration(QObject):
 
     def __init__(
         self,
-        avatar: Optional['VisualNovelWidget'] = None,
-        voice: Optional['VoiceHandler'] = None,
-        enable_voice: bool = False
+        avatar: Optional["VisualNovelWidget"] = None,
+        voice: Optional["VoiceHandler"] = None,
+        enable_voice: bool = False,
     ):
         """
         Initialize Claude Code integration.
@@ -89,7 +91,7 @@ class ClaudeIntegration(QObject):
             "files_written": 0,
             "files_edited": 0,
             "bash_commands": 0,
-            "web_fetches": 0
+            "web_fetches": 0,
         }
 
         logger.info("Claude Code integration initialized")
@@ -99,40 +101,34 @@ class ClaudeIntegration(QObject):
 
         # User prompts - Emit signal (thread-safe)
         self.monitor.add_callback(
-            ClaudeEventType.USER_PROMPT,
-            lambda event: self.user_prompt_detected.emit(event)
+            ClaudeEventType.USER_PROMPT, lambda event: self.user_prompt_detected.emit(event)
         )
 
         # File operations - Emit signals
         self.monitor.add_callback(
-            ClaudeEventType.FILE_READ,
-            lambda event: self.file_read_detected.emit(event)
+            ClaudeEventType.FILE_READ, lambda event: self.file_read_detected.emit(event)
         )
         self.monitor.add_callback(
-            ClaudeEventType.FILE_WRITE,
-            lambda event: self.file_write_detected.emit(event)
+            ClaudeEventType.FILE_WRITE, lambda event: self.file_write_detected.emit(event)
         )
         self.monitor.add_callback(
-            ClaudeEventType.FILE_EDIT,
-            lambda event: self.file_edit_detected.emit(event)
+            ClaudeEventType.FILE_EDIT, lambda event: self.file_edit_detected.emit(event)
         )
 
         # Bash commands - Emit signal
         self.monitor.add_callback(
-            ClaudeEventType.BASH_COMMAND,
-            lambda event: self.bash_command_detected.emit(event)
+            ClaudeEventType.BASH_COMMAND, lambda event: self.bash_command_detected.emit(event)
         )
 
         # Assistant responses - Emit signal
         self.monitor.add_callback(
             ClaudeEventType.ASSISTANT_RESPONSE,
-            lambda event: self.assistant_response_detected.emit(event)
+            lambda event: self.assistant_response_detected.emit(event),
         )
 
         # Web fetches - Emit signal
         self.monitor.add_callback(
-            ClaudeEventType.WEB_FETCH,
-            lambda event: self.web_fetch_detected.emit(event)
+            ClaudeEventType.WEB_FETCH, lambda event: self.web_fetch_detected.emit(event)
         )
 
     def _connect_signals(self):
@@ -168,10 +164,13 @@ class ClaudeIntegration(QObject):
         if self.avatar:
             self.avatar.set_led("processing", True, pulsing=True)
             self.avatar.set_state(AvatarState.PROCESSING)
-            QTimer.singleShot(500, lambda: (
-                self.avatar.set_led("processing", False),
-                self.avatar.set_state(AvatarState.IDLE)
-            ))
+            QTimer.singleShot(
+                500,
+                lambda: (
+                    self.avatar.set_led("processing", False),
+                    self.avatar.set_state(AvatarState.IDLE),
+                ),
+            )
 
     def _handle_file_write(self, event: ClaudeEvent):
         """Handle file write event (runs in main thread)."""
@@ -181,10 +180,13 @@ class ClaudeIntegration(QObject):
         if self.avatar:
             self.avatar.set_led("processing", True, pulsing=True)
             self.avatar.set_state(AvatarState.PROCESSING)
-            QTimer.singleShot(1000, lambda: (
-                self.avatar.set_led("processing", False),
-                self.avatar.set_state(AvatarState.IDLE)
-            ))
+            QTimer.singleShot(
+                1000,
+                lambda: (
+                    self.avatar.set_led("processing", False),
+                    self.avatar.set_state(AvatarState.IDLE),
+                ),
+            )
 
     def _handle_file_edit(self, event: ClaudeEvent):
         """Handle file edit event (runs in main thread)."""
@@ -194,10 +196,13 @@ class ClaudeIntegration(QObject):
         if self.avatar:
             self.avatar.set_led("processing", True, pulsing=True)
             self.avatar.set_state(AvatarState.PROCESSING)
-            QTimer.singleShot(800, lambda: (
-                self.avatar.set_led("processing", False),
-                self.avatar.set_state(AvatarState.IDLE)
-            ))
+            QTimer.singleShot(
+                800,
+                lambda: (
+                    self.avatar.set_led("processing", False),
+                    self.avatar.set_state(AvatarState.IDLE),
+                ),
+            )
 
     def _handle_bash_command(self, event: ClaudeEvent):
         """Handle bash command event (runs in main thread)."""
@@ -215,10 +220,13 @@ class ClaudeIntegration(QObject):
         if self.avatar:
             self.avatar.set_led("voice", True, pulsing=True)
             self.avatar.set_state(AvatarState.TALKING)
-            QTimer.singleShot(1500, lambda: (
-                self.avatar.set_led("voice", False),
-                self.avatar.set_state(AvatarState.IDLE)
-            ))
+            QTimer.singleShot(
+                1500,
+                lambda: (
+                    self.avatar.set_led("voice", False),
+                    self.avatar.set_state(AvatarState.IDLE),
+                ),
+            )
 
     def _handle_web_fetch(self, event: ClaudeEvent):
         """Handle web fetch event (runs in main thread)."""
@@ -234,9 +242,7 @@ class ClaudeIntegration(QObject):
     # =========================================================================
 
     def start_monitoring(
-        self,
-        session_dir: Optional[Path] = None,
-        project_name: Optional[str] = None
+        self, session_dir: Optional[Path] = None, project_name: Optional[str] = None
     ):
         """
         Start monitoring Claude Code sessions.
@@ -248,7 +254,12 @@ class ClaudeIntegration(QObject):
         """
         if session_dir is None:
             # Auto-detect session directory for fifth-symphony
-            session_dir = Path.home() / ".claude" / "projects" / "-path-to-git-internal-repos-project-name"
+            session_dir = (
+                Path.home()
+                / ".claude"
+                / "projects"
+                / "-path-to-git-internal-repos-project-name"
+            )
 
         if not session_dir.exists():
             logger.error(f"Claude Code session directory not found: {session_dir}")

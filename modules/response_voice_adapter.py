@@ -32,6 +32,7 @@ class ParsedResponse:
         has_links: Whether response contains hyperlinks
         complexity_score: 0-10 score of how technical the response is
     """
+
     visual: str
     voice: str
     has_code: bool = False
@@ -125,7 +126,7 @@ class ResponseVoiceAdapter:
             code_summary=code_summary,
             has_tables=has_tables,
             has_links=has_links,
-            complexity_score=complexity_score
+            complexity_score=complexity_score,
         )
 
     def _has_code_blocks(self, text: str) -> bool:
@@ -157,10 +158,12 @@ class ResponseVoiceAdapter:
 
         summaries = []
         for lang, code in code_blocks:
-            lang_name = self.CODE_LANGUAGE_NAMES.get(lang.lower(), f"{lang} code" if lang else "code")
+            lang_name = self.CODE_LANGUAGE_NAMES.get(
+                lang.lower(), f"{lang} code" if lang else "code"
+            )
 
             # Try to infer what the code does
-            lines = code.strip().split('\n')
+            lines = code.strip().split("\n")
 
             # For short code blocks, count lines
             if len(lines) <= 5:
@@ -210,11 +213,14 @@ class ResponseVoiceAdapter:
 
     def _replace_code_blocks(self, text: str) -> str:
         """Replace code blocks with natural language descriptions."""
+
         def replace_block(match):
             lang = match.group(1)
             code = match.group(2)
 
-            lang_name = self.CODE_LANGUAGE_NAMES.get(lang.lower(), f"{lang} code" if lang else "code")
+            lang_name = self.CODE_LANGUAGE_NAMES.get(
+                lang.lower(), f"{lang} code" if lang else "code"
+            )
 
             # Try to extract function/class names
             function_match = re.search(r"(?:def|function|class|fn)\s+(\w+)", code)
@@ -223,7 +229,7 @@ class ResponseVoiceAdapter:
                 return f"I've created a {name} {lang_name} function. "
 
             # Count lines for context
-            lines = code.strip().split('\n')
+            lines = code.strip().split("\n")
             if len(lines) == 1:
                 return f"Here's a {lang_name} one-liner. "
             else:
@@ -238,7 +244,7 @@ class ResponseVoiceAdapter:
 
         def replace_table(match):
             table = match.group(0)
-            rows = [r for r in table.split('\n') if r.strip() and not r.strip().startswith('|--')]
+            rows = [r for r in table.split("\n") if r.strip() and not r.strip().startswith("|--")]
 
             if len(rows) <= 1:
                 return "Here's a table with the information. "
@@ -254,9 +260,9 @@ class ResponseVoiceAdapter:
 
         # Remove bold/italic (keep text)
         text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)  # **bold**
-        text = re.sub(r"\*([^*]+)\*", r"\1", text)      # *italic*
-        text = re.sub(r"__([^_]+)__", r"\1", text)      # __bold__
-        text = re.sub(r"_([^_]+)_", r"\1", text)        # _italic_
+        text = re.sub(r"\*([^*]+)\*", r"\1", text)  # *italic*
+        text = re.sub(r"__([^_]+)__", r"\1", text)  # __bold__
+        text = re.sub(r"_([^_]+)_", r"\1", text)  # _italic_
 
         # Remove inline code (keep text)
         text = re.sub(r"`([^`]+)`", r"\1", text)
@@ -330,12 +336,12 @@ class ResponseVoiceAdapter:
 
         # Try to break at sentence boundary
         truncated = text[:max_length]
-        last_period = truncated.rfind('. ')
+        last_period = truncated.rfind(". ")
 
         if last_period > max_length * 0.7:  # If we can break at sentence within 70% of max
-            return truncated[:last_period + 1]
+            return truncated[: last_period + 1]
         else:
-            return truncated[:max_length - 3] + "..."
+            return truncated[: max_length - 3] + "..."
 
     def _calculate_complexity(self, text: str) -> int:
         """
@@ -365,9 +371,24 @@ class ResponseVoiceAdapter:
 
         # Technical terms (+1 per unique term, max 3)
         technical_terms = [
-            "function", "class", "method", "variable", "array", "object",
-            "async", "await", "promise", "callback", "API", "endpoint",
-            "database", "query", "schema", "migration", "container", "docker"
+            "function",
+            "class",
+            "method",
+            "variable",
+            "array",
+            "object",
+            "async",
+            "await",
+            "promise",
+            "callback",
+            "API",
+            "endpoint",
+            "database",
+            "query",
+            "schema",
+            "migration",
+            "container",
+            "docker",
         ]
         found_terms = sum(1 for term in technical_terms if term.lower() in text.lower())
         score += min(found_terms, 3)
@@ -440,4 +461,5 @@ The function will return the sum of all items.
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(demo())
