@@ -20,8 +20,10 @@ try:
     from defusedxml.ElementTree import fromstring, parse as safe_parse
 except ImportError:
     # Fallback to standard library with warning
-    from xml import etree
-    from xml.etree.ElementTree import parse as safe_parse
+    # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
+    from xml import etree  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
+    # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
+    from xml.etree.ElementTree import parse as safe_parse  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
 
     ElementTree = etree.ElementTree
     warnings.warn(

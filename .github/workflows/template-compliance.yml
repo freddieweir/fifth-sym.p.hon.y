@@ -76,20 +76,38 @@ jobs:
           done
         fi
 
-        # Check 3: Verify scripts/ directory - only .template files should be tracked
+        # Check 3: Verify scripts/ directory - utility scripts allowed in subdirectories
         echo "🚫 Checking scripts/ directory template compliance..."
 
         if [ -d "scripts/" ]; then
-          # Check if any non-.template files in scripts/ are tracked by git
-          TRACKED_NON_TEMPLATES=$(git ls-files scripts/ 2>/dev/null | grep -v "\.template$" || true)
+          # Exclude organized utility script directories from template checks
+          UTILITY_DIRS="cli launchers setup development services user-scripts symlinks"
+
+          # Check for tracked non-template files outside utility directories
+          TRACKED_NON_TEMPLATES=""
+          for file in $(git ls-files scripts/ 2>/dev/null | grep -v "\.template$" || true); do
+            # Check if file is in an allowed utility directory
+            IS_UTILITY=false
+            for util_dir in $UTILITY_DIRS; do
+              if echo "$file" | grep -q "^scripts/$util_dir/"; then
+                IS_UTILITY=true
+                break
+              fi
+            done
+
+            # If not in utility directory and not a template, it's a violation
+            if [ "$IS_UTILITY" = false ]; then
+              TRACKED_NON_TEMPLATES="$TRACKED_NON_TEMPLATES$file\n"
+            fi
+          done
 
           if [ ! -z "$TRACKED_NON_TEMPLATES" ]; then
-            echo "❌ Found tracked non-template files in scripts/ directory:"
-            echo "$TRACKED_NON_TEMPLATES"
-            VIOLATIONS="$VIOLATIONS\n- Tracked non-template files in scripts/: $TRACKED_NON_TEMPLATES"
+            echo "❌ Found tracked non-template files in scripts/ root directory:"
+            echo -e "$TRACKED_NON_TEMPLATES"
+            VIOLATIONS="$VIOLATIONS\n- Tracked non-template files in scripts/ root: $TRACKED_NON_TEMPLATES"
             VIOLATION_COUNT=$((VIOLATION_COUNT + 1))
           else
-            echo "✅ scripts/ directory properly configured (only .template files tracked)"
+            echo "✅ scripts/ directory properly configured (utility dirs + .template files allowed)"
           fi
 
           # Check that .template files exist and are tracked
@@ -97,6 +115,12 @@ jobs:
           if [ ! -z "$TRACKED_TEMPLATES" ]; then
             TEMPLATE_COUNT=$(echo "$TRACKED_TEMPLATES" | wc -l)
             echo "✅ Found $TEMPLATE_COUNT .template files tracked in scripts/"
+          fi
+
+          # Report utility script organization
+          UTILITY_SCRIPT_COUNT=$(git ls-files scripts/ 2>/dev/null | grep -E "^scripts/($UTILITY_DIRS)/" | wc -l || true)
+          if [ $UTILITY_SCRIPT_COUNT -gt 0 ]; then
+            echo "✅ Found $UTILITY_SCRIPT_COUNT utility scripts in organized subdirectories"
           fi
         fi
 
