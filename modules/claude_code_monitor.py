@@ -296,7 +296,7 @@ class ClaudeCodeMonitor:
         if isinstance(content, str) and content.startswith("     1→"):
             # This is a file read (cat -n format)
             lines = content.split('\n')
-            num_lines = len([l for l in lines if l.strip()])
+            num_lines = len([line for line in lines if line.strip()])
 
             event = ClaudeEvent(
                 event_type=ClaudeEventType.FILE_READ,

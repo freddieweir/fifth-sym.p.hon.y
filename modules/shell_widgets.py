@@ -151,13 +151,13 @@ class ShellWidget(Widget):
         if self.master_fd:
             try:
                 os.close(self.master_fd)
-            except:
+            except OSError:
                 pass
 
         if self.pid:
             try:
                 os.kill(self.pid, 15)  # SIGTERM
-            except:
+            except (OSError, ProcessLookupError):
                 pass
 
 

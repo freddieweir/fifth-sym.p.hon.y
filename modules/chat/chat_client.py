@@ -165,7 +165,7 @@ class ChatClient:
         try:
             dt = datetime.fromisoformat(timestamp)
             time_str = dt.strftime("%H:%M:%S")
-        except:
+        except (ValueError, AttributeError):
             time_str = "??:??:??"
 
         # Get color and emoji

@@ -85,7 +85,7 @@ class AppleScriptBridge:
         '''
 
         try:
-            output = await self.run_applescript(script)
+            await self.run_applescript(script)
             # Parse AppleScript output (simplified)
             # Real implementation would parse the returned data structure
             return [{"title": "Event parsing TODO", "start": "", "end": ""}]

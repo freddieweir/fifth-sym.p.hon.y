@@ -498,7 +498,6 @@ class NeuralOrchestra:
             self.console.print("\n[yellow]Neural Orchestra interrupted[/yellow]")
             await self.voice_handler.speak("Neural Orchestra interrupted")
         except Exception as e:
-            error_message = self.output_translator.simplify_error(str(e))
             await self.voice_handler.speak(
                 f"Fatal error: {self.output_translator.simplify_error(str(e))}",
                 priority="high"

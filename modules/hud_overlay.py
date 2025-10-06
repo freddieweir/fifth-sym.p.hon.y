@@ -198,7 +198,7 @@ class SystemHUD(Widget):
         try:
             used, total = self.model_context.split("/")
             return (int(used) / int(total)) * 100 if int(total) > 0 else 0
-        except:
+        except (ValueError, ZeroDivisionError):
             return 0
 
     def _create_progress_bar(self, label: str, value: str, percentage: float) -> Text:

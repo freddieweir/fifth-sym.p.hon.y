@@ -17,7 +17,7 @@ from pathlib import Path
 
 try:
     from defusedxml import ElementTree
-    from defusedxml.ElementTree import fromstring, parse as safe_parse
+    from defusedxml.ElementTree import parse as safe_parse
 except ImportError:
     # Fallback to standard library with warning
     # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
@@ -29,7 +29,7 @@ except ImportError:
     warnings.warn(
         "defusedxml not installed. Using standard xml library. "
         "Install defusedxml for better security: pip install defusedxml",
-        SecurityWarning,
+        UserWarning,
         stacklevel=2
     )
 
@@ -65,9 +65,9 @@ class OPMLParser:
             return self.title, self.categories
 
         except ElementTree.ParseError as e:
-            raise ValueError(f"Invalid OPML file: {e}")
-        except FileNotFoundError:
-            raise FileNotFoundError(f"OPML file not found: {self.opml_path}")
+            raise ValueError(f"Invalid OPML file: {e}") from e
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"OPML file not found: {self.opml_path}") from e
 
     def _parse_outlines(self, element: ElementTree.Element, category: str = "Uncategorized"):
         """Recursively parse outline elements."""

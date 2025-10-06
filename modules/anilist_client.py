@@ -91,7 +91,7 @@ class AniListClient:
 
         except subprocess.CalledProcessError as e:
             self.logger.error(f"Failed to retrieve API token: {e.stderr}")
-            raise RuntimeError(f"Cannot access AniList API token: {e.stderr}")
+            raise RuntimeError(f"Cannot access AniList API token: {e.stderr}") from e
 
     async def _query(self, query: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
