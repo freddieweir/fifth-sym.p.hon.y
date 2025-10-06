@@ -2,7 +2,7 @@
 Speech-to-Text voice input module.
 
 Provides keyboard-activated voice input using Whisper.
-ADHD-friendly with visual feedback and hotkey toggle.
+Attention-friendly with visual feedback and hotkey toggle.
 """
 
 import asyncio
@@ -27,7 +27,7 @@ class VoiceInput:
     - Hotkey activation (Cmd+Shift+V)
     - Real-time recording indicator
     - Whisper transcription
-    - ADHD-friendly visual feedback
+    - Attention-friendly visual feedback
     """
 
     def __init__(

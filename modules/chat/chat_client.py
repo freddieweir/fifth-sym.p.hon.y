@@ -1,7 +1,7 @@
 """
 Terminal UI chat client with color-coded messages.
 
-ADHD-friendly visual design with emoji indicators and rich formatting.
+Attention-friendly visual design with emoji indicators and rich formatting.
 """
 
 import asyncio

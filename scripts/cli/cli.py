@@ -26,7 +26,7 @@ def cli():
     🎵 Fifth Symphony - AI-Powered Distributed Automation Conductor
 
     Orchestrates Python, Bash, and AppleScript scripts across networks
-    with voice synthesis, multi-agent chat, and ADHD-friendly interfaces.
+    with voice synthesis, multi-agent chat, and Attention-friendly interfaces.
     """
     pass
 

@@ -68,7 +68,7 @@ CREATE TABLE chat_exports (
     export_date DATE,
     message_count INT,
     processed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    adhd_md_path VARCHAR(500), -- Path to ADHD-friendly markdown
+    adhd_md_path VARCHAR(500), -- Path to Attention-friendly markdown
     llm_txt_path VARCHAR(500), -- Path to LLM-optimized text
     source_json_hash VARCHAR(64), -- SHA256 hash of source JSON
     metadata JSONB DEFAULT '{}'

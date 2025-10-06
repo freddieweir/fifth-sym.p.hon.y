@@ -5,7 +5,7 @@ Intercepts LLM responses and requests permission to speak them.
 Integrates with permission engine for auto-approve rules and
 attention sound notifications.
 
-ADHD-optimized with:
+Attention-optimized with:
 - Audio cue notifications
 - Auto-approve patterns
 - Voice-friendly output parsing

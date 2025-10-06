@@ -2,7 +2,7 @@
 """
 Fifth Symphony Multi-Pane Dashboard
 
-ADHD-friendly TUI with multiple synchronized views:
+Attention-friendly TUI with multiple synchronized views:
 - Live chat feed
 - Directory tree
 - Ollama model output

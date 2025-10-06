@@ -1,7 +1,7 @@
 """
 Eye-Grabbing CLI UI
 
-ADHD-friendly terminal interface with colors, animations, and visual hierarchy.
+Attention-friendly terminal interface with colors, animations, and visual hierarchy.
 Designed for maximum visibility and engagement.
 """
 
@@ -37,7 +37,7 @@ class CLIUI:
     - Colorful banners and headers
     - Animated progress indicators
     - Risk-level color coding
-    - ADHD-friendly visual hierarchy
+    - Attention-friendly visual hierarchy
     - Emoji-rich feedback
     """
 

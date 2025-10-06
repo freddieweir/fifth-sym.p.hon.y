@@ -5,7 +5,7 @@ Provides organized access to frequently used directories with:
 - Real-time folder monitoring (watchdog)
 - File organization helpers
 - Quick access to common folders
-- ADHD-friendly folder summaries
+- Attention-friendly folder summaries
 - Automatic cleanup suggestions
 
 Common folders:

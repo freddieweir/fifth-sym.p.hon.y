@@ -2,7 +2,7 @@
 """
 Fifth Symphony - Complete Integrated System Example
 
-Demonstrates full integration of all ADHD-optimized features:
+Demonstrates full integration of all Attention-optimized features:
 - Voice I/O (speech-to-text + text-to-speech)
 - Voice permission system with code-free output
 - Visual Novel avatar with LED indicators
@@ -290,7 +290,7 @@ class IntegratedFifthSymphony(QMainWindow):
 
         # Process test response through voice hook
         test_response = """
-Hello! I'm Fifth Symphony, your ADHD-friendly AI assistant.
+Hello! I'm Fifth Symphony, your Attention-friendly AI assistant.
 
 I can help you with automation, voice feedback, and file management.
 """

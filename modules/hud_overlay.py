@@ -2,7 +2,7 @@
 Video Game-Style HUD Overlay
 
 Displays system status in gaming-inspired heads-up display.
-ADHD-optimized with visual indicators and real-time stats.
+Attention-optimized with visual indicators and real-time stats.
 """
 
 import asyncio

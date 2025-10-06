@@ -2,7 +2,7 @@
 Folder Management Dashboard Widget
 
 Textual widget for displaying folder summaries and quick access.
-ADHD-friendly with visual file organization and quick actions.
+Attention-friendly with visual file organization and quick actions.
 """
 
 import asyncio

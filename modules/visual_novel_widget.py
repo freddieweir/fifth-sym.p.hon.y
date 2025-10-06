@@ -1,7 +1,7 @@
 """
 Visual Novel Widget
 
-Static image display with state-based swapping for ADHD-friendly visual feedback.
+Static image display with state-based swapping for Attention-friendly visual feedback.
 Features LED status indicators and emotion-based image selection.
 
 States:
