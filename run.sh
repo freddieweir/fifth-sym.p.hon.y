@@ -60,6 +60,16 @@ fi
 
 echo
 echo -e "${BLUE}Starting Python Orchestrator...${NC}"
+
+# Check if chat server is running (optional)
+if nc -z localhost 8765 2>/dev/null; then
+    echo -e "${GREEN}✓ Chat server detected on localhost:8765${NC}"
+    echo -e "${YELLOW}  Tip: Use --with-chat to enable multi-agent chat${NC}"
+else
+    echo -e "${YELLOW}⚠ Chat server not running (optional)${NC}"
+    echo "  Start with: ./start_chat_server.sh"
+fi
+
 echo
 
 # Run the orchestrator with any passed arguments

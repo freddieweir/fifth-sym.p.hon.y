@@ -1,0 +1,14 @@
+# act configuration for Fifth Symphony
+# https://github.com/nektos/act
+
+# Use linux/amd64 for Apple Silicon compatibility
+--container-architecture linux/amd64
+
+# Use medium-sized runner image (balances speed vs compatibility)
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Bind Docker socket for workflows that use Docker
+--bind
+
+# Enable verbose output for debugging
+--verbose

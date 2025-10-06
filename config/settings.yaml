@@ -51,6 +51,23 @@ logging:
   file: "orchestrator.log"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+# Multi-Agent Chat Configuration
+chat:
+  enabled: false  # Enable multi-agent chat (requires chat server running)
+  server_url: "ws://localhost:8765"  # WebSocket server URL
+  username: "Fifth-Symphony"  # Orchestrator display name
+  auto_announce: true  # Automatically announce permission requests
+  announce_approvals: true  # Announce approval/denial decisions
+  announce_errors: true  # Announce errors to chat
+
+# Security Configuration
+security:
+  yubikey:
+    # Require YubiKey tap on first startup
+    enabled: false  # Set to true to enable YubiKey authentication
+    # Session duration (hours) - how long before requiring tap again
+    session_duration_hours: 24
+
 # Platform-specific settings
 platform:
   macos:

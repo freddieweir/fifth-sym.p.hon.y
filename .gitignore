@@ -13,6 +13,9 @@ CLAUDE.md
 **/CLAUDE.md
 
 # Personal/internal documentation (not for public repos)
+docs/
+!docs/.gitkeep
+!docs/README.md.template
 docs/internal/
 docs/private/
 **/internal-docs/
@@ -28,9 +31,6 @@ IDEAS.md
 THOUGHTS.md
 **/IDEAS.md
 **/THOUGHTS.md
-
-# Allow only the README to explain internal/ directory exists
-!docs/internal/README.md
 
 # =============================================================================
 # CRITICAL SECURITY - SSL/TLS CERTIFICATES AND PRIVATE KEYS

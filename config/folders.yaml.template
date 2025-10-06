@@ -1,0 +1,187 @@
+# Folder Management Configuration
+# Template file for managing frequently used directories
+
+# =============================================================================
+# MANAGED FOLDERS
+# =============================================================================
+# Define folders you want Fifth Symphony to manage and monitor
+
+folders:
+  # Downloads folder - Main system downloads
+  downloads:
+    path: "~/Downloads"
+    watch: true           # Monitor for new files
+    auto_organize: false  # Automatically organize by extension
+
+  # Project downloads - Fifth Symphony specific downloads
+  project_downloads:
+    path: "~/git/internal/repos/fifth-symphony/downloads"
+    watch: true
+    auto_organize: true
+
+  # Resume folder - Job application materials
+  resume:
+    path: "~/Documents/Resume"
+    watch: false
+    auto_organize: false
+
+  # Documents - General documents
+  documents:
+    path: "~/Documents"
+    watch: false
+    auto_organize: false
+
+  # Desktop - Quick access to desktop
+  desktop:
+    path: "~/Desktop"
+    watch: true
+    auto_organize: false
+
+# =============================================================================
+# FOLDER WATCHER SETTINGS
+# =============================================================================
+# Configuration for real-time folder monitoring
+
+watcher:
+  # Enable folder watching (requires watchdog package)
+  enabled: true
+
+  # Recursive monitoring (watch subdirectories)
+  recursive: true
+
+  # Debounce time (seconds) - Minimum time between event notifications
+  debounce_seconds: 1.0
+
+  # Ignore patterns (don't trigger events for these)
+  ignore_patterns:
+    - "*.tmp"
+    - "*.swp"
+    - "*.DS_Store"
+    - "*~"
+    - "*.lock"
+    - "__pycache__/*"
+    - ".git/*"
+
+# =============================================================================
+# AUTO-ORGANIZATION RULES
+# =============================================================================
+# Automatically organize files by type
+
+auto_organize:
+  # Enable auto-organization
+  enabled: false  # Set to true to enable automatic organization
+
+  # Organization strategy
+  strategy: "extension"  # Options: extension, date, size, custom
+
+  # File type categories (for extension-based organization)
+  categories:
+    documents:
+      extensions: [".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt"]
+      folder_name: "Documents"
+
+    images:
+      extensions: [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp"]
+      folder_name: "Images"
+
+    videos:
+      extensions: [".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv"]
+      folder_name: "Videos"
+
+    audio:
+      extensions: [".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a"]
+      folder_name: "Audio"
+
+    archives:
+      extensions: [".zip", ".tar", ".gz", ".rar", ".7z", ".bz2"]
+      folder_name: "Archives"
+
+    code:
+      extensions: [".py", ".js", ".ts", ".java", ".cpp", ".c", ".go", ".rs"]
+      folder_name: "Code"
+
+    spreadsheets:
+      extensions: [".xls", ".xlsx", ".csv", ".ods"]
+      folder_name: "Spreadsheets"
+
+# =============================================================================
+# CLEANUP SUGGESTIONS
+# =============================================================================
+# Settings for identifying files that may need cleanup
+
+cleanup:
+  # Enable cleanup suggestions
+  enabled: true
+
+  # Old file threshold (days)
+  old_file_days: 30
+
+  # Large file threshold (MB)
+  large_file_mb: 10
+
+  # Duplicate detection
+  detect_duplicates: true
+
+  # Suggest cleanup for these categories
+  suggest_cleanup_for:
+    - old_files      # Files not modified in old_file_days
+    - large_files    # Files larger than large_file_mb
+    - duplicates     # Duplicate files
+    - temp_files     # Temporary files (*.tmp, etc.)
+
+# =============================================================================
+# SUMMARY SETTINGS
+# =============================================================================
+# Configuration for folder summaries
+
+summary:
+  # Recent file threshold (days)
+  recent_days: 7
+
+  # Number of items to show in each category
+  max_recent_files: 10
+  max_old_files: 10
+  max_large_files: 10
+
+  # File type breakdown limit
+  max_file_types: 10
+
+# =============================================================================
+# NOTIFICATIONS
+# =============================================================================
+# Voice/visual notifications for folder events
+
+notifications:
+  # Enable notifications
+  enabled: true
+
+  # Notify on new files in watched folders
+  notify_on_new_file: true
+
+  # Notify on large downloads (MB)
+  notify_on_large_download: 50
+
+  # Voice notification for important events
+  voice_notifications: false
+
+  # Desktop notifications (macOS)
+  desktop_notifications: true
+
+# =============================================================================
+# QUICK ACCESS
+# =============================================================================
+# Shortcuts for common folder operations
+
+quick_access:
+  # Enable quick access commands
+  enabled: true
+
+  # Default folder for quick operations
+  default_folder: "downloads"
+
+  # File type presets for quick find
+  presets:
+    resumes: "*.pdf"
+    images: "*.{jpg,jpeg,png,gif}"
+    videos: "*.{mp4,mov,avi}"
+    documents: "*.{pdf,doc,docx,txt}"
