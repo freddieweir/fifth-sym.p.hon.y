@@ -11,10 +11,23 @@ Usage:
 If output file is not specified, outputs to stdout.
 """
 
-import xml.etree.ElementTree as ET
 import sys
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+
+try:
+    from defusedxml.ElementTree import parse as safe_parse, fromstring
+    import defusedxml.ElementTree as ET
+except ImportError:
+    # Fallback to standard library with warning
+    import xml.etree.ElementTree as ET
+    from xml.etree.ElementTree import parse as safe_parse
+    import warnings
+    warnings.warn(
+        "defusedxml not installed. Using standard xml library. "
+        "Install defusedxml for better security: pip install defusedxml",
+        SecurityWarning
+    )
 
 
 class OPMLParser:
@@ -30,7 +43,7 @@ class OPMLParser:
     def parse(self) -> Tuple[str, Dict[str, List[Dict]]]:
         """Parse the OPML file and return title and categorized feeds."""
         try:
-            tree = ET.parse(self.opml_path)
+            tree = safe_parse(self.opml_path)
             root = tree.getroot()
 
             # Extract title from head

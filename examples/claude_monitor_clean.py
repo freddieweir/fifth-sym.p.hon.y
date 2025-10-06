@@ -21,14 +21,7 @@ from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Vertical
-from textual.reactive import reactive
 from textual.widgets import Footer, Header, RichLog, Static
-
-try:
-    import ollama
-    OLLAMA_AVAILABLE = True
-except ImportError:
-    OLLAMA_AVAILABLE = False
 
 from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEventType
 
@@ -202,13 +195,13 @@ Events update in real-time as Claude works.[/dim]
 
         projects = []
         for session_dir in claude_dir.iterdir():
-            if session_dir.is_dir() and not session_dir.name.startswith('.'):
+            if session_dir.is_dir() and not session_dir.name.startswith("."):
                 jsonl_files = list(session_dir.glob("*.jsonl"))
                 if jsonl_files:
                     most_recent = max(f.stat().st_mtime for f in jsonl_files)
 
                     # Extract nice project name
-                    parts = session_dir.name.split('-')
+                    parts = session_dir.name.split("-")
                     if len(parts) > 4:
                         project_name = f"{parts[-2]}/{parts[-1]}"
                     elif len(parts) > 2:
