@@ -12,19 +12,17 @@ Keybindings:
 """
 
 import sys
-import asyncio
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, VerticalScroll
-from textual.widgets import Header, Footer, Static, Input, Button, RichLog, TabbedContent, TabPane
-from textual.binding import Binding
-from textual.reactive import reactive
-
 from rich.text import Text
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Container, Vertical
+from textual.reactive import reactive
+from textual.widgets import Footer, Header, RichLog, Static
 
 try:
     import ollama

@@ -207,9 +207,9 @@ auth.log*
 # Generated scripts with real domains (use templates instead)
 *.sh
 !*.sh.template
-!create-scripts.sh
 !run.sh
-!run_gui.sh
+# Allow organized scripts in scripts/ subdirectories
+!scripts/**/*.sh
 
 # Generated configuration files with real values
 *.yaml
@@ -421,7 +421,9 @@ private_docs/
 !*.template
 !*.example
 !*.sample
-!scripts/
+!scripts/**/*.py
+!scripts/**/*.sh
+!scripts/**/*.md
 
 # =============================================================================
 # GIT AUXILIARY FILES

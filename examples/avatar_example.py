@@ -10,11 +10,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication
 
-from modules.visual_novel_widget import VisualNovelWidget, AvatarState
 from modules.avatar_emotion_engine import AvatarEmotionEngine
+from modules.visual_novel_widget import AvatarState, VisualNovelWidget
 
 
 def main():

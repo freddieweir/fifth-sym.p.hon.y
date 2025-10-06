@@ -1,6 +1,6 @@
 # 🎵 Fifth Symphony Changelog
 
-**ADHD-Friendly**: Check this anytime to see what's new! Eye-grabbing visual updates.
+**Attention-Optimized**: Check this anytime to see what's new! Eye-grabbing visual updates.
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### 🎨 Visual Enhancements
 - **Eye-grabbing CLI UI** with Rich library animations and colors
-- **ADHD-optimized** visual feedback with emojis and progress bars
+- **Attention-optimized** visual feedback with emojis and progress bars
 - **Color-coded risk levels** (🟢 LOW, 🟡 MEDIUM, 🟠 HIGH, 🔴 CRITICAL)
 
 ### 🔒 Security Features
@@ -62,7 +62,7 @@
 - **CLI interface** (`main.py`) - Terminal script runner
 - **GUI interface** (`gui.py`) - Visual script management
 - **Voice synthesis** - ElevenLabs integration
-- **ADHD-friendly reminders** - Escalating attention alerts
+- **Smart reminders** - Escalating attention alerts
 - **1Password integration** - Secure credential management
 - **Script discovery** - Auto-detect scripts in `scripts/`
 
@@ -71,7 +71,7 @@
 - `voice_handler.py` - ElevenLabs voice synthesis
 - `script_runner.py` - Async script execution
 - `output_translator.py` - Technical→conversational translation
-- `reminder_system.py` - ADHD attention management
+- `reminder_system.py` - Attention management system
 - `symlink_manager.py` - External script integration
 
 ### ⚙️ Configuration

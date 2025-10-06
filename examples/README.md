@@ -1,6 +1,6 @@
 # Fifth Symphony - Integration Examples
 
-This directory contains example code showing how to use Fifth Symphony's ADHD-optimized features.
+This directory contains example code showing how to use Fifth Symphony's attention-optimized features.
 
 ## 📋 Examples
 
