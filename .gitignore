@@ -392,10 +392,8 @@ orchestrator_state.json
 # =============================================================================
 # PRIVATE PLANNING AND NOTES (OPSEC)
 # =============================================================================
-# Never commit private planning directories
-todos/
-/todos/
-**/todos/
+# Note: tasks/ directory is allowed for public task tracking
+# todos/ is for private planning only
 
 # Personal notes and documentation
 personal_notes/
