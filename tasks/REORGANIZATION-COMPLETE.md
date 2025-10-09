@@ -132,7 +132,7 @@ class MCPClient:
 ```
 
 **Integration**: Uses official ElevenLabs MCP server at:
-`/Users/fweir/git/external/mcp/elevenlabs-mcp`
+`$GIT_ROOT/external/mcp/elevenlabs-mcp`
 
 **Features**:
 - 1Password CLI integration for API key

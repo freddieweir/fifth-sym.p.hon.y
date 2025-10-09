@@ -64,7 +64,7 @@ jobs:
         echo "✅ Dependency Scanning"
         echo ""
         echo "🎯 Critical Requirements:"
-        echo "- ❌ Block ${PRODUCTION_DOMAIN:-corporateseas.com} (production domain)"
+        echo "- ❌ Block ${PRODUCTION_DOMAIN:-yourdomain.com} (production domain)"
         echo "- ✅ Allow yourdomain.com in templates only"
         echo "- ✅ Enforce template/scripts separation"
         echo "- ✅ Detect API keys and secrets"

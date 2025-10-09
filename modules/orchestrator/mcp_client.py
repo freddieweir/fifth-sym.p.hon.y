@@ -21,7 +21,7 @@ class MCPClient:
     Client for ElevenLabs MCP server integration.
 
     Uses the official ElevenLabs MCP server at:
-    /Users/fweir/git/external/mcp/elevenlabs-mcp
+    $GIT_ROOT/external/mcp/elevenlabs-mcp
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -32,7 +32,8 @@ class MCPClient:
             config: Configuration dictionary with ElevenLabs settings
         """
         self.config = config
-        self.mcp_server_path = Path("/Users/fweir/git/external/mcp/elevenlabs-mcp")
+        # Default path - override via config if needed
+        self.mcp_server_path = Path.home() / "git" / "external" / "mcp" / "elevenlabs-mcp"
         self.voice_id = config.get("voice_id", "default")
         self.api_key_vault_item = config.get("elevenlabs_api_key_item", "ElevenLabs API Key")
         self.logger = logging.getLogger(__name__)

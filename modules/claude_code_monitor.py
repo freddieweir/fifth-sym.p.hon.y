@@ -120,7 +120,7 @@ class ClaudeCodeMonitor:
     Example:
         monitor = ClaudeCodeMonitor()
         monitor.add_callback(ClaudeEventType.FILE_WRITE, on_file_written)
-        monitor.start_monitoring("/Users/fweir/.claude/projects/...")
+        monitor.start_monitoring("~/.claude/projects/...")
     """
 
     def __init__(self):

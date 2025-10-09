@@ -12,7 +12,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-EXTERNAL_REPOS_DIR="/Users/fweir/git/external/repos"
+# Configure this path for your environment
+EXTERNAL_REPOS_DIR="${GIT_ROOT:-$HOME/git}/external/repos"
 
 echo -e "${CYAN}════════════════════════════════════════════════════════${NC}"
 echo -e "${CYAN}   📚 External Repos Auto-Update${NC}"

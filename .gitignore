@@ -20,6 +20,11 @@ docs/internal/
 docs/private/
 **/internal-docs/
 **/private-docs/
+
+# Examples directory (contains specific implementation details)
+examples/
+!examples/.gitkeep
+!examples/README.md.template
 TEMPLATE_SECURITY.md
 CHANGELOG.md
 INTERNAL_*.md
