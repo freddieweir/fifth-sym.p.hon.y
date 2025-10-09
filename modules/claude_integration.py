@@ -16,7 +16,7 @@ from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEv
 
 # Optional imports (may not be available in all contexts)
 try:
-    from modules.visual_novel_widget import VisualNovelWidget, AvatarState
+    from modules.visualization_widget import VisualNovelWidget, AvatarState
 
     AVATAR_AVAILABLE = True
 except ImportError:

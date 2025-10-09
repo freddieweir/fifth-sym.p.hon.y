@@ -148,7 +148,7 @@ class VisualNovelWidget(QWidget):
         super().__init__(parent)
 
         # Configuration
-        self.assets_path = assets_path or Path(__file__).parent.parent / "assets" / "visual_novel"
+        self.assets_path = assets_path or Path(__file__).parent.parent / "assets" / "visualization"
         self.always_on_top = always_on_top
 
         # State
@@ -324,7 +324,7 @@ class VisualNovelWidget(QWidget):
         painter.drawText(
             pixmap.rect(),
             Qt.AlignCenter,
-            f"{state.upper()}\n\nPlace image at:\nassets/visual_novel/{state}.png",
+            f"{state.upper()}\n\nPlace image at:\nassets/visualization/{state}.png",
         )
 
         painter.end()

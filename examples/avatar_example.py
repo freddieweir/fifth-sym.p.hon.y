@@ -14,7 +14,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from modules.avatar_emotion_engine import AvatarEmotionEngine
-from modules.visual_novel_widget import AvatarState, VisualNovelWidget
+from modules.visualization_widget import AvatarState, VisualNovelWidget
 
 
 def main():

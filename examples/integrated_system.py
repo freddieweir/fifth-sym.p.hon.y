@@ -28,7 +28,7 @@ from modules.avatar_emotion_engine import AvatarEmotionEngine
 from modules.claude_integration import ClaudeIntegration
 from modules.folder_manager import FileEvent, FolderManager
 from modules.onepassword_manager import OnePasswordManager
-from modules.visual_novel_widget import AvatarState, VisualNovelWidget
+from modules.visualization_widget import AvatarState, VisualNovelWidget
 from modules.voice_handler import VoiceHandler
 from modules.voice_permission_hook import VoicePermissionHook, VoicePermissionResponse
 

@@ -23,7 +23,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QLabel, QMainWindow, QTextEdit, QVBoxLayout, QWidget
 
 from modules.claude_integration import ClaudeIntegration
-from modules.visual_novel_widget import VisualNovelWidget
+from modules.visualization_widget import VisualNovelWidget
 
 
 class ClaudeMonitorDemo(QMainWindow):

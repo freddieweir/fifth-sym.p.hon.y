@@ -121,7 +121,7 @@ await voice_hook.on_response("Hello! This is a test.")
 ### Minimal Avatar Example
 
 ```python
-from modules.visual_novel_widget import VisualNovelWidget
+from modules.visualization_widget import VisualNovelWidget
 
 # Create avatar
 avatar = VisualNovelWidget(always_on_top=True)

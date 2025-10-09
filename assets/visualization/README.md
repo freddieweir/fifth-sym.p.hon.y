@@ -44,7 +44,7 @@ If an image file is missing, the widget will:
 IDLE
 
 Place image at:
-assets/visual_novel/idle.png
+assets/visualization/idle.png
 ```
 
 ## Image Sources
@@ -97,7 +97,7 @@ The widget will work immediately with placeholder images. You can test all funct
 ## Integration Example
 
 ```python
-from modules.visual_novel_widget import VisualNovelWidget
+from modules.visualization_widget import VisualNovelWidget
 
 # Create widget
 avatar = VisualNovelWidget()

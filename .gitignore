@@ -21,6 +21,7 @@ docs/private/
 **/internal-docs/
 **/private-docs/
 TEMPLATE_SECURITY.md
+CHANGELOG.md
 INTERNAL_*.md
 PERSONAL_*.md
 TODO_*.md
