@@ -20,6 +20,8 @@ from modules.reminder_system import ReminderSystem
 from modules.script_runner import ScriptRunner
 from modules.symlink_manager import SymlinkManager
 from modules.voice_handler import VoiceHandler
+from modules.orchestrator.chat_integration import OrchestratorChatContext
+from modules.yubikey_auth import YubiKeyAuth
 
 # Add modules to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -32,7 +34,7 @@ class NeuralOrchestra:
     with voice synthesis and modular integration
     """
 
-    def __init__(self, config_path: Path = None):
+    def __init__(self, config_path: Path = None, enable_chat: bool = False):
         self.console = Console()
         self.config_path = config_path or Path(__file__).parent / "config"
         self.scripts_path = Path(__file__).parent / "scripts"
@@ -48,6 +50,10 @@ class NeuralOrchestra:
         self.script_runner = ScriptRunner(self.scripts_path)
         self.reminder_system = ReminderSystem(self.voice_handler, self.config.get("reminders", {}))
         self.symlink_manager = SymlinkManager(self.symlinks_path)
+
+        # Chat integration (optional)
+        self.enable_chat = enable_chat or self.config.get("chat", {}).get("enabled", False)
+        self.chat_client = None
 
         # Track running scripts
         self.running_scripts: dict[str, asyncio.Task] = {}
@@ -182,6 +188,10 @@ class NeuralOrchestra:
         # Voice announcement
         await self.voice_handler.speak(f"Starting execution of {script_name}")
 
+        # Chat announcement
+        if self.chat_client:
+            await self.chat_client.post_message(f"🎬 Starting script: {script_name}")
+
         # Create reminder task for this script
         reminder_task = None
         if self.config.get("reminders", {}).get("enabled"):
@@ -189,8 +199,7 @@ class NeuralOrchestra:
 
         try:
             # Run the script
-            async for output_type, output in self.script_runner.run_script_async(
-                script_path, args):
+            async for output_type, output in self.script_runner.run_script_async(script_path, args):
                 # Display output
                 if output_type == "stdout":
                     self.console.print(output, style="green", end="")
@@ -210,6 +219,8 @@ class NeuralOrchestra:
                     await self.voice_handler.speak(
                         f"{script_name} is waiting for your input", priority="high"
                     )
+                    if self.chat_client:
+                        await self.chat_client.post_message(f"⏸️ {script_name} waiting for input")
                     # Restart reminder after input is provided
                     if self.config.get("reminders", {}).get("enabled"):
                         reminder_task = asyncio.create_task(
@@ -218,6 +229,8 @@ class NeuralOrchestra:
 
             # Script completed
             await self.voice_handler.speak(f"{script_name} completed successfully")
+            if self.chat_client:
+                await self.chat_client.post_message(f"✅ {script_name} completed successfully")
 
         except Exception as e:
             error_message = self.output_translator.simplify_error(str(e))
@@ -225,6 +238,8 @@ class NeuralOrchestra:
                 f"Error in {script_name}: {error_message}", priority="high"
             )
             self.console.print(f"[red]Error: {e}[/red]")
+            if self.chat_client:
+                await self.chat_client.post_message(f"❌ {script_name} failed: {error_message}")
         finally:
             if reminder_task:
                 reminder_task.cancel()
@@ -347,6 +362,10 @@ class NeuralOrchestra:
             "Welcome to the Neural Orchestra. Initializing automation symphony."
         )
 
+        # Chat startup announcement
+        if self.chat_client:
+            await self.chat_client.post_message("🎵 Neural Orchestra started in interactive mode")
+
         scripts = await self.discover_scripts()
 
         if not scripts:
@@ -411,6 +430,9 @@ class NeuralOrchestra:
         parser.add_argument("-q", "--quiet", action="store_true", help="Disable voice feedback")
         parser.add_argument("--no-reminders", action="store_true", help="Disable reminder system")
         parser.add_argument(
+            "--with-chat", action="store_true", help="Enable multi-agent chat integration"
+        )
+        parser.add_argument(
             "--add-symlink", metavar="PATH", help="Add a symlink to an external script"
         )
         parser.add_argument(
@@ -430,90 +452,128 @@ class NeuralOrchestra:
         if args.no_reminders:
             self.config["reminders"]["enabled"] = False
 
+        if args.with_chat:
+            self.enable_chat = True
+
+        # Initialize chat connection if enabled
+        chat_context = None
+        if self.enable_chat:
+            chat_config = self.config.get("chat", {})
+            chat_context = OrchestratorChatContext(
+                server_url=chat_config.get("server_url", "ws://localhost:8765"),
+                username=chat_config.get("username", "Fifth-Symphony"),
+            )
+
         try:
-            # Initialize 1Password session if needed
-            if self.config.get("onepassword", {}).get("vault"):
-                await self.op_manager.initialize_session()
-
-            # Handle symlink operations
-            if args.add_symlink:
-                success, message = self.symlink_manager.add_symlink(
-                    args.add_symlink, args.symlink_alias
+            # YubiKey authentication (first startup only)
+            yubikey_config = self.config.get("security", {}).get("yubikey", {})
+            if yubikey_config.get("enabled", False):
+                yubikey_auth = YubiKeyAuth(
+                    session_duration_hours=yubikey_config.get("session_duration_hours", 24)
                 )
-                if success:
-                    self.console.print(f"[green]{message}[/green]")
-                else:
-                    self.console.print(f"[red]{message}[/red]")
-                return
+                try:
+                    await yubikey_auth.require_yubikey_tap("fifth-symphony-orchestrator")
+                    self.console.print("[green]🔐 YubiKey authentication successful[/green]")
+                except PermissionError as e:
+                    self.console.print(f"[red]🔐 YubiKey authentication failed: {e}[/red]")
+                    return
 
-            if args.list_symlinks:
-                symlinks = self.symlink_manager.list_symlinks()
-                if symlinks:
-                    table = Table(
-                        title="Configured Symlinks", show_header=True, header_style="bold cyan"
-                    )
-                    table.add_column("Name", style="green")
-                    table.add_column("Target", style="yellow")
-                    table.add_column("Status", style="blue")
+            # Connect to chat if enabled
+            if chat_context:
+                async with chat_context as chat_client:
+                    self.chat_client = chat_client
 
-                    for link in symlinks:
-                        status = "✅ Valid" if link["valid"] else "❌ Broken"
-                        table.add_row(link["name"], link.get("target", "Unknown"), status)
+                    # Initialize 1Password session if needed
+                    if self.config.get("onepassword", {}).get("vault"):
+                        await self.op_manager.initialize_session()
 
-                    self.console.print(table)
-                else:
-                    self.console.print("[yellow]No symlinks configured[/yellow]")
-                return
-
-            if args.sequence:
-                await self.run_orchestration_sequence(args.sequence)
-            elif args.script:
-                # Try to find script in various locations
-                script_path = None
-
-                # Check scripts directory
-                for attempt in [
-                    self.scripts_path / f"{args.script}.py",
-                    self.scripts_path / args.script,
-                ]:
-                    if attempt.exists():
-                        script_path = attempt
-                        break
-
-                # If not found, check symlinks directory
-                if not script_path:
-                    for attempt in [
-                        self.symlinks_path / args.script,
-                        self.symlinks_path / f"{args.script}.py",
-                        self.symlinks_path / f"{args.script}.sh",
-                        self.symlinks_path / f"{args.script}.bash",
-                    ]:
-                        if attempt.exists():
-                            script_path = attempt
-                            break
-
-                if script_path:
-                    await self.run_script(script_path, args.args)
-                else:
-                    self.console.print(f"[red]Script not found: {args.script}[/red]")
-                    await self.voice_handler.speak(f"Script {args.script} not found")
+                    await self._run_main_logic(args)
             else:
-                await self.interactive_mode()
+                # Initialize 1Password session if needed
+                if self.config.get("onepassword", {}).get("vault"):
+                    await self.op_manager.initialize_session()
+
+                await self._run_main_logic(args)
 
         except KeyboardInterrupt:
             self.console.print("\n[yellow]Neural Orchestra interrupted[/yellow]")
             await self.voice_handler.speak("Neural Orchestra interrupted")
         except Exception as e:
-            error_message = self.output_translator.simplify_error(str(e))
             await self.voice_handler.speak(
-                f"Fatal error: {self.output_translator.simplify_error(str(e))}",
-                priority="high"
+                f"Fatal error: {self.output_translator.simplify_error(str(e))}", priority="high"
             )
         finally:
             # Cleanup
             await self.voice_handler.cleanup()
             for task in self.running_scripts.values():
                 task.cancel()
+
+    async def _run_main_logic(self, args):
+        """Execute main orchestrator logic"""
+        # Handle symlink operations
+        if args.add_symlink:
+            success, message = self.symlink_manager.add_symlink(
+                args.add_symlink, args.symlink_alias
+            )
+            if success:
+                self.console.print(f"[green]{message}[/green]")
+            else:
+                self.console.print(f"[red]{message}[/red]")
+            return
+
+        if args.list_symlinks:
+            symlinks = self.symlink_manager.list_symlinks()
+            if symlinks:
+                table = Table(
+                    title="Configured Symlinks", show_header=True, header_style="bold cyan"
+                )
+                table.add_column("Name", style="green")
+                table.add_column("Target", style="yellow")
+                table.add_column("Status", style="blue")
+
+                for link in symlinks:
+                    status = "✅ Valid" if link["valid"] else "❌ Broken"
+                    table.add_row(link["name"], link.get("target", "Unknown"), status)
+
+                self.console.print(table)
+            else:
+                self.console.print("[yellow]No symlinks configured[/yellow]")
+            return
+
+        if args.sequence:
+            await self.run_orchestration_sequence(args.sequence)
+        elif args.script:
+            # Try to find script in various locations
+            script_path = None
+
+            # Check scripts directory
+            for attempt in [
+                self.scripts_path / f"{args.script}.py",
+                self.scripts_path / args.script,
+            ]:
+                if attempt.exists():
+                    script_path = attempt
+                    break
+
+            # If not found, check symlinks directory
+            if not script_path:
+                for attempt in [
+                    self.symlinks_path / args.script,
+                    self.symlinks_path / f"{args.script}.py",
+                    self.symlinks_path / f"{args.script}.sh",
+                    self.symlinks_path / f"{args.script}.bash",
+                ]:
+                    if attempt.exists():
+                        script_path = attempt
+                        break
+
+            if script_path:
+                await self.run_script(script_path, args.args)
+            else:
+                self.console.print(f"[red]Script not found: {args.script}[/red]")
+                await self.voice_handler.speak(f"Script {args.script} not found")
+        else:
+            await self.interactive_mode()
 
 
 if __name__ == "__main__":

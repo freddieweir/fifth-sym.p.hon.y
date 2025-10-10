@@ -129,7 +129,7 @@ The system automatically retrieves credentials at runtime without storing them i
 
 ## Reminder System
 
-ADHD-friendly attention management:
+Focus-friendly attention management:
 
 - **Gentle reminders** after 2 minutes
 - **Moderate alerts** after 5 minutes  

@@ -1,0 +1,6 @@
+# Recycled directory - temporary storage for old/outdated scripts
+# All files are excluded from git
+
+*
+!.gitignore
+!README.md

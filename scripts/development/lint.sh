@@ -1,5 +1,5 @@
 #!/bin/bash
-# Neural Orchestra - Quick Lint Script
+# Fifth Symphony - Quick Lint Script
 # Usage: ./lint.sh [fix|check|all]
 
 set -e

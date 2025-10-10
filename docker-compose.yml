@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 18 - Knowledge base and memory storage
+  postgres:
+    image: postgres:18-alpine
+    container_name: fifth-symphony-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fifth_symphony
+      POSTGRES_USER: symphony
+      # Password should be set via environment variable or secrets
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U symphony -d fifth_symphony"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: fifth-symphony-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL MCP Server (for Claude Code integration)
+  postgres-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.postgres-mcp
+    container_name: fifth-symphony-postgres-mcp
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://symphony:${POSTGRES_PASSWORD:-changeme}@postgres:5432/fifth_symphony
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ./modules/mcp:/app/mcp:ro
+
+volumes:
+  postgres-data:
+    name: fifth-symphony-postgres-data
+  redis-data:
+    name: fifth-symphony-redis-data
+
+networks:
+  default:
+    name: fifth-symphony-network

@@ -1,0 +1,9 @@
+# Memory directory contains runtime state and must be excluded from git
+# Only structure documentation should be committed
+
+# Exclude all files by default
+*
+
+# But allow these documentation files
+!.gitignore
+!README.md
