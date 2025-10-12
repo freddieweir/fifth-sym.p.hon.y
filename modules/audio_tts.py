@@ -413,7 +413,10 @@ class AudioTTS:
 
     def _pause_media(self, app_name: str) -> bool:
         """
-        Pause media in the specified app.
+        Pause media in the specified app using MediaPlayPause Shortcut.
+
+        Uses the same Shortcuts.app media control for all apps to ensure
+        consistent behavior and avoid launching apps that aren't running.
 
         Args:
             app_name: Name of the app
@@ -425,18 +428,9 @@ class AudioTTS:
             return False
 
         try:
-            if app_name == "Music":
-                subprocess.run(
-                    ["osascript", "-e", 'tell application "Music" to pause'],
-                    capture_output=True,
-                    timeout=2,
-                    check=False
-                )
-                logger.debug(f"Paused {app_name}")
-                return True
-
-            elif app_name in ["Safari", "zen", "Zen Browser", "Web App", "YouTube"]:
-                return self._pause_browser_media(app_name)
+            # Use MediaPlayPause Shortcut for all apps (Music, browsers, YouTube)
+            # This avoids opening Music.app if it's not already running
+            return self._pause_browser_media(app_name)
 
         except Exception as e:
             logger.debug(f"Could not pause {app_name}: {e}")
@@ -445,7 +439,10 @@ class AudioTTS:
 
     def _resume_media(self, app_name: str) -> bool:
         """
-        Resume media in the specified app.
+        Resume media in the specified app using MediaPlayPause Shortcut.
+
+        Uses the same Shortcuts.app media control for all apps (toggle behavior)
+        to ensure consistent behavior and avoid launching apps that aren't running.
 
         Args:
             app_name: Name of the app
@@ -457,19 +454,10 @@ class AudioTTS:
             return False
 
         try:
-            if app_name == "Music":
-                subprocess.run(
-                    ["osascript", "-e", 'tell application "Music" to play'],
-                    capture_output=True,
-                    timeout=2,
-                    check=False
-                )
-                logger.debug(f"Resumed {app_name}")
-                return True
-
-            elif app_name in ["Safari", "zen", "Zen Browser", "Web App", "YouTube"]:
-                # Resume browser/app media using same keyboard shortcut (toggle)
-                return self._pause_browser_media(app_name)
+            # Use MediaPlayPause Shortcut for all apps (Music, browsers, YouTube)
+            # MediaPlayPause is a toggle, so calling it again resumes playback
+            # This avoids opening Music.app if it's not already running
+            return self._pause_browser_media(app_name)
 
         except Exception as e:
             logger.debug(f"Could not resume {app_name}: {e}")
