@@ -284,7 +284,8 @@ class AudioTTS:
         """
         Check if Music.app is currently playing.
 
-        Uses AppleScript to query Music.app's player state without launching it.
+        CRITICAL: Must check if Music.app process exists BEFORE querying state,
+        because AppleScript 'tell application' will launch the app if not running.
 
         Returns:
             True if Music.app is playing, False otherwise
@@ -293,8 +294,20 @@ class AudioTTS:
             return False
 
         try:
-            # Query Music.app player state
-            # This will NOT launch Music.app if it's not running
+            # Step 1: Check if Music.app process is running (doesn't launch app)
+            result = subprocess.run(
+                ["pgrep", "-x", "Music"],
+                capture_output=True,
+                timeout=2,
+                check=False
+            )
+
+            if result.returncode != 0:
+                # Music.app is NOT running
+                logger.debug("Music.app is not running - skipping state check")
+                return False
+
+            # Step 2: Music.app IS running - safe to query state now
             result = subprocess.run(
                 ["osascript", "-e", 'tell application "Music" to get player state'],
                 capture_output=True,
@@ -307,7 +320,7 @@ class AudioTTS:
             if is_playing:
                 logger.info("Detected Music.app is playing")
             else:
-                logger.debug(f"Music.app state: {result.stdout.strip()}")
+                logger.debug(f"Music.app is running but not playing (state: {result.stdout.strip()})")
 
             return is_playing
 
