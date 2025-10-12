@@ -181,6 +181,10 @@ venv.bak/
 # Claude IDE settings (personal)
 .claude/
 
+# MCP server configuration (user-specific paths)
+.mcp.json
+*.mcp.json
+
 # =============================================================================
 # OPERATIONAL FILES
 # =============================================================================

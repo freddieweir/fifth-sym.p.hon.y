@@ -107,7 +107,7 @@ class OnePasswordManager:
         args = ["item", "get", item_name]
         if vault_name:
             args.extend(["--vault", vault_name])
-        args.extend(["--field", field])
+        args.extend(["--field", field, "--reveal"])
 
         result = self._run_op_command(args)
 

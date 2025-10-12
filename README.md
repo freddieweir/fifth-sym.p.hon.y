@@ -151,7 +151,8 @@ Fifth Symphony includes example scripts:
 fifth-symphony/
 ├── main.py                 # Fifth Symphony main conductor
 ├── modules/               # Core functionality modules
-│   ├── onepassword_manager.py
+│   ├── audio_tts.py      # Text-to-speech with ElevenLabs (NEW!)
+│   ├── onepassword_manager.py  # Secure credential management
 │   ├── voice_handler.py
 │   ├── script_runner.py
 │   ├── output_translator.py
@@ -163,6 +164,22 @@ fifth-symphony/
 ├── scripts/             # Your Python scripts go here
 └── pyproject.toml       # uv package configuration
 ```
+
+### Modular Components
+
+The `modules/` directory contains reusable components that can be imported into other projects:
+
+- **audio_tts.py** - High-quality text-to-speech using ElevenLabs SDK
+  - Voice differentiation (VM vs Main machine)
+  - Automatic media pause/resume
+  - 1Password API key integration
+  - Simple usage: `AudioTTS(auto_play=True).generate_speech("Hello!")`
+
+- **onepassword_manager.py** - Secure credential retrieval from 1Password CLI
+- **voice_handler.py** - Voice synthesis coordination
+- **script_runner.py** - Execute and monitor scripts across the network
+- **output_translator.py** - Convert technical output to human-friendly speech
+- **reminder_system.py** - Proactive attention-grabbing for long-running tasks
 
 ## Security
 
