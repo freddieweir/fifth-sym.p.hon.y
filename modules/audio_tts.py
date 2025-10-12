@@ -280,93 +280,51 @@ class AudioTTS:
             logger.error(f"Failed to initialize ElevenLabs client: {e}")
             raise AudioTTSError(f"Cannot initialize audio TTS: {e}") from e
 
-    def _is_app_running(self, app_name: str) -> bool:
+    def _check_music_playing(self) -> bool:
         """
-        Check if an application is currently running.
+        Check if Music.app is currently playing.
 
-        Args:
-            app_name: Name of the app
+        Uses AppleScript to query Music.app's player state without launching it.
 
         Returns:
-            True if app is running, False otherwise
+            True if Music.app is playing, False otherwise
         """
         if sys.platform != "darwin":
             return False
 
         try:
+            # Query Music.app player state
+            # This will NOT launch Music.app if it's not running
             result = subprocess.run(
-                ["osascript", "-e", f'tell application "System Events" to (name of processes) contains "{app_name}"'],
+                ["osascript", "-e", 'tell application "Music" to get player state'],
                 capture_output=True,
                 text=True,
                 timeout=2,
                 check=False
             )
-            return result.stdout.strip() == "true"
-        except Exception as e:
-            logger.debug(f"Could not check if {app_name} is running: {e}")
-            return False
 
-    def _check_if_app_playing(self, app_name: str) -> bool:
-        """
-        Check if a media app is currently playing.
+            is_playing = result.stdout.strip() == "playing"
+            if is_playing:
+                logger.info("Detected Music.app is playing")
+            else:
+                logger.debug(f"Music.app state: {result.stdout.strip()}")
 
-        Only checks apps that are actually running.
-
-        Args:
-            app_name: Name of the app (Music, Safari, Zen Browser, YouTube)
-
-        Returns:
-            True if app is playing media, False otherwise
-        """
-        if sys.platform != "darwin":
-            return False
-
-        # First check if app is even running
-        if not self._is_app_running(app_name):
-            logger.debug(f"{app_name} is not running, skipping")
-            return False
-
-        try:
-            if app_name == "Music":
-                # Check if Music.app is playing
-                result = subprocess.run(
-                    ["osascript", "-e", 'tell application "Music" to get player state'],
-                    capture_output=True,
-                    text=True,
-                    timeout=2,
-                    check=False
-                )
-                is_playing = result.stdout.strip() == "playing"
-                if is_playing:
-                    logger.info(f"Detected {app_name} is playing")
-                return is_playing
-
-            elif app_name in ["Safari", "zen", "Zen Browser", "Web App", "YouTube"]:
-                # For browsers and YouTube app, we can't reliably detect playback state
-                # Just assume if they're running, they might be playing something
-                logger.info(f"{app_name} is running, will pause")
-                return True
+            return is_playing
 
         except Exception as e:
-            logger.debug(f"Could not check if {app_name} is playing: {e}")
+            logger.debug(f"Could not check Music.app state: {e}")
+            return False
 
-        return False
-
-    def _pause_browser_media(self, app_name: str) -> bool:
+    def _toggle_media_playback(self) -> bool:
         """
-        Pause media in browser/app (Safari, Zen Browser, YouTube) using Shortcuts.
+        Toggle media playback using MediaPlayPause Shortcut.
 
-        Uses the configured macOS Shortcut (default: "MediaPlayPause") to toggle media.
-        This works with Karabiner-Elements and BetterTouchTool since it uses
-        official media control APIs instead of simulating key presses.
-
-        Falls back gracefully if Shortcuts.app is unavailable or shortcut doesn't exist.
-
-        Args:
-            app_name: Browser/app name (Safari, Zen Browser, or YouTube)
+        Uses macOS Shortcuts.app to control media playback universally.
+        Works with Karabiner-Elements since it uses official media control APIs
+        instead of simulating key presses.
 
         Returns:
-            True if pause command was sent successfully, False otherwise
+            True if toggle command was sent successfully, False otherwise
         """
         if sys.platform != "darwin":
             return False
@@ -382,7 +340,7 @@ class AudioTTS:
             )
 
             if result.returncode == 0:
-                logger.debug(f"Toggled media playback via Shortcuts '{self.media_shortcut}' for {app_name}")
+                logger.debug(f"Toggled media playback via Shortcuts '{self.media_shortcut}'")
                 return True
             else:
                 # Log detailed error for troubleshooting
@@ -394,7 +352,7 @@ class AudioTTS:
                         f"Media will not be paused/resumed."
                     )
                 else:
-                    logger.debug(f"Shortcuts command failed for {app_name}: {stderr}")
+                    logger.debug(f"Shortcuts command failed: {stderr}")
                 return False
 
         except FileNotFoundError:
@@ -405,119 +363,57 @@ class AudioTTS:
             )
             return False
         except subprocess.TimeoutExpired:
-            logger.warning(f"Shortcuts command timed out for {app_name}")
+            logger.warning("Shortcuts command timed out")
             return False
         except Exception as e:
-            logger.debug(f"Could not toggle {app_name} media: {e}")
+            logger.debug(f"Could not toggle media: {e}")
             return False
-
-    def _pause_media(self, app_name: str) -> bool:
-        """
-        Pause media in the specified app using MediaPlayPause Shortcut.
-
-        Uses the same Shortcuts.app media control for all apps to ensure
-        consistent behavior and avoid launching apps that aren't running.
-
-        Args:
-            app_name: Name of the app
-
-        Returns:
-            True if pause was successful
-        """
-        if sys.platform != "darwin":
-            return False
-
-        try:
-            # Use MediaPlayPause Shortcut for all apps (Music, browsers, YouTube)
-            # This avoids opening Music.app if it's not already running
-            return self._pause_browser_media(app_name)
-
-        except Exception as e:
-            logger.debug(f"Could not pause {app_name}: {e}")
-
-        return False
-
-    def _resume_media(self, app_name: str) -> bool:
-        """
-        Resume media in the specified app using MediaPlayPause Shortcut.
-
-        Uses the same Shortcuts.app media control for all apps (toggle behavior)
-        to ensure consistent behavior and avoid launching apps that aren't running.
-
-        Args:
-            app_name: Name of the app
-
-        Returns:
-            True if resume was successful
-        """
-        if sys.platform != "darwin":
-            return False
-
-        try:
-            # Use MediaPlayPause Shortcut for all apps (Music, browsers, YouTube)
-            # MediaPlayPause is a toggle, so calling it again resumes playback
-            # This avoids opening Music.app if it's not already running
-            return self._pause_browser_media(app_name)
-
-        except Exception as e:
-            logger.debug(f"Could not resume {app_name}: {e}")
-
-        return False
 
     @contextmanager
     def _manage_media_playback(self):
         """
-        Context manager to pause/resume media during audio playback.
+        Smart media management with state detection.
 
-        Detects currently running media apps (Music, Safari, Zen Browser, YouTube),
-        pauses them before audio playback, and resumes after.
+        Only pauses/resumes media if Music.app is actually playing.
+        Uses MediaPlayPause Shortcut to avoid launching apps unnecessarily.
 
-        Only interacts with apps that are actually running.
+        This prevents random media playback when nothing was playing before.
         """
-        # Process name → Display name mapping
-        apps_to_check = [
-            ("Music", "Music"),
-            ("Safari", "Safari"),
-            ("zen", "Zen Browser"),  # Process name is lowercase
-            ("Web App", "YouTube")  # YouTube.app runs as "Web App" process
-        ]
-        paused_apps: List[tuple] = []  # List of (process_name, display_name)
+        media_was_playing = False
 
         # Only manage media on macOS
         if sys.platform != "darwin":
             yield
             return
 
-        # Detect and pause playing media (only checks running apps)
-        for process_name, display_name in apps_to_check:
-            try:
-                if self._check_if_app_playing(process_name):
-                    logger.info(f"Detected {display_name} playing media - pausing")
-                    if self._pause_media(process_name):
-                        paused_apps.append((process_name, display_name))
-            except Exception as e:
-                logger.debug(f"Error checking {display_name}: {e}")
+        # Check if Music.app is actually playing
+        if self._check_music_playing():
+            logger.info("Music.app is playing - will pause during audio")
 
-        if paused_apps:
-            display_names = [name for _, name in paused_apps]
-            logger.info(f"Paused media in: {', '.join(display_names)}")
+            # Pause via MediaPlayPause Shortcut
+            if self._toggle_media_playback():
+                media_was_playing = True
+                logger.info("Media paused successfully")
+            else:
+                logger.debug("Could not pause media - proceeding anyway")
+        else:
+            logger.debug("No media playing - skipping pause/resume")
 
         try:
             # Allow audio playback to proceed
             yield
         finally:
-            # Resume previously playing media
-            if paused_apps:
+            # Only resume if we actually paused something
+            if media_was_playing:
                 # Small delay to ensure audio has finished
                 import time
                 time.sleep(0.5)
 
-                for process_name, display_name in paused_apps:
-                    try:
-                        logger.info(f"Resuming {display_name}")
-                        self._resume_media(process_name)
-                    except Exception as e:
-                        logger.debug(f"Could not resume {display_name}: {e}")
+                logger.info("Resuming media playback")
+                if self._toggle_media_playback():
+                    logger.info("Media resumed successfully")
+                else:
+                    logger.debug("Could not resume media")
 
     def clean_text_for_tts(self, text: str) -> str:
         """
