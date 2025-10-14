@@ -280,59 +280,13 @@ class AudioTTS:
             logger.error(f"Failed to initialize ElevenLabs client: {e}")
             raise AudioTTSError(f"Cannot initialize audio TTS: {e}") from e
 
-    def _check_music_playing(self) -> bool:
-        """
-        Check if Music.app is currently playing.
-
-        CRITICAL: Must check if Music.app process exists BEFORE querying state,
-        because AppleScript 'tell application' will launch the app if not running.
-
-        Returns:
-            True if Music.app is playing, False otherwise
-        """
-        if sys.platform != "darwin":
-            return False
-
-        try:
-            # Step 1: Check if Music.app process is running (doesn't launch app)
-            result = subprocess.run(
-                ["pgrep", "-x", "Music"],
-                capture_output=True,
-                timeout=2,
-                check=False
-            )
-
-            if result.returncode != 0:
-                # Music.app is NOT running
-                logger.debug("Music.app is not running - skipping state check")
-                return False
-
-            # Step 2: Music.app IS running - safe to query state now
-            result = subprocess.run(
-                ["osascript", "-e", 'tell application "Music" to get player state'],
-                capture_output=True,
-                text=True,
-                timeout=2,
-                check=False
-            )
-
-            is_playing = result.stdout.strip() == "playing"
-            if is_playing:
-                logger.info("Detected Music.app is playing")
-            else:
-                logger.debug(f"Music.app is running but not playing (state: {result.stdout.strip()})")
-
-            return is_playing
-
-        except Exception as e:
-            logger.debug(f"Could not check Music.app state: {e}")
-            return False
-
     def _toggle_media_playback(self) -> bool:
         """
         Toggle media playback using MediaPlayPause Shortcut.
 
-        Uses macOS Shortcuts.app to control media playback universally.
+        Uses macOS Shortcuts.app to control media playback universally across
+        all apps: YouTube, Spotify, Music, Safari, Zen Browser, etc.
+
         Works with Karabiner-Elements since it uses official media control APIs
         instead of simulating key presses.
 
@@ -385,48 +339,34 @@ class AudioTTS:
     @contextmanager
     def _manage_media_playback(self):
         """
-        Smart media management with state detection.
+        Universal media pause/resume using MediaPlayPause Shortcut.
 
-        Only pauses/resumes media if Music.app is actually playing.
-        Uses MediaPlayPause Shortcut to avoid launching apps unnecessarily.
+        Always calls MediaPlayPause regardless of what app is playing.
+        Works with YouTube, Spotify, Music, Safari, and any media app.
 
-        This prevents random media playback when nothing was playing before.
+        Future enhancement: Add playback detection inside MediaPlayPause
+        Shortcut itself to prevent toggling when nothing is playing.
         """
-        media_was_playing = False
-
         # Only manage media on macOS
         if sys.platform != "darwin":
             yield
             return
 
-        # Check if Music.app is actually playing
-        if self._check_music_playing():
-            logger.info("Music.app is playing - will pause during audio")
-
-            # Pause via MediaPlayPause Shortcut
-            if self._toggle_media_playback():
-                media_was_playing = True
-                logger.info("Media paused successfully")
-            else:
-                logger.debug("Could not pause media - proceeding anyway")
-        else:
-            logger.debug("No media playing - skipping pause/resume")
+        # Always pause media (MediaPlayPause works universally)
+        paused = self._toggle_media_playback()
 
         try:
             # Allow audio playback to proceed
             yield
         finally:
-            # Only resume if we actually paused something
-            if media_was_playing:
+            # Resume if we successfully paused
+            if paused:
                 # Small delay to ensure audio has finished
                 import time
                 time.sleep(0.5)
 
                 logger.info("Resuming media playback")
-                if self._toggle_media_playback():
-                    logger.info("Media resumed successfully")
-                else:
-                    logger.debug("Could not resume media")
+                self._toggle_media_playback()
 
     def clean_text_for_tts(self, text: str) -> str:
         """
