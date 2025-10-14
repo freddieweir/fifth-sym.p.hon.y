@@ -30,6 +30,25 @@ class OnePasswordManager:
         """Run a 1Password CLI command"""
         try:
             env = os.environ.copy()
+
+            # Try to use service account token first (for restricted vaults like "Prompts")
+            if not self.session_token and "OP_SERVICE_ACCOUNT_TOKEN" not in env:
+                # Attempt to retrieve service account token from 1Password
+                try:
+                    sa_token_result = subprocess.run(
+                        ["op", "item", "get", "Service Account Auth Token: albedo",
+                         "--vault", "API", "--fields", "credential", "--reveal"],
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                        timeout=5
+                    )
+                    if sa_token_result.returncode == 0 and sa_token_result.stdout.strip():
+                        env["OP_SERVICE_ACCOUNT_TOKEN"] = sa_token_result.stdout.strip()
+                        logger.debug("Using service account token for 1Password access")
+                except Exception as e:
+                    logger.debug(f"Could not retrieve service account token: {e}")
+
             if self.session_token:
                 env["OP_SESSION"] = self.session_token
 
