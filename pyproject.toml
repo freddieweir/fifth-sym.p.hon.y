@@ -5,15 +5,11 @@ description = "AI-powered distributed automation conductor with voice feedback a
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "mlx-whisper>=0.4.3",
+    "numpy>=2.2.6",
     "ollama>=0.6.0",
+    "pyaudio>=0.2.14",
     "textual>=6.2.1",
-]
-
-[project.scripts]
-fifth-symphony = "cli:cli"
-symphony = "cli:cli"
-
-dependencies = [
     "elevenlabs>=1.0.0",
     "pyyaml>=6.0",
     "psutil>=5.9.0",
@@ -57,6 +53,19 @@ dependencies = [
     "pyobjc-framework-EventKit>=10.0",  # Calendar/Reminders
     "pyobjc-framework-ScriptingBridge>=10.0",  # AppleScript bridge
 ]
+
+[tool.uv]
+package = true
+
+[tool.setuptools]
+packages = ["modules"]
+
+[project.scripts]
+fifth-symphony = "cli:cli"
+symphony = "cli:cli"
+voice-listener = "modules.voice_listener:main"
+dashboard = "modules.dashboard:main"
+claude-monitor = "modules.claude_monitor:main"
 
 [project.optional-dependencies]
 dev = [

@@ -18,6 +18,7 @@ except ImportError:
     sys.exit(1)
 
 from .onepassword_manager import OnePasswordManager
+from .smart_media_control import is_anything_playing
 
 # Configure logging
 logging.basicConfig(
@@ -339,27 +340,35 @@ class AudioTTS:
     @contextmanager
     def _manage_media_playback(self):
         """
-        Universal media pause/resume using MediaPlayPause Shortcut.
+        Smart media pause/resume using MediaPlayPause Shortcut.
 
-        Always calls MediaPlayPause regardless of what app is playing.
+        Only pauses media if something is currently playing (prevents Music.app
+        from launching when nothing is playing).
+
         Works with YouTube, Spotify, Music, Safari, and any media app.
-
-        Future enhancement: Add playback detection inside MediaPlayPause
-        Shortcut itself to prevent toggling when nothing is playing.
         """
         # Only manage media on macOS
         if sys.platform != "darwin":
             yield
             return
 
-        # Always pause media (MediaPlayPause works universally)
-        paused = self._toggle_media_playback()
+        # Check if anything is playing before toggling
+        media_was_playing = is_anything_playing()
+
+        if media_was_playing:
+            # Something is playing - safe to pause
+            logger.debug("Media detected playing - pausing")
+            paused = self._toggle_media_playback()
+        else:
+            # Nothing playing - skip pause to avoid launching Music.app
+            logger.debug("No media playing - skipping pause")
+            paused = False
 
         try:
             # Allow audio playback to proceed
             yield
         finally:
-            # Resume if we successfully paused
+            # Only resume if we actually paused something
             if paused:
                 # Small delay to ensure audio has finished
                 import time

@@ -9,12 +9,15 @@ from .output_translator import OutputTranslator
 from .reminder_system import ReminderSystem
 from .script_runner import ScriptRunner
 from .voice_handler import VoiceHandler
+from .voice_listener import VoiceListener, VoiceListenerError
 
 __all__ = [
     "AudioTTS",
     "AudioTTSError",
     "OnePasswordManager",
     "VoiceHandler",
+    "VoiceListener",
+    "VoiceListenerError",
     "ScriptRunner",
     "OutputTranslator",
     "ReminderSystem",
