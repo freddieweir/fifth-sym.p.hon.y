@@ -147,11 +147,13 @@ Fifth Symphony includes example scripts:
 
 ## Architecture
 
+Fifth Symphony is a **Python-first project** focused on reusable Python modules and AI orchestration. While it includes bash launcher scripts (`run.sh`, `gui.sh`, etc.) for convenience, the core functionality is pure Python.
+
 ```
 fifth-symphony/
 ├── main.py                 # Fifth Symphony main conductor
-├── modules/               # Core functionality modules
-│   ├── audio_tts.py      # Text-to-speech with ElevenLabs (NEW!)
+├── modules/               # Core functionality modules (Python-only)
+│   ├── audio_tts.py      # Text-to-speech with ElevenLabs
 │   ├── onepassword_manager.py  # Secure credential management
 │   ├── voice_handler.py
 │   ├── script_runner.py
@@ -162,8 +164,16 @@ fifth-symphony/
 │   ├── prompts/         # Voice message templates
 │   └── templates/       # Output formatting
 ├── scripts/             # Your Python scripts go here
+├── *.sh                 # Project-specific bash launchers
 └── pyproject.toml       # uv package configuration
 ```
+
+### Design Philosophy
+
+- **Python modules** in `modules/` are reusable across projects
+- **Bash scripts** are project-specific launchers (kept minimal)
+- **General-purpose bash utilities** live in [scriptum-shell](../scriptum-shell)
+- **macOS automation** lives in [applescript-arsenal](../applescript-arsenal)
 
 ### Modular Components
 
