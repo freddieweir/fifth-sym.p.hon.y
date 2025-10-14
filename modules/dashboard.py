@@ -229,6 +229,7 @@ class DashboardApp(App):
             "audio-monitor": {},
             "voice-listener": {},
             "keyword-listener": {},
+            "claude-monitor": {},
         }
 
     def compose(self) -> ComposeResult:
@@ -258,6 +259,7 @@ class DashboardApp(App):
         """Refresh all dashboard panels."""
         self.refresh_services()
         self.refresh_system_stats()
+        self.check_claude_instances()
 
     def refresh_services(self) -> None:
         """Update service status."""
@@ -339,6 +341,34 @@ class DashboardApp(App):
     def action_toggle_dark(self) -> None:
         """Toggle dark mode."""
         self.dark = not self.dark
+
+    def check_claude_instances(self) -> None:
+        """Check for pending Claude Code instances."""
+        from pathlib import Path
+
+        # Check for claude-pending flag file
+        flag_file = Path("/tmp/claude-pending.flag")
+
+        events = self.query_one("#events", EventLogPanel)
+
+        if flag_file.exists():
+            try:
+                timestamp = flag_file.read_text().strip()
+                # Only alert if flag is recent (within last 30 seconds)
+                from datetime import datetime
+                flag_time = datetime.fromisoformat(timestamp)
+                age = (datetime.now() - flag_time).total_seconds()
+
+                if age < 30:
+                    # Check if we already alerted recently
+                    if not hasattr(self, '_last_claude_alert'):
+                        self._last_claude_alert = None
+
+                    if self._last_claude_alert is None or (datetime.now() - self._last_claude_alert).total_seconds() > 60:
+                        events.add_event("WARNING", "claude-monitor", "Claude Code instance waiting for response")
+                        self._last_claude_alert = datetime.now()
+            except Exception:
+                pass
 
 
 def main():
