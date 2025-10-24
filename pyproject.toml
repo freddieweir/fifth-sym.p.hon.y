@@ -5,15 +5,11 @@ description = "AI-powered distributed automation conductor with voice feedback a
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "mlx-whisper>=0.4.3; sys_platform == 'darwin'",
+    "numpy>=2.2.6",
     "ollama>=0.6.0",
+    "pyaudio>=0.2.14; sys_platform == 'darwin'",
     "textual>=6.2.1",
-]
-
-[project.scripts]
-fifth-symphony = "cli:cli"
-symphony = "cli:cli"
-
-dependencies = [
     "elevenlabs>=1.0.0",
     "pyyaml>=6.0",
     "psutil>=5.9.0",
@@ -52,11 +48,27 @@ dependencies = [
     "openai-whisper>=20231117",
     "sounddevice>=0.4.6",
     "soundfile>=0.12.1",
-    # macOS automation
-    "pyobjc-framework-Cocoa>=10.0",
-    "pyobjc-framework-EventKit>=10.0",  # Calendar/Reminders
-    "pyobjc-framework-ScriptingBridge>=10.0",  # AppleScript bridge
+    # macOS automation (platform-specific)
+    "pyobjc-framework-Cocoa>=10.0; sys_platform == 'darwin'",
+    "pyobjc-framework-EventKit>=10.0; sys_platform == 'darwin'", # Calendar/Reminders
+    "pyobjc-framework-ScriptingBridge>=10.0; sys_platform == 'darwin'", # AppleScript bridge
+    # TTS API Server
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
 ]
+
+[tool.uv]
+package = true
+
+[tool.setuptools]
+packages = ["modules"]
+
+[project.scripts]
+fifth-symphony = "cli:cli"
+symphony = "cli:cli"
+voice-listener = "modules.voice_listener:main"
+dashboard = "modules.dashboard:main"
+claude-monitor = "modules.claude_monitor:main"
 
 [project.optional-dependencies]
 dev = [
@@ -91,7 +103,9 @@ exclude = [
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C", "Q"]  # Core quality rules
 ignore = [
+    "E402",    # module-import-not-at-top-of-file (import after dependency check)
     "E501",    # line-too-long (handled by formatter)
+    "E722",    # bare-except (intentional for resilient error handling)
     "N802",    # invalid-function-name (Qt methods)
     "N812",    # lowercase-imported-as-non-lowercase
     "BLE001",  # blind-except (sometimes necessary)
@@ -103,7 +117,7 @@ ignore = [
     "S110",    # try-except-pass (sometimes intentional)
     "ARG002",  # unused-method-argument (GUI callbacks)
     "FBT001",  # boolean-type-hint-positional-argument
-    "FBT002",  # boolean-default-value-positional-argument  
+    "FBT002",  # boolean-default-value-positional-argument
     "FBT003",  # boolean-positional-value-in-call
     "DTZ005",  # call-datetime-now-without-tzinfo (local time is fine)
     "DTZ006",  # call-datetime-fromtimestamp (local time is fine)
