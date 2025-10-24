@@ -103,7 +103,9 @@ exclude = [
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C", "Q"]  # Core quality rules
 ignore = [
+    "E402",    # module-import-not-at-top-of-file (import after dependency check)
     "E501",    # line-too-long (handled by formatter)
+    "E722",    # bare-except (intentional for resilient error handling)
     "N802",    # invalid-function-name (Qt methods)
     "N812",    # lowercase-imported-as-non-lowercase
     "BLE001",  # blind-except (sometimes necessary)
@@ -115,7 +117,7 @@ ignore = [
     "S110",    # try-except-pass (sometimes intentional)
     "ARG002",  # unused-method-argument (GUI callbacks)
     "FBT001",  # boolean-type-hint-positional-argument
-    "FBT002",  # boolean-default-value-positional-argument  
+    "FBT002",  # boolean-default-value-positional-argument
     "FBT003",  # boolean-positional-value-in-call
     "DTZ005",  # call-datetime-now-without-tzinfo (local time is fine)
     "DTZ006",  # call-datetime-fromtimestamp (local time is fine)
