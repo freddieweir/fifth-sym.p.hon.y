@@ -10,6 +10,9 @@ from contextlib import contextmanager
 import logging
 from datetime import datetime
 
+# Suppress httpx INFO logs to prevent voice ID exposure in API request URLs
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 try:
     from elevenlabs.client import ElevenLabs
     from elevenlabs import play, save
@@ -38,23 +41,39 @@ VOICE_ALBEDO_V2 = "Sr4DTtH3Kmyd0sUrsL97"  # Main Mac (Albedo v2 - from "ElevenLa
 DEFAULT_MEDIA_SHORTCUT = "MediaPlayPause"  # Default macOS Shortcut name for media control
 
 
+def censor_voice_id(voice_id: str) -> str:
+    """Censor voice ID for logging to prevent exposure in demos."""
+    if voice_id == VOICE_ALBEDO_V1:
+        return "Albedo OG"
+    elif voice_id == VOICE_ALBEDO_V2:
+        return "Albedo v2"
+    else:
+        return "******"
+
+
 def detect_environment() -> str:
     """
     Detect if running on Main Mac or VM.
 
     Returns:
-        "main" if on main macOS machine (local /Users paths)
-        "vm" if on VM (shared volumes or virtualgit paths)
+        "main" if on main macOS machine (standard user paths)
+        "vm" if on VM (shared volume paths or virtualgit)
     """
     cwd = Path.cwd()
     cwd_str = str(cwd)
 
-    # Check for VM paths
-    if "/Volumes/aetherium" in cwd_str or "virtualgit" in cwd_str:
-        logger.info("Environment detected: VM")
-        return "vm"
+    # Check for VM indicators
+    vm_indicators = [
+        "/Volumes/",  # Any mounted volume
+        "virtualgit"  # Virtual git directory
+    ]
 
-    # Check for main Mac paths (local user directories)
+    for indicator in vm_indicators:
+        if indicator in cwd_str:
+            logger.info(f"Environment detected: VM (matched: {indicator})")
+            return "vm"
+
+    # Check for standard user home directory structure (main Mac)
     if cwd_str.startswith("/Users/"):
         logger.info("Environment detected: Main Mac")
         return "main"
@@ -69,9 +88,10 @@ def detect_source_from_filepath(filepath: Path) -> str:
     Detect if file came from VM or main machine based on its path.
 
     Priority order:
-    1. Explicit prefix directories (vm-audio, main-audio)
-    2. Path-based indicators (shared volumes, virtualgit, claude-agent-reports)
-    3. Default to main
+    1. Explicit prefix directories (vm-audio, main-audio, albedos-desk)
+    2. VM indicators (mounted volumes, virtualgit)
+    3. Standard user home paths (main machine)
+    4. Default to main
 
     Args:
         filepath: Path to the audio file
@@ -82,19 +102,18 @@ def detect_source_from_filepath(filepath: Path) -> str:
     filepath_str = str(filepath.resolve())
 
     # Priority 1: Explicit prefix directories (most reliable)
-    if "vm-audio" in filepath_str:
-        logger.info(f"File source detected: VM (explicit prefix 'vm-audio')")
+    if "vm-audio" in filepath_str or "albedos-desk" in filepath_str:
+        logger.info(f"File source detected: VM (explicit directory marker)")
         return "vm"
 
     if "main-audio" in filepath_str:
         logger.info(f"File source detected: Main Mac (explicit prefix 'main-audio')")
         return "main"
 
-    # Priority 2: Path-based indicators (for backward compatibility)
+    # Priority 2: Path-based VM indicators
     vm_indicators = [
-        "/Volumes/My Shared Files",
-        "/Volumes/aetherium",
-        "virtualgit",
+        "/Volumes/",  # Any mounted volume (VM indicator)
+        "virtualgit",  # Virtual git directory
         "claude-agent-reports"  # Agent reports are typically from VM
     ]
 
@@ -103,7 +122,12 @@ def detect_source_from_filepath(filepath: Path) -> str:
             logger.info(f"File source detected: VM (path contains '{indicator}')")
             return "vm"
 
-    # Priority 3: Default to main
+    # Priority 3: Standard user home paths (main machine)
+    if filepath_str.startswith("/Users/"):
+        logger.info(f"File source detected: Main Mac (standard user path)")
+        return "main"
+
+    # Priority 4: Default to main
     logger.info(f"File source detected: Main Mac (default)")
     return "main"
 
@@ -123,11 +147,11 @@ def get_voice_id_for_environment(env: Optional[str] = None) -> str:
 
     if env == "vm":
         voice_id = os.getenv("ELEVENLABS_VOICE_VM", VOICE_ALBEDO_V1)
-        logger.info(f"Using VM voice (Albedo v1): {voice_id}")
+        logger.info(f"Using VM voice: {censor_voice_id(voice_id)}")
         return voice_id
     else:
         voice_id = os.getenv("ELEVENLABS_VOICE_MAIN", VOICE_ALBEDO_V2)
-        logger.info(f"Using Main Mac voice (Albedo v2): {voice_id}")
+        logger.info(f"Using Main Mac voice: {censor_voice_id(voice_id)}")
         return voice_id
 
 
@@ -164,7 +188,7 @@ class AudioTTS:
     Key Features:
     - Voice differentiation: Automatically uses different voices for VM vs Main machine
     - Media control: Pauses your music/videos before speaking, resumes after
-    - Notification sounds: Plays Glass sound before, Hero sound after speaking
+    - Notification sounds: Plays Blow sound before, Submarine sound after speaking
     - Multi-app support: Works with Music, Safari, Zen Browser, YouTube
     - Keyboard-friendly: Compatible with Karabiner-Elements (uses Shortcuts.app)
 
@@ -209,6 +233,7 @@ class AudioTTS:
         use_speaker_boost: bool = True,
         speed: float = 0.85,
         media_shortcut: Optional[str] = None,
+        notification_mode: str = "both",
     ):
         """
         Initialize AudioTTS.
@@ -256,6 +281,10 @@ class AudioTTS:
         # Media control configuration (env var > parameter > default)
         self.media_shortcut = os.getenv("MEDIA_SHORTCUT", media_shortcut or DEFAULT_MEDIA_SHORTCUT)
         logger.debug(f"Media control shortcut configured: {self.media_shortcut}")
+
+        # Notification sound mode
+        self.notification_mode = notification_mode
+        logger.debug(f"Notification mode: {notification_mode}")
 
         # Initialize ElevenLabs client
         try:
@@ -346,19 +375,34 @@ class AudioTTS:
         from launching when nothing is playing).
 
         Works with YouTube, Spotify, Music, Safari, and any media app.
+
+        Environment Variables:
+            FORCE_MEDIA_CONTROL: Set to "true" to force media pause/resume
+                                even if playback detection returns False.
+                                Useful for VM environments where detection may not work.
         """
         # Only manage media on macOS
         if sys.platform != "darwin":
             yield
             return
 
+        # Check environment variable for forced media control
+        force_control = os.getenv("FORCE_MEDIA_CONTROL", "false").lower() == "true"
+
         # Check if anything is playing before toggling
         media_was_playing = is_anything_playing()
 
-        if media_was_playing:
-            # Something is playing - safe to pause
-            logger.debug("Media detected playing - pausing")
+        if media_was_playing or force_control:
+            # Something is playing (or forced) - safe to pause
+            if force_control and not media_was_playing:
+                logger.debug("Forcing media control (FORCE_MEDIA_CONTROL=true)")
+            else:
+                logger.debug("Media detected playing - pausing")
+
             paused = self._toggle_media_playback()
+
+            if paused:
+                logger.info("Paused media playback")
         else:
             # Nothing playing - skip pause to avoid launching Music.app
             logger.debug("No media playing - skipping pause")
@@ -529,7 +573,7 @@ class AudioTTS:
             voice_id = self.voice_id
             if source_filepath:
                 voice_id = get_voice_id_for_filepath(source_filepath)
-                logger.info(f"Using filepath-based voice selection: {voice_id}")
+                logger.info(f"Using filepath-based voice selection: {censor_voice_id(voice_id)}")
 
             # Generate audio using ElevenLabs SDK with voice settings
             from elevenlabs import VoiceSettings
@@ -563,9 +607,9 @@ class AudioTTS:
 
             logger.info(f"Audio saved to: {output_file}")
 
-            # Auto-play if enabled (with macOS system notification)
+            # Auto-play if enabled (notification mode controlled by self.notification_mode)
             if self.auto_play:
-                self.play_audio(output_file, notification=True)
+                self.play_audio(output_file)
 
             return output_file
 
@@ -573,78 +617,91 @@ class AudioTTS:
             logger.error(f"Failed to generate speech: {e}")
             raise AudioTTSError(f"Speech generation failed: {e}") from e
 
-    def play_audio(self, audio_file: Path, notification: bool = True) -> None:
+    def _play_audio_raw(self, audio_file: Path, skip_media_management: bool = False) -> None:
         """
-        Play audio file with optional notification sound first.
-
-        Automatically pauses any playing media (Music, Safari, Zen Browser)
-        before playing audio and resumes after.
+        Play audio file with notification sounds (internal method).
 
         Args:
             audio_file: Path to audio file
-            notification: Whether to play notification sound before audio
+            skip_media_management: If True, don't use media pause/resume context manager
         """
-        try:
-            # Use media playback manager to pause/resume media apps
-            with self._manage_media_playback():
-                # Play notification sound first (if enabled)
-                if notification:
-                    if sys.platform == "darwin":
-                        # Use macOS system sound - "Glass" is a nice attention-grabbing sound
-                        # Other options: "Hero", "Funk", "Glass", "Ping", "Pop", "Purr", "Tink"
-                        try:
-                            subprocess.run(
-                                ["afplay", "/System/Library/Sounds/Glass.aiff"],
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                timeout=2,
-                                check=False
-                            )
-                            logger.debug("Played macOS notification sound (Glass)")
-                        except Exception as e:
-                            logger.debug(f"Could not play notification sound: {e}")
-
-                # macOS: use afplay - BLOCKING to ensure audio completes
-                if sys.platform == "darwin":
+        # Play start notification sound (based on notification_mode)
+        if self.notification_mode in ["both", "start"]:
+            if sys.platform == "darwin":
+                # Use macOS system sound - "Blow" is a nice attention-grabbing start sound
+                try:
                     subprocess.run(
-                        ["afplay", str(audio_file)],
+                        ["afplay", "/System/Library/Sounds/Blow.aiff"],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
-                        check=False,
+                        timeout=2,
+                        check=False
                     )
-                    logger.info(f"Playing audio: {audio_file}")
+                    logger.debug("Played macOS start notification (Blow)")
+                except Exception as e:
+                    logger.debug(f"Could not play start notification: {e}")
 
-                    # Play completion notification after audio finishes
-                    if notification:
-                        try:
-                            # Use "Hero" sound for completion (different from "Glass" start notification)
-                            subprocess.run(
-                                ["afplay", "/System/Library/Sounds/Hero.aiff"],
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                timeout=2,
-                                check=False
-                            )
-                            logger.debug("Played macOS completion notification (Hero)")
-                        except Exception as e:
-                            logger.debug(f"Could not play completion notification: {e}")
+        # macOS: use afplay - BLOCKING to ensure audio completes
+        if sys.platform == "darwin":
+            subprocess.run(
+                ["afplay", str(audio_file)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+            logger.info(f"Playing audio: {audio_file}")
 
-                    return
+            # Play end notification after audio finishes (based on notification_mode)
+            if self.notification_mode in ["both", "end"]:
+                try:
+                    # Use "Submarine" sound for completion (different from "Blow" start notification)
+                    subprocess.run(
+                        ["afplay", "/System/Library/Sounds/Submarine.aiff"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        timeout=2,
+                        check=False
+                    )
+                    logger.debug("Played macOS end notification (Submarine)")
+                except Exception as e:
+                    logger.debug(f"Could not play end notification: {e}")
 
-                # Linux: try common players
-                for player in ["paplay", "aplay", "mpg123", "ffplay"]:
-                    try:
-                        subprocess.Popen(
-                            [player, str(audio_file)],
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL,
-                        )
-                        logger.info(f"Playing audio with {player}: {audio_file}")
-                        return
-                    except FileNotFoundError:
-                        continue
+            return
 
-                logger.warning("No audio player found")
+        # Linux: try common players
+        for player in ["paplay", "aplay", "mpg123", "ffplay"]:
+            try:
+                subprocess.Popen(
+                    [player, str(audio_file)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                logger.info(f"Playing audio with {player}: {audio_file}")
+                return
+            except FileNotFoundError:
+                continue
+
+        logger.warning("No audio player found")
+
+    def play_audio(self, audio_file: Path, skip_media_management: bool = False) -> None:
+        """
+        Play audio file with notification sounds based on self.notification_mode.
+
+        Automatically pauses any playing media (Music, Safari, Zen Browser)
+        before playing audio and resumes after (unless skip_media_management=True).
+
+        Args:
+            audio_file: Path to audio file
+            skip_media_management: If True, don't pause/resume media (for batch processing)
+        """
+        try:
+            if skip_media_management:
+                # Play without media management (caller handles pause/resume)
+                self._play_audio_raw(audio_file, skip_media_management=True)
+            else:
+                # Use media playback manager to pause/resume media apps
+                with self._manage_media_playback():
+                    self._play_audio_raw(audio_file, skip_media_management=False)
 
         except Exception as e:
             logger.warning(f"Failed to play audio: {e}")
