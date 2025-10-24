@@ -5,10 +5,10 @@ description = "AI-powered distributed automation conductor with voice feedback a
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "mlx-whisper>=0.4.3",
+    "mlx-whisper>=0.4.3; sys_platform == 'darwin'",
     "numpy>=2.2.6",
     "ollama>=0.6.0",
-    "pyaudio>=0.2.14",
+    "pyaudio>=0.2.14; sys_platform == 'darwin'",
     "textual>=6.2.1",
     "elevenlabs>=1.0.0",
     "pyyaml>=6.0",
@@ -48,10 +48,13 @@ dependencies = [
     "openai-whisper>=20231117",
     "sounddevice>=0.4.6",
     "soundfile>=0.12.1",
-    # macOS automation
-    "pyobjc-framework-Cocoa>=10.0",
-    "pyobjc-framework-EventKit>=10.0",  # Calendar/Reminders
-    "pyobjc-framework-ScriptingBridge>=10.0",  # AppleScript bridge
+    # macOS automation (platform-specific)
+    "pyobjc-framework-Cocoa>=10.0; sys_platform == 'darwin'",
+    "pyobjc-framework-EventKit>=10.0; sys_platform == 'darwin'", # Calendar/Reminders
+    "pyobjc-framework-ScriptingBridge>=10.0; sys_platform == 'darwin'", # AppleScript bridge
+    # TTS API Server
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
 ]
 
 [tool.uv]
