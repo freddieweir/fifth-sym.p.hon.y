@@ -15,7 +15,6 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 try:
     from elevenlabs.client import ElevenLabs
-    from elevenlabs import play, save
 except ImportError:
     print("Error: elevenlabs package not found. Install with: uv add elevenlabs")
     sys.exit(1)
