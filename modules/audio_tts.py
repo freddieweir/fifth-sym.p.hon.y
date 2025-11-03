@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 
 
 # Voice IDs for environment-specific selection
-# Original Albedo (v1) → VM files
-# Albedo v2 → Main machine files
-VOICE_ALBEDO_V1 = "ugizIPhoOxPnNuPGr01h"  # VM (Original Albedo - from "ElevenLabs Voice IDs" vault)
-VOICE_ALBEDO_V2 = "Sr4DTtH3Kmyd0sUrsL97"  # Main Mac (Albedo v2 - from "ElevenLabs Voice IDs" vault)
+# Orchestrator (Albedo) → Main machine (with audio tag support)
+# VM Subagents → Brief verbal reports to user
+VOICE_ALBEDO_V1 = "0cIZJ9xMew2j253BzxSK"  # VM Subagents (concise reports - from "ElevenLabs Voice IDs" vault)
+VOICE_ALBEDO_V2 = "PFF6XD37b8cx8WEi1461"  # Orchestrator Albedo (emotional range - from "ElevenLabs Voice IDs" vault)
 
 # Media control configuration
 DEFAULT_MEDIA_SHORTCUT = "MediaPlayPause"  # Default macOS Shortcut name for media control
@@ -43,9 +43,9 @@ DEFAULT_MEDIA_SHORTCUT = "MediaPlayPause"  # Default macOS Shortcut name for med
 def censor_voice_id(voice_id: str) -> str:
     """Censor voice ID for logging to prevent exposure in demos."""
     if voice_id == VOICE_ALBEDO_V1:
-        return "Albedo OG"
+        return "VM Subagent"
     elif voice_id == VOICE_ALBEDO_V2:
-        return "Albedo v2"
+        return "Albedo Orchestrator"
     else:
         return "******"
 
@@ -87,10 +87,11 @@ def detect_source_from_filepath(filepath: Path) -> str:
     Detect if file came from VM or main machine based on its path.
 
     Priority order:
-    1. Explicit prefix directories (vm-audio, main-audio, albedos-desk)
-    2. VM indicators (mounted volumes, virtualgit)
-    3. Standard user home paths (main machine)
-    4. Default to main
+    1. Filename suffix (-vm.txt or -main.txt) - NEW preferred method
+    2. Explicit prefix directories (vm-audio, main-audio, albedos-desk) - LEGACY
+    3. VM indicators (mounted volumes, virtualgit)
+    4. Standard user home paths (main machine)
+    5. Default to main
 
     Args:
         filepath: Path to the audio file
@@ -99,17 +100,27 @@ def detect_source_from_filepath(filepath: Path) -> str:
         "vm" if file is from VM paths, "main" otherwise
     """
     filepath_str = str(filepath.resolve())
+    filename = filepath.stem  # Get filename without extension
 
-    # Priority 1: Explicit prefix directories (most reliable)
+    # Priority 1: Filename suffix (most reliable - new method)
+    if filename.endswith("-vm"):
+        logger.info(f"File source detected: VM (filename suffix '-vm')")
+        return "vm"
+
+    if filename.endswith("-main"):
+        logger.info(f"File source detected: Main Mac (filename suffix '-main')")
+        return "main"
+
+    # Priority 2: Explicit prefix directories (legacy support)
     if "vm-audio" in filepath_str or "albedos-desk" in filepath_str:
-        logger.info(f"File source detected: VM (explicit directory marker)")
+        logger.info(f"File source detected: VM (explicit directory marker - legacy)")
         return "vm"
 
     if "main-audio" in filepath_str:
-        logger.info(f"File source detected: Main Mac (explicit prefix 'main-audio')")
+        logger.info(f"File source detected: Main Mac (explicit prefix 'main-audio' - legacy)")
         return "main"
 
-    # Priority 2: Path-based VM indicators
+    # Priority 3: Path-based VM indicators
     vm_indicators = [
         "/Volumes/",  # Any mounted volume (VM indicator)
         "virtualgit",  # Virtual git directory
@@ -121,12 +132,12 @@ def detect_source_from_filepath(filepath: Path) -> str:
             logger.info(f"File source detected: VM (path contains '{indicator}')")
             return "vm"
 
-    # Priority 3: Standard user home paths (main machine)
+    # Priority 4: Standard user home paths (main machine)
     if filepath_str.startswith("/Users/"):
         logger.info(f"File source detected: Main Mac (standard user path)")
         return "main"
 
-    # Priority 4: Default to main
+    # Priority 5: Default to main
     logger.info(f"File source detected: Main Mac (default)")
     return "main"
 
@@ -224,7 +235,7 @@ class AudioTTS:
         self,
         output_dir: Optional[Path] = None,
         voice_id: Optional[str] = None,
-        model: str = "eleven_monolingual_v1",
+        model: str = "eleven_v3",
         auto_play: bool = True,
         stability: float = 0.5,
         similarity_boost: float = 0.75,
