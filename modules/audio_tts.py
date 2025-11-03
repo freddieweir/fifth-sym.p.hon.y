@@ -31,10 +31,10 @@ logger = logging.getLogger(__name__)
 
 
 # Voice IDs for environment-specific selection
-# Orchestrator (Albedo) → Main machine (with audio tag support)
-# VM Subagents → Brief verbal reports to user
-VOICE_ALBEDO_V1 = "0cIZJ9xMew2j253BzxSK"  # VM Subagents (concise reports - from "ElevenLabs Voice IDs" vault)
-VOICE_ALBEDO_V2 = "PFF6XD37b8cx8WEi1461"  # Orchestrator Albedo (emotional range - from "ElevenLabs Voice IDs" vault)
+# Seer → VM Subagents (brief, concise verbal reports)
+# Secretary → Orchestrator Main Machine (natural speech with audio tag support)
+VOICE_ALBEDO_V1 = "0cIZJ9xMew2j253BzxSK"  # Seer voice (VM subagents)
+VOICE_ALBEDO_V2 = "PFF6XD37b8cx8WEi1461"  # Secretary voice (orchestrator)
 
 # Media control configuration
 DEFAULT_MEDIA_SHORTCUT = "MediaPlayPause"  # Default macOS Shortcut name for media control
@@ -43,9 +43,9 @@ DEFAULT_MEDIA_SHORTCUT = "MediaPlayPause"  # Default macOS Shortcut name for med
 def censor_voice_id(voice_id: str) -> str:
     """Censor voice ID for logging to prevent exposure in demos."""
     if voice_id == VOICE_ALBEDO_V1:
-        return "VM Subagent"
+        return "Seer (VM)"
     elif voice_id == VOICE_ALBEDO_V2:
-        return "Albedo Orchestrator"
+        return "Secretary (Main)"
     else:
         return "******"
 
