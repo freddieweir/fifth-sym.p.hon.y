@@ -1,124 +1,54 @@
-"""Smart media control with playback detection to prevent unwanted app launches."""
+"""
+DEPRECATED: Media control has moved to tengen-tts.
 
-import subprocess
-import logging
+This module is a compatibility shim. Please update your imports:
 
-logger = logging.getLogger(__name__)
+    # Old import (deprecated)
+    from fifth_symphony.modules.smart_media_control import is_anything_playing
 
+    # New import (recommended)
+    from tengen_tts.media import is_anything_playing, is_music_playing
 
-def is_music_playing() -> bool:
-    """
-    Check if Music.app is currently playing.
+This shim will be removed in a future version.
+"""
 
-    Returns:
-        True if Music.app is playing, False otherwise
-    """
-    try:
-        # Check if Music.app process is running
-        result = subprocess.run(
-            ["pgrep", "-x", "Music"],
-            capture_output=True,
-            timeout=2,
-            check=False
-        )
+import warnings
 
-        if result.returncode != 0:
-            # Music.app not running
-            return False
+warnings.warn(
+    "fifth-symphony.modules.smart_media_control is deprecated. "
+    "Use 'from tengen_tts.media import is_anything_playing' instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-        # Music.app is running - check playback state
-        result = subprocess.run(
-            ["osascript", "-e", 'tell application "Music" to get player state'],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=False
-        )
-
-        return result.stdout.strip() == "playing"
-
-    except Exception as e:
-        logger.debug(f"Could not check Music.app state: {e}")
-        return False
-
-
-def is_anything_playing() -> bool:
-    """
-    Check if any media is currently playing system-wide.
-
-    Checks multiple indicators:
-    1. Music.app playback state
-    2. System audio output (if available)
-
-    Returns:
-        True if any media is detected as playing
-    """
-    # Check Music.app
-    if is_music_playing():
-        return True
-
-    # TODO: Add more checks for other apps
-    # - Spotify via AppleScript
-    # - Safari/Chrome via JavaScript
-    # - System-wide audio detection
-
-    return False
+# Re-export from tengen-tts for backward compatibility
+try:
+    from tengen_tts.media import is_anything_playing, is_music_playing
+    from tengen_tts.media.control import MediaController
+except ImportError as e:
+    raise ImportError(
+        "tengen-tts package not installed. "
+        "Install with: uv add tengen-tts (from internal/repos/tengen-tts)"
+    ) from e
 
 
 def smart_media_playpause() -> bool:
-    """
-    Toggle media playback ONLY if something is currently playing.
-
-    This prevents Music.app from launching when nothing is playing.
-
-    Returns:
-        True if playback was toggled, False if nothing was playing
-    """
+    """Toggle media playback ONLY if something is currently playing."""
+    controller = MediaController()
     if is_anything_playing():
-        # Something is playing - safe to toggle
-        try:
-            result = subprocess.run(
-                ["shortcuts", "run", "MediaPlayPause"],
-                capture_output=True,
-                timeout=2,
-                check=False
-            )
-
-            if result.returncode == 0:
-                logger.info("Media playback toggled")
-                return True
-            else:
-                logger.warning(f"MediaPlayPause failed: {result.stderr.decode()}")
-                return False
-
-        except Exception as e:
-            logger.error(f"Failed to toggle media: {e}")
-            return False
-    else:
-        # Nothing playing - do nothing
-        logger.debug("No media playing - ignoring toggle command")
-        return False
+        return controller.toggle_playback()
+    return False
 
 
 def force_media_playpause() -> bool:
-    """
-    Force toggle media playback even if nothing is playing.
+    """Force toggle media playback even if nothing is playing."""
+    controller = MediaController()
+    return controller.toggle_playback()
 
-    Use this if you explicitly want to start playback from a stopped state.
 
-    Returns:
-        True if command was sent successfully
-    """
-    try:
-        result = subprocess.run(
-            ["shortcuts", "run", "MediaPlayPause"],
-            capture_output=True,
-            timeout=2,
-            check=False
-        )
-
-        return result.returncode == 0
-
-    except Exception as e:
-        logger.error(f"Failed to force toggle media: {e}")
-        return False
+__all__ = [
+    "is_anything_playing",
+    "is_music_playing",
+    "smart_media_playpause",
+    "force_media_playpause",
+]
