@@ -233,7 +233,6 @@ auth.log*
 !config/prompts/*.yaml
 !config/templates/*.yaml
 !config/onepassword/*.yaml
-!config/youtube/*.yaml
 !pyproject.toml
 !.pre-commit-config.yaml
 !.github/workflows/*.yml

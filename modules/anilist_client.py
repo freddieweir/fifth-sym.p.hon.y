@@ -5,12 +5,11 @@ Integrates with AniList GraphQL API for anime/manga tracking.
 Uses 1Password for secure API token storage.
 """
 
-import logging
 import subprocess
-from dataclasses import dataclass
-from typing import Any
-
+import logging
 import aiohttp
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +22,8 @@ class AnimeEntry:
     title: str
     status: str  # CURRENT, PLANNING, COMPLETED, DROPPED, PAUSED
     progress: int
-    score: float | None = None
-    episodes: int | None = None
+    score: Optional[float] = None
+    episodes: Optional[int] = None
 
 
 @dataclass
@@ -35,8 +34,8 @@ class MangaEntry:
     title: str
     status: str
     progress: int
-    score: float | None = None
-    chapters: int | None = None
+    score: Optional[float] = None
+    chapters: Optional[int] = None
 
 
 class AniListClient:
@@ -52,7 +51,7 @@ class AniListClient:
 
     API_URL = "https://graphql.anilist.co"
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         Initialize AniList client.
 
@@ -63,7 +62,7 @@ class AniListClient:
         self.vault = self.config.get("onepassword_vault", "API")
         self.api_token_item = self.config.get("api_token_item", "AniList API")
         self.logger = logging.getLogger(__name__)
-        self._token: str | None = None
+        self._token: Optional[str] = None
 
     async def _get_api_token(self) -> str:
         """
@@ -93,7 +92,7 @@ class AniListClient:
             )
 
             self._token = result.stdout.strip()
-            self.logger.info("Retrieved AniList API token from 1Password")
+            self.logger.info(f"Retrieved AniList API token from 1Password")
             return self._token
 
         except subprocess.CalledProcessError as e:
@@ -101,8 +100,8 @@ class AniListClient:
             raise RuntimeError(f"Cannot access AniList API token: {e.stderr}") from e
 
     async def _query(
-        self, query: str, variables: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
+        self, query: str, variables: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Execute GraphQL query against AniList API.
 
@@ -134,8 +133,8 @@ class AniListClient:
                 return data
 
     async def get_user_anime_list(
-        self, username: str, status: str | None = None
-    ) -> list[AnimeEntry]:
+        self, username: str, status: Optional[str] = None
+    ) -> List[AnimeEntry]:
         """
         Get user's anime list.
 
@@ -198,7 +197,7 @@ class AniListClient:
 
         return entries
 
-    async def get_currently_watching(self, username: str) -> list[AnimeEntry]:
+    async def get_currently_watching(self, username: str) -> List[AnimeEntry]:
         """
         Get anime currently being watched.
 
@@ -211,8 +210,8 @@ class AniListClient:
         return await self.get_user_anime_list(username, status="CURRENT")
 
     async def update_anime_progress(
-        self, media_id: int, progress: int, score: float | None = None
-    ) -> dict[str, Any]:
+        self, media_id: int, progress: int, score: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Update anime progress.
 
@@ -243,7 +242,7 @@ class AniListClient:
         data = await self._query(mutation, variables)
         return data.get("data", {}).get("SaveMediaListEntry", {})
 
-    async def search_anime(self, search: str) -> list[dict[str, Any]]:
+    async def search_anime(self, search: str) -> List[Dict[str, Any]]:
         """
         Search for anime.
 
@@ -276,7 +275,7 @@ class AniListClient:
         media = data.get("data", {}).get("Page", {}).get("media", [])
         return media
 
-    async def get_user_stats(self, username: str) -> dict[str, Any]:
+    async def get_user_stats(self, username: str) -> Dict[str, Any]:
         """
         Get user statistics.
 
@@ -311,6 +310,7 @@ class AniListClient:
 # Example usage
 async def example_usage():
     """Example AniList integration"""
+    import asyncio
 
     client = AniListClient()
 
@@ -330,7 +330,7 @@ async def example_usage():
 
     # Get stats
     stats = await client.get_user_stats("YourUsername")
-    print("\nStats:")
+    print(f"\nStats:")
     print(f"  Total Anime: {stats.get('count')}")
     print(f"  Episodes Watched: {stats.get('episodesWatched')}")
     print(f"  Mean Score: {stats.get('meanScore')}")

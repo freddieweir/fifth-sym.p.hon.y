@@ -8,14 +8,15 @@ Provides real-time notifications about Claude's actions (file reads, edits, bash
 import asyncio
 import json
 import logging
-import threading
-from collections.abc import Callable
+from pathlib import Path
+from typing import Dict, Optional, Callable, List
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
+from queue import Queue
+import threading
 
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class ClaudeEvent:
         event_type: ClaudeEventType,
         timestamp: datetime,
         session_id: str,
-        data: dict,
+        data: Dict,
         summary: str,
     ):
         self.event_type = event_type
@@ -123,10 +124,10 @@ class ClaudeCodeMonitor:
     """
 
     def __init__(self):
-        self.callbacks: dict[ClaudeEventType, list[Callable]] = {}
-        self.observer: Observer | None = None
-        self.last_processed_line: dict[Path, int] = {}
-        self.active_sessions: dict[str, dict] = {}
+        self.callbacks: Dict[ClaudeEventType, List[Callable]] = {}
+        self.observer: Optional[Observer] = None
+        self.last_processed_line: Dict[Path, int] = {}
+        self.active_sessions: Dict[str, Dict] = {}
 
     def add_callback(self, event_type: ClaudeEventType, callback: Callable):
         """
@@ -143,7 +144,7 @@ class ClaudeCodeMonitor:
         self.callbacks[event_type].append(callback)
         logger.info(f"Registered callback for {event_type.value} events")
 
-    def start_monitoring(self, session_dir: Path, project_name: str | None = None):
+    def start_monitoring(self, session_dir: Path, project_name: Optional[str] = None):
         """
         Start monitoring Claude Code session directory.
 
@@ -199,7 +200,7 @@ class ClaudeCodeMonitor:
             last_line = self.last_processed_line.get(file_path, 0)
 
             # Read new lines only
-            with open(file_path) as f:
+            with open(file_path, "r") as f:
                 lines = f.readlines()
 
             new_lines = lines[last_line:]
@@ -222,7 +223,7 @@ class ClaudeCodeMonitor:
         except Exception as e:
             logger.error(f"Error parsing session file: {e}")
 
-    def _process_session_entry(self, entry: dict):
+    def _process_session_entry(self, entry: Dict):
         """
         Process individual session entry and generate events.
 
@@ -288,7 +289,7 @@ class ClaudeCodeMonitor:
                     elif item.get("type") == "tool_use":
                         self._process_tool_use(item, timestamp, session_id)
 
-    def _process_tool_result(self, tool_result: dict, timestamp: datetime, session_id: str):
+    def _process_tool_result(self, tool_result: Dict, timestamp: datetime, session_id: str):
         """Process tool result entries."""
         content = tool_result.get("content", "")
 
@@ -318,7 +319,7 @@ class ClaudeCodeMonitor:
             )
             self._notify_callbacks(event)
 
-    def _process_tool_use(self, tool_use: dict, timestamp: datetime, session_id: str):
+    def _process_tool_use(self, tool_use: Dict, timestamp: datetime, session_id: str):
         """Process tool use entries."""
         tool_name = tool_use.get("name", "")
         tool_input = tool_use.get("input", {})
@@ -409,7 +410,7 @@ class ClaudeCodeMonitor:
             except Exception as e:
                 logger.error(f"Error in callback for {event.event_type.value}: {e}")
 
-    def get_active_sessions(self) -> dict[str, dict]:
+    def get_active_sessions(self) -> Dict[str, Dict]:
         """
         Get currently active Claude Code sessions.
 

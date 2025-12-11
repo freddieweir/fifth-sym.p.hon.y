@@ -7,12 +7,15 @@ Attention-friendly visual design with emoji indicators and rich formatting.
 import asyncio
 import json
 import logging
+import sys
 from datetime import datetime
-
+from typing import Optional
 import websockets
 from rich.console import Console
-from rich.panel import Panel
 from rich.text import Text
+from rich.panel import Panel
+from rich.layout import Layout
+from rich.live import Live
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +59,7 @@ class ChatClient:
         self.server_url = server_url
         self.console = Console()
         self.messages = []
-        self.websocket: websockets.WebSocketClientProtocol | None = None
+        self.websocket: Optional[websockets.WebSocketClientProtocol] = None
         self.running = False
 
     async def connect(self):
@@ -95,7 +98,7 @@ class ChatClient:
             self.console.print(
                 "[bold red]❌ Connection refused. Is the chat server running?[/bold red]"
             )
-            self.console.print("   Try: python -m modules.chat.chat_server")
+            self.console.print(f"   Try: python -m modules.chat.chat_server")
         except Exception as e:
             self.console.print(f"[bold red]❌ Connection error: {e}[/bold red]")
         finally:

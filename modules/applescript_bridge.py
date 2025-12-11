@@ -6,7 +6,9 @@ Provides Python interface to Calendar, Reminders, Notes, and other macOS apps.
 
 import asyncio
 import logging
+import subprocess
 from datetime import datetime, timedelta
+from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,7 @@ class AppleScriptBridge:
 
     # Calendar Methods
 
-    async def get_today_events(self) -> list[dict]:
+    async def get_today_events(self) -> List[Dict]:
         """
         Get today's calendar events.
 
@@ -112,13 +114,13 @@ class AppleScriptBridge:
         start_str = start_time.strftime("%m/%d/%Y %I:%M:%S %p")
         end_str = end_time.strftime("%m/%d/%Y %I:%M:%S %p")
 
-        script = f"""
+        script = f'''
         tell application "Calendar"
             tell calendar "Fifth Symphony"
                 make new event with properties {{summary:"{title}", start date:date "{start_str}", end date:date "{end_str}", description:"{notes}"}}
             end tell
         end tell
-        """
+        '''
 
         try:
             await self.run_applescript(script)
@@ -131,7 +133,7 @@ class AppleScriptBridge:
 
     # Reminders Methods
 
-    async def get_reminders(self, list_name: str = "Fifth Symphony") -> list[dict]:
+    async def get_reminders(self, list_name: str = "Fifth Symphony") -> List[Dict]:
         """
         Get reminders from list.
 
@@ -141,7 +143,7 @@ class AppleScriptBridge:
         Returns:
             List of reminder dicts
         """
-        script = f"""
+        script = f'''
         tell application "Reminders"
             set reminderList to list "{list_name}"
             set output to ""
@@ -152,7 +154,7 @@ class AppleScriptBridge:
 
             return output
         end tell
-        """
+        '''
 
         try:
             output = await self.run_applescript(script)
@@ -173,7 +175,7 @@ class AppleScriptBridge:
         self,
         title: str,
         list_name: str = "Fifth Symphony",
-        due_date: datetime | None = None,
+        due_date: Optional[datetime] = None,
         notes: str = "",
     ) -> bool:
         """
@@ -225,9 +227,9 @@ class AppleScriptBridge:
             message: Notification message
             subtitle: Subtitle (optional)
         """
-        script = f"""
+        script = f'''
         display notification "{message}" with title "{title}" subtitle "{subtitle}"
-        """
+        '''
 
         try:
             await self.run_applescript(script)
@@ -249,11 +251,11 @@ class AppleScriptBridge:
         Returns:
             True if successful
         """
-        script = f"""
+        script = f'''
         tell application "Notes"
             make new note with properties {{name:"{title}", body:"{body}"}}
         end tell
-        """
+        '''
 
         try:
             await self.run_applescript(script)
@@ -274,9 +276,9 @@ class AppleScriptBridge:
             text: Text to speak
             voice: macOS voice name
         """
-        script = f"""
+        script = f'''
         say "{text}" using "{voice}"
-        """
+        '''
 
         try:
             await self.run_applescript(script)

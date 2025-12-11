@@ -7,10 +7,10 @@ Allows Claude Code agents to post messages to the shared chat hub.
 import asyncio
 import json
 import logging
-
+from typing import Optional
 import websockets
 from mcp.server import Server
-from mcp.types import TextContent, Tool
+from mcp.types import Tool, TextContent
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 server = Server("fifth-symphony-chat")
 
 # Global WebSocket connection
-_chat_connection: websockets.WebSocketClientProtocol | None = None
+_chat_connection: Optional[websockets.WebSocketClientProtocol] = None
 _chat_server_url = "ws://localhost:8765"
 
 

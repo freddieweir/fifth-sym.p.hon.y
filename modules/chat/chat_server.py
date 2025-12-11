@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-
+from typing import Dict, Set, Optional
 import websockets
 from websockets.server import WebSocketServerProtocol
 
@@ -34,7 +34,7 @@ class ChatServer:
         """
         self.host = host
         self.port = port
-        self.clients: set[WebSocketServerProtocol] = set()
+        self.clients: Set[WebSocketServerProtocol] = set()
         self.message_history = []
         self.max_history = max_history
         self.server = None

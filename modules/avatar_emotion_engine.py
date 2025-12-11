@@ -9,8 +9,9 @@ Future integration with Visual Novel widget for dynamic emotional expressions.
 
 import logging
 import re
-from dataclasses import dataclass
+from typing import Dict, Optional, List
 from enum import Enum
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class EmotionScore:
 
     emotion: Emotion
     confidence: float
-    triggers: list[str]
+    triggers: List[str]
 
 
 class AvatarEmotionEngine:
@@ -126,10 +127,10 @@ class AvatarEmotionEngine:
     def __init__(self):
         """Initialize emotion engine."""
         self.current_emotion = Emotion.NEUTRAL
-        self.emotion_history: list[EmotionScore] = []
+        self.emotion_history: List[EmotionScore] = []
         self.max_history = 10
 
-    def detect_emotion(self, text: str, context: dict | None = None) -> EmotionScore:
+    def detect_emotion(self, text: str, context: Optional[Dict] = None) -> EmotionScore:
         """
         Detect emotion from text and context.
 
@@ -140,8 +141,8 @@ class AvatarEmotionEngine:
         Returns:
             EmotionScore with detected emotion and confidence
         """
-        scores: dict[Emotion, float] = {}
-        triggers: dict[Emotion, list[str]] = {}
+        scores: Dict[Emotion, float] = {}
+        triggers: Dict[Emotion, List[str]] = {}
 
         # Analyze text for emotion keywords
         text_lower = text.lower()
@@ -192,7 +193,7 @@ class AvatarEmotionEngine:
         return result
 
     def _apply_context(
-        self, scores: dict[Emotion, float], triggers: dict[Emotion, list[str]], context: dict
+        self, scores: Dict[Emotion, float], triggers: Dict[Emotion, List[str]], context: Dict
     ):
         """
         Apply context-based adjustments to emotion scores.
@@ -242,7 +243,7 @@ class AvatarEmotionEngine:
 
         return state_emotions.get(state.lower(), Emotion.NEUTRAL)
 
-    def get_recent_emotions(self, count: int = 5) -> list[EmotionScore]:
+    def get_recent_emotions(self, count: int = 5) -> List[EmotionScore]:
         """
         Get recent emotion history.
 
@@ -270,7 +271,7 @@ class AvatarEmotionEngine:
             return Emotion.NEUTRAL
 
         # Count emotions
-        emotion_counts: dict[Emotion, int] = {}
+        emotion_counts: Dict[Emotion, int] = {}
         for score in recent:
             emotion_counts[score.emotion] = emotion_counts.get(score.emotion, 0) + 1
 

@@ -6,9 +6,10 @@ Handles request evaluation, auto-approve rules, and risk assessment.
 """
 
 import logging
-from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from dataclasses import dataclass
+from typing import Optional, Dict, Any
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +38,10 @@ class PermissionRequest:
     """Represents a permission request from Claude Code"""
 
     action: str  # Description of action
-    command: str | None  # Actual command if applicable
+    command: Optional[str]  # Actual command if applicable
     risk_level: RiskLevel  # Assessed risk level
     agent: str  # Which Nazarick agent is requesting
-    context: dict[str, Any]  # Additional context
+    context: Dict[str, Any]  # Additional context
     session_id: str  # Session identifier
 
 
@@ -55,7 +56,7 @@ class PermissionEngine:
     - Store approval decisions
     """
 
-    def __init__(self, config: dict[str, Any], approval_store):
+    def __init__(self, config: Dict[str, Any], approval_store):
         """
         Initialize permission engine.
 
@@ -70,7 +71,7 @@ class PermissionEngine:
         # Risk assessment patterns
         self.risk_patterns = self._load_risk_patterns()
 
-    def _load_risk_patterns(self) -> dict[RiskLevel, list]:
+    def _load_risk_patterns(self) -> Dict[RiskLevel, list]:
         """Load risk assessment patterns from config"""
         return {
             RiskLevel.CRITICAL: [
@@ -106,7 +107,7 @@ class PermissionEngine:
             ],
         }
 
-    async def assess_risk(self, action: str, command: str | None = None) -> RiskLevel:
+    async def assess_risk(self, action: str, command: Optional[str] = None) -> RiskLevel:
         """
         Assess risk level for an action.
 
@@ -134,7 +135,7 @@ class PermissionEngine:
         # Default to medium risk if no patterns match
         return RiskLevel.MEDIUM
 
-    async def check_auto_approve(self, request: PermissionRequest) -> bool | None:
+    async def check_auto_approve(self, request: PermissionRequest) -> Optional[bool]:
         """
         Check if request matches auto-approve rules.
 
@@ -146,7 +147,7 @@ class PermissionEngine:
         """
         return await self.approval_store.check_auto_approve(request)
 
-    async def evaluate_request(self, request: PermissionRequest) -> ApprovalResponse | None:
+    async def evaluate_request(self, request: PermissionRequest) -> Optional[ApprovalResponse]:
         """
         Evaluate permission request against auto-approve rules.
 
@@ -172,7 +173,7 @@ class PermissionEngine:
         self,
         request: PermissionRequest,
         response: ApprovalResponse,
-        custom_message: str | None = None,
+        custom_message: Optional[str] = None,
     ):
         """
         Record user decision for future reference.

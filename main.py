@@ -15,12 +15,12 @@ from rich.console import Console
 from rich.table import Table
 
 from modules.onepassword_manager import OnePasswordManager
-from modules.orchestrator.chat_integration import OrchestratorChatContext
 from modules.output_translator import OutputTranslator
 from modules.reminder_system import ReminderSystem
 from modules.script_runner import ScriptRunner
 from modules.symlink_manager import SymlinkManager
 from modules.voice_handler import VoiceHandler
+from modules.orchestrator.chat_integration import OrchestratorChatContext
 from modules.yubikey_auth import YubiKeyAuth
 
 # Add modules to path

@@ -5,18 +5,20 @@ Attention-friendly terminal interface with colors, animations, and visual hierar
 Designed for maximum visibility and engagement.
 """
 
-import time
-from enum import Enum
-from typing import Any
-
-from rich.align import Align
-from rich.box import DOUBLE, HEAVY, ROUNDED
 from rich.console import Console
-from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.table import Table
+from rich.layout import Layout
 from rich.text import Text
+from rich.box import ROUNDED, DOUBLE, HEAVY
+from rich.align import Align
+from rich import print as rprint
+from rich.live import Live
+from rich.markdown import Markdown
+import time
+from typing import Optional, List, Dict, Any
+from enum import Enum
 
 
 class RiskLevel(Enum):
@@ -74,7 +76,7 @@ class CLIUI:
         action: str,
         risk_level: RiskLevel,
         agent: str,
-        details: dict[str, Any] | None = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         """
         Display eye-grabbing permission request.
@@ -156,7 +158,7 @@ class CLIUI:
 
         self.console.print(panel)
 
-    def show_approval_denied(self, action: str, agent: str, reason: str | None = None):
+    def show_approval_denied(self, action: str, agent: str, reason: Optional[str] = None):
         """Show approval denied message"""
         text = Text()
         text.append("❌ ", style="bold red")
@@ -204,7 +206,7 @@ class CLIUI:
             limit: Number of recent entries to show
         """
         try:
-            with open("CHANGELOG.md") as f:
+            with open("CHANGELOG.md", "r") as f:
                 content = f.read()
 
             md = Markdown(content)
@@ -242,7 +244,7 @@ class CLIUI:
         )
 
     def show_table(
-        self, title: str, headers: list[str], rows: list[list[str]], style: str = "cyan"
+        self, title: str, headers: List[str], rows: List[List[str]], style: str = "cyan"
     ):
         """
         Display data in a table.
@@ -263,7 +265,7 @@ class CLIUI:
 
         self.console.print(table)
 
-    def show_session_info(self, session_data: dict[str, Any]):
+    def show_session_info(self, session_data: Dict[str, Any]):
         """Display current session information"""
         text = Text()
         text.append("🔗 SESSION INFO\n\n", style="bold bright_cyan")

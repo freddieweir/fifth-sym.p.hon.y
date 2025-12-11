@@ -10,10 +10,12 @@ import pty
 import select
 import termios
 import tty
+from typing import Optional
 
-from rich.console import RenderableType
-from rich.text import Text
 from textual.widget import Widget
+from textual.widgets import Static
+from rich.text import Text
+from rich.console import RenderableType
 
 
 class ShellWidget(Widget):
@@ -41,8 +43,8 @@ class ShellWidget(Widget):
         self.title = title
 
         # PTY file descriptors
-        self.master_fd: int | None = None
-        self.pid: int | None = None
+        self.master_fd: Optional[int] = None
+        self.pid: Optional[int] = None
 
         # Output buffer
         self.output_lines = []

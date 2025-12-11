@@ -5,11 +5,12 @@ Detects when Claude Code instances in iTerm2 are waiting for responses.
 Provides physical (Stream Deck LED) and audio notifications.
 """
 
-import logging
 import subprocess
 import time
-from datetime import datetime
+import logging
 from pathlib import Path
+from typing import List, Dict, Optional
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +64,12 @@ class ClaudeMonitor:
         self.audio_alerts = audio_alerts
         self.stream_deck_alerts = stream_deck_alerts
 
-        self.instances: dict[str, ClaudeInstance] = {}
+        self.instances: Dict[str, ClaudeInstance] = {}
         self.alert_file = Path("/tmp/claude-pending.flag")
 
-    def get_iterm_tabs(self) -> list[dict]:
+    def get_iterm_tabs(self) -> List[Dict]:
         """Get all iTerm2 tabs using AppleScript."""
-        script = """
+        script = '''
         tell application "iTerm"
             set output to ""
             repeat with theWindow in windows
@@ -81,7 +82,7 @@ class ClaudeMonitor:
             end repeat
             return output
         end tell
-        """
+        '''
 
         try:
             result = subprocess.run(
@@ -96,11 +97,11 @@ class ClaudeMonitor:
                 return []
 
             tabs = []
-            for line in result.stdout.strip().split("\n"):
+            for line in result.stdout.strip().split('\n'):
                 if not line:
                     continue
 
-                parts = line.split("|")
+                parts = line.split('|')
                 if len(parts) == 3:
                     tabs.append({
                         "window_id": parts[0],
@@ -139,7 +140,7 @@ class ClaudeMonitor:
         title_lower = title.lower()
         return any(indicator in title_lower for indicator in waiting_indicators)
 
-    def detect_instances(self) -> list[ClaudeInstance]:
+    def detect_instances(self) -> List[ClaudeInstance]:
         """Detect all Claude Code instances."""
         tabs = self.get_iterm_tabs()
         instances = []

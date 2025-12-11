@@ -5,17 +5,18 @@ Connects Claude Code monitoring with avatar visuals and voice feedback.
 Provides real-time awareness of Claude's activities.
 """
 
+import asyncio
 import logging
 from pathlib import Path
 from typing import Optional
 
-from PySide6.QtCore import QObject, QTimer, Signal
+from PySide6.QtCore import QTimer, QObject, Signal
 
 from modules.claude_code_monitor import ClaudeCodeMonitor, ClaudeEvent, ClaudeEventType
 
 # Optional imports (may not be available in all contexts)
 try:
-    from modules.visualization_widget import AvatarState, VisualNovelWidget
+    from modules.visualization_widget import VisualNovelWidget, AvatarState
 
     AVATAR_AVAILABLE = True
 except ImportError:
@@ -241,7 +242,7 @@ class ClaudeIntegration(QObject):
     # =========================================================================
 
     def start_monitoring(
-        self, session_dir: Path | None = None, project_name: str | None = None
+        self, session_dir: Optional[Path] = None, project_name: Optional[str] = None
     ):
         """
         Start monitoring Claude Code sessions.

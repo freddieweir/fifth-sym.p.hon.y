@@ -1,9 +1,12 @@
 """Voice listener module with dynamic model switching based on power state."""
 
-import logging
-import subprocess
+import os
 import sys
-from collections.abc import Callable
+import subprocess
+import time
+import logging
+from pathlib import Path
+from typing import Optional, Dict, Callable
 from contextlib import contextmanager
 
 import numpy as np
@@ -91,7 +94,7 @@ class VoiceListener:
         self.current_model_name = None
 
         # Command mapping
-        self.commands: dict[str, Callable] = {
+        self.commands: Dict[str, Callable] = {
             "play": self._media_control,
             "pause": self._media_control,
             "stop": self._media_control,
@@ -102,11 +105,11 @@ class VoiceListener:
         self._update_power_state()
         self._load_model()
 
-        logger.info("Voice listener initialized")
+        logger.info(f"Voice listener initialized")
         logger.info(f"Power state: {self.power_state}, Battery: {self.battery_percent}%")
         logger.info(f"Model: {self.current_model_name}")
 
-    def _detect_power_state(self) -> tuple[str, int | None]:
+    def _detect_power_state(self) -> tuple[str, Optional[int]]:
         """
         Detect if running on battery or AC power.
 
@@ -135,7 +138,7 @@ class VoiceListener:
             # Extract battery percentage
             battery_percent = None
             import re
-            match = re.search(r"(\d+)%", output)
+            match = re.search(r'(\d+)%', output)
             if match:
                 battery_percent = int(match.group(1))
 
@@ -244,7 +247,7 @@ class VoiceListener:
             yield stream
 
         finally:
-            if "stream" in locals():
+            if 'stream' in locals():
                 stream.stop_stream()
                 stream.close()
             audio.terminate()
@@ -265,7 +268,7 @@ class VoiceListener:
                 frames.append(data)
 
             # Convert to numpy array
-            audio_data = np.frombuffer(b"".join(frames), dtype=np.int16)
+            audio_data = np.frombuffer(b''.join(frames), dtype=np.int16)
 
             # Convert to float32 and normalize to [-1, 1] for Whisper
             audio_float = audio_data.astype(np.float32) / 32768.0
