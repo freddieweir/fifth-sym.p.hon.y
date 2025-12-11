@@ -34,7 +34,7 @@ if ! command -v uv &> /dev/null; then
 fi
 
 # Check if audio output directory exists
-AUDIO_DIR="/Users/fweir/git/ai-bedo/communications/audio"
+AUDIO_DIR="$ALBEDO_ROOT/communications/audio"
 if [ ! -d "$AUDIO_DIR" ]; then
     echo -e "${YELLOW}Warning: Audio output directory does not exist: $AUDIO_DIR${NC}"
     echo "Creating directory..."

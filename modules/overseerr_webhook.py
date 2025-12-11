@@ -7,6 +7,7 @@ Integrates with existing AudioTTS module and audio monitor service.
 """
 
 import logging
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,9 @@ from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+
+# Dynamic path resolution for ai-bedo repository
+ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
 
 # Configure logging
 logging.basicConfig(
@@ -24,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 # Configuration
-AUDIO_OUTPUT_DIR = Path("/Users/fweir/git/ai-bedo/communications/audio")
+AUDIO_OUTPUT_DIR = ALBEDO_ROOT / "communications" / "audio"
 
 # Notification templates for different event types
 NOTIFICATION_TEMPLATES = {

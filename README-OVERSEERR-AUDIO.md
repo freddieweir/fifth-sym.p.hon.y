@@ -43,7 +43,7 @@ This integration connects Overseerr's webhook notifications to the Fifth Symphon
 ### 1. Start the Webhook Listener
 
 ```bash
-cd /Users/fweirvm/git/internal/repos/fifth-symphony
+cd ~/git/internal/repos/fifth-symphony
 ./scripts/launchers/start-overseerr-webhook.sh
 ```
 
@@ -98,7 +98,7 @@ Health check: http://0.0.0.0:8765/health
 
 The audio monitor service should already be running on your main machine at:
 ```
-/Users/fweir/git/ai-bedo/audio_monitor/
+~/git/internal/repos/ai-bedo/audio_monitor/
 ```
 
 Check status:
@@ -192,7 +192,7 @@ curl -X POST http://localhost:8765/webhook/overseerr \
 ### Expected workflow:
 
 1. **Webhook received** → Logged in webhook listener console
-2. **Text file written** → `/Users/fweir/git/ai-bedo/communications/audio/YYYYMMDD-HHMMSS-overseerr-media-pending-main.txt`
+2. **Text file written** → `$ALBEDO_ROOT/communications/audio/YYYYMMDD-HHMMSS-overseerr-media-pending-main.txt`
 3. **Audio monitor detects** → Watchdog picks up new file
 4. **Speech generated** → ElevenLabs synthesizes voice
 5. **Audio plays** → Automatic playback with Secretary voice
@@ -201,10 +201,10 @@ curl -X POST http://localhost:8765/webhook/overseerr \
 
 ```bash
 # List recent audio notifications
-ls -lt /Users/fweir/git/ai-bedo/communications/audio/ | head -10
+ls -lt ~/git/internal/repos/ai-bedo/communications/audio/ | head -10
 
 # View a notification text
-cat /Users/fweir/git/ai-bedo/communications/audio/20251103-*.txt
+cat ~/git/internal/repos/ai-bedo/communications/audio/20251103-*.txt
 ```
 
 ## 🛠️ Troubleshooting
@@ -236,12 +236,12 @@ pgrep -f audio_monitor
 
 **Check audio files are being created:**
 ```bash
-ls -lt /Users/fweir/git/ai-bedo/communications/audio/ | head -5
+ls -lt ~/git/internal/repos/ai-bedo/communications/audio/ | head -5
 ```
 
 **Check audio monitor logs:**
 ```bash
-tail -f /Users/fweir/git/ai-bedo/audio_monitor/logs/audio_monitor.log
+tail -f ~/git/internal/repos/ai-bedo/audio_monitor/logs/audio_monitor.log
 ```
 
 **Verify ElevenLabs API key:**
@@ -263,7 +263,7 @@ Webhook listener defaults to `-main` since Overseerr runs on main machine.
 **Check logs:**
 ```bash
 # Run in foreground to see errors
-cd /Users/fweirvm/git/internal/repos/fifth-symphony
+cd ~/git/internal/repos/fifth-symphony
 uv run python -m modules.overseerr_webhook
 ```
 
@@ -307,7 +307,7 @@ Response:
 ```bash
 # Start in tmux
 tmux new-session -d -s overseerr-webhook \
-  '/Users/fweirvm/git/internal/repos/fifth-symphony/scripts/launchers/start-overseerr-webhook.sh'
+  '~/git/internal/repos/fifth-symphony/scripts/launchers/start-overseerr-webhook.sh'
 
 # Attach to view logs
 tmux attach -t overseerr-webhook
@@ -329,11 +329,11 @@ Create `~/Library/LaunchAgents/com.fifth-symphony.overseerr-webhook.plist`:
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/fweirvm/git/internal/repos/fifth-symphony/scripts/launchers/start-overseerr-webhook.sh</string>
+        <string>~/git/internal/repos/fifth-symphony/scripts/launchers/start-overseerr-webhook.sh</string>
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/fweirvm/git/internal/repos/fifth-symphony</string>
+    <string>~/git/internal/repos/fifth-symphony</string>
 
     <key>RunAtLoad</key>
     <true/>
@@ -400,7 +400,7 @@ if media_type != "movie":
 
 ## 📚 Related Documentation
 
-- **Audio Monitor Service**: `/Users/fweir/git/ai-bedo/audio_monitor/README.md`
+- **Audio Monitor Service**: `~/git/internal/repos/ai-bedo/audio_monitor/README.md`
 - **AudioTTS Module**: `modules/audio_tts.py`
 - **Fifth Symphony Main Docs**: `README.md`
 - **Overseerr Webhook Docs**: https://docs.overseerr.dev/using-overseerr/notifications/webhooks
