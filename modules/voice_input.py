@@ -8,13 +8,13 @@ Attention-friendly with visual feedback and hotkey toggle.
 import asyncio
 import logging
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
-from typing import Optional, Callable
 
+import numpy as np
 import sounddevice as sd
 import soundfile as sf
 import whisper
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class VoiceInput:
         self,
         model_size: str = "base",
         sample_rate: int = 16000,
-        callback: Optional[Callable[[str], None]] = None,
+        callback: Callable[[str], None] | None = None,
     ):
         """
         Initialize voice input.
@@ -111,7 +111,7 @@ class VoiceInput:
             while self.is_recording:
                 await asyncio.sleep(0.1)
 
-    async def _transcribe_audio(self) -> Optional[str]:
+    async def _transcribe_audio(self) -> str | None:
         """
         Transcribe recorded audio with Whisper.
 

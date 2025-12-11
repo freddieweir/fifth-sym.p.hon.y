@@ -7,19 +7,14 @@ Attention-friendly with visual file organization and quick actions.
 
 import asyncio
 import logging
-from pathlib import Path
-from typing import Optional
 
-from textual.widget import Widget
-from textual.widgets import Static, DataTable, Tree
-from textual.reactive import reactive
-from textual.containers import Container, Vertical, Horizontal
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.tree import Tree as RichTree
+from textual.reactive import reactive
+from textual.widgets import Static
 
-from modules.folder_manager import FolderManager, FolderSummary, FileEvent
+from modules.folder_manager import FileEvent, FolderManager, FolderSummary
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +32,7 @@ class FolderSummaryWidget(Static):
 
     # Reactive state
     current_folder = reactive("downloads")
-    summary: Optional[FolderSummary] = None
+    summary: FolderSummary | None = None
 
     def __init__(self, folder_manager: FolderManager):
         super().__init__()

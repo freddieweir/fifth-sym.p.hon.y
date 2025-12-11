@@ -7,19 +7,18 @@ Provides visual permission prompts and voice output for LLM responses.
 
 import asyncio
 import logging
-from typing import Optional
-from textual.widgets import Static, Input, Button
-from textual.containers import Container, Horizontal
-from textual.reactive import reactive
+
 from rich.panel import Panel
 from rich.text import Text
+from textual.reactive import reactive
+from textual.widgets import Static
 
+from modules.voice_handler import VoiceHandler
 from modules.voice_permission_hook import (
     VoicePermissionHook,
     VoicePermissionRequest,
     VoicePermissionResponse,
 )
-from modules.voice_handler import VoiceHandler
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +41,8 @@ class VoicePermissionPrompt(Static):
 
     def __init__(self):
         super().__init__()
-        self.current_request: Optional[VoicePermissionRequest] = None
-        self.response_future: Optional[asyncio.Future] = None
+        self.current_request: VoicePermissionRequest | None = None
+        self.response_future: asyncio.Future | None = None
 
     def render(self):
         """Render permission prompt."""
@@ -146,7 +145,7 @@ class VoiceDashboardIntegration:
     - Voice system status display
     """
 
-    def __init__(self, voice_handler: VoiceHandler, config: Optional[dict] = None):
+    def __init__(self, voice_handler: VoiceHandler, config: dict | None = None):
         """
         Initialize dashboard voice integration.
 

@@ -9,11 +9,9 @@ Maintains dual-output system:
 - Voice: Natural language summary without code syntax
 """
 
-import re
 import logging
-from typing import Dict, Optional, List
+import re
 from dataclasses import dataclass
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +34,7 @@ class ParsedResponse:
     visual: str
     voice: str
     has_code: bool = False
-    code_summary: Optional[str] = None
+    code_summary: str | None = None
     has_tables: bool = False
     has_links: bool = False
     complexity_score: int = 0
@@ -452,7 +450,7 @@ The function will return the sum of all items.
     print(parsed.visual)
     print("\n=== Voice Output ===")
     print(parsed.voice)
-    print(f"\n=== Metadata ===")
+    print("\n=== Metadata ===")
     print(f"Has code: {parsed.has_code}")
     print(f"Code summary: {parsed.code_summary}")
     print(f"Complexity: {parsed.complexity_score}/10")

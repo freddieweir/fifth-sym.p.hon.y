@@ -9,9 +9,9 @@ import asyncio
 import json
 import logging
 import subprocess
-from pathlib import Path
-from typing import Optional, Dict, Any
 import tempfile
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class MCPClient:
     $GIT_ROOT/external/mcp/elevenlabs-mcp
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize MCP client.
 
@@ -59,7 +59,7 @@ class MCPClient:
             raise
 
     async def synthesize_speech(
-        self, text: str, output_path: Optional[Path] = None, voice_id: Optional[str] = None
+        self, text: str, output_path: Path | None = None, voice_id: str | None = None
     ) -> Path:
         """
         Synthesize speech using ElevenLabs MCP server.

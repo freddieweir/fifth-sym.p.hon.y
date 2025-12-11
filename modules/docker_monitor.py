@@ -6,8 +6,7 @@ Provides container status tracking and log streaming with filtering.
 
 import asyncio
 import logging
-from typing import List, Dict, Optional, AsyncIterator
-from datetime import datetime
+from collections.abc import AsyncIterator
 
 import docker
 from docker.errors import DockerException
@@ -25,7 +24,7 @@ class DockerMonitor:
     - Container filtering by name pattern
     """
 
-    def __init__(self, watched_containers: List[str] = None):
+    def __init__(self, watched_containers: list[str] = None):
         """
         Initialize Docker monitor.
 
@@ -43,7 +42,7 @@ class DockerMonitor:
 
         self.watched_containers = watched_containers or []
 
-    def get_container_status(self) -> List[Dict[str, str]]:
+    def get_container_status(self) -> list[dict[str, str]]:
         """
         Get status of all watched containers.
 
@@ -155,11 +154,11 @@ class DockerMonitor:
         except DockerException as e:
             yield f"[ERROR] {e}"
 
-    def get_watched_containers(self) -> List[str]:
+    def get_watched_containers(self) -> list[str]:
         """Get list of currently watched container patterns."""
         return self.watched_containers
 
-    def set_watched_containers(self, patterns: List[str]):
+    def set_watched_containers(self, patterns: list[str]):
         """Update watched container patterns."""
         self.watched_containers = patterns
 

@@ -5,11 +5,11 @@ Stores orchestrator prompts in 1Password for runtime injection.
 Zero plaintext prompts in code or config files.
 """
 
+import json
 import logging
 import subprocess
-from typing import Dict, Any, Optional
 from dataclasses import dataclass
-import json
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class PromptManager:
     No prompts are hardcoded in source code or config files.
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize prompt manager.
 
@@ -41,7 +41,7 @@ class PromptManager:
         """
         self.config = config
         self.vault = config.get("onepassword_vault", "Development")
-        self.cache: Dict[str, str] = {}
+        self.cache: dict[str, str] = {}
         self.logger = logging.getLogger(__name__)
 
         # 1Password item names for different prompt categories
@@ -176,7 +176,7 @@ class PromptManager:
         template = fallbacks.get(category, "Unknown prompt: {category}/{prompt_key}")
         return template.format(category=category, prompt_key=prompt_key, **format_args)
 
-    async def list_available_prompts(self, category: Optional[str] = None) -> Dict[str, list]:
+    async def list_available_prompts(self, category: str | None = None) -> dict[str, list]:
         """
         List all available prompts from 1Password.
 
@@ -200,7 +200,7 @@ class PromptManager:
 
         return result
 
-    async def _fetch_all_prompts_in_category(self, item_name: str) -> Dict[str, str]:
+    async def _fetch_all_prompts_in_category(self, item_name: str) -> dict[str, str]:
         """
         Fetch all prompts in a category from 1Password.
 

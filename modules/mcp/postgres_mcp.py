@@ -8,11 +8,10 @@ Allows querying memories, anime preferences, voice IDs, and chat logs.
 import asyncio
 import logging
 import os
-from typing import Any, List
 
 import asyncpg
 from mcp.server import Server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ async def get_db_pool() -> asyncpg.Pool:
 
 
 @server.list_tools()
-async def list_tools() -> List[Tool]:
+async def list_tools() -> list[Tool]:
     """List available database tools."""
     return [
         Tool(
@@ -184,7 +183,7 @@ async def list_tools() -> List[Tool]:
 
 
 @server.call_tool()
-async def call_tool(name: str, arguments: dict) -> List[TextContent]:
+async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
     pool = await get_db_pool()
 

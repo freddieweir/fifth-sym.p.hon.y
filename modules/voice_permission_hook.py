@@ -14,12 +14,13 @@ Attention-optimized with:
 
 import asyncio
 import logging
-from pathlib import Path
-from typing import Optional, Callable, Dict, Any
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
-from modules.response_voice_adapter import ResponseVoiceAdapter, ParsedResponse
+from modules.response_voice_adapter import ParsedResponse, ResponseVoiceAdapter
 from modules.voice_handler import VoiceHandler
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ class VoicePermissionRequest:
 
     response_text: str
     parsed: ParsedResponse
-    context: Dict[str, Any]
+    context: dict[str, Any]
     session_id: str
 
 
@@ -68,8 +69,8 @@ class VoicePermissionHook:
     def __init__(
         self,
         voice_handler: VoiceHandler,
-        config: Optional[Dict[str, Any]] = None,
-        permission_callback: Optional[Callable[[VoicePermissionRequest], asyncio.Future]] = None,
+        config: dict[str, Any] | None = None,
+        permission_callback: Callable[[VoicePermissionRequest], asyncio.Future] | None = None,
     ):
         """
         Initialize voice permission hook.
@@ -88,7 +89,7 @@ class VoicePermissionHook:
 
         # State
         self.is_muted = False
-        self.auto_approve_patterns: Dict[str, bool] = {}  # Pattern hash -> approve/deny
+        self.auto_approve_patterns: dict[str, bool] = {}  # Pattern hash -> approve/deny
         self.session_id = "default"
 
         # Attention sounds
@@ -105,9 +106,9 @@ class VoicePermissionHook:
 
         # Auto-approve threshold (how many times to see pattern before auto-approving)
         self.auto_approve_threshold = self.config.get("auto_approve_threshold", 3)
-        self.pattern_counts: Dict[str, int] = {}
+        self.pattern_counts: dict[str, int] = {}
 
-    async def on_response(self, response: str, context: Optional[Dict[str, Any]] = None) -> None:
+    async def on_response(self, response: str, context: dict[str, Any] | None = None) -> None:
         """
         Called when LLM generates response.
 
@@ -167,7 +168,7 @@ class VoicePermissionHook:
 
     async def _check_auto_approve(
         self, request: VoicePermissionRequest
-    ) -> Optional[VoicePermissionResponse]:
+    ) -> VoicePermissionResponse | None:
         """
         Check if request matches auto-approve rules.
 
@@ -381,7 +382,7 @@ class VoicePermissionHook:
         self.pattern_counts.clear()
         logger.info("Cleared all auto-approve patterns")
 
-    def get_auto_approve_patterns(self) -> Dict[str, bool]:
+    def get_auto_approve_patterns(self) -> dict[str, bool]:
         """
         Get current auto-approve patterns.
 
@@ -408,10 +409,10 @@ async def demo():
 
     # Mock permission callback
     async def mock_permission_callback(request: VoicePermissionRequest) -> VoicePermissionResponse:
-        print(f"\n=== Permission Request ===")
+        print("\n=== Permission Request ===")
         print(f"Voice output: {request.parsed.voice}")
         print(f"Complexity: {request.parsed.complexity_score}/10")
-        print(f"\nOptions: (y)es, (n)o, (a)lways, (never), (m)ute")
+        print("\nOptions: (y)es, (n)o, (a)lways, (never), (m)ute")
 
         # For demo, auto-approve
         return VoicePermissionResponse.YES

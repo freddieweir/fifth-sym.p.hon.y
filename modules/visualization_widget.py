@@ -15,21 +15,20 @@ Future: Emotion-based dynamic selection (happy, sad, surprised, etc.)
 """
 
 import logging
-from pathlib import Path
-from typing import Optional, Dict
 from enum import Enum
+from pathlib import Path
 
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
-    QWidget,
-    QLabel,
-    QVBoxLayout,
-    QHBoxLayout,
     QFrame,
+    QHBoxLayout,
+    QLabel,
     QPushButton,
     QSizePolicy,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Qt, QTimer, Signal, Slot, QSize
-from PySide6.QtGui import QPixmap, QPainter, QColor, QPen
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +142,7 @@ class VisualNovelWidget(QWidget):
     led_changed = Signal(LEDColor)
 
     def __init__(
-        self, assets_path: Optional[Path] = None, always_on_top: bool = False, parent=None
+        self, assets_path: Path | None = None, always_on_top: bool = False, parent=None
     ):
         super().__init__(parent)
 
@@ -157,7 +156,7 @@ class VisualNovelWidget(QWidget):
         self.current_led = LEDColor.OFF
 
         # Image cache
-        self.images: Dict[str, QPixmap] = {}
+        self.images: dict[str, QPixmap] = {}
 
         # Setup UI
         self._setup_ui()
@@ -437,6 +436,7 @@ class VisualNovelWidget(QWidget):
 def main():
     """Run visual novel widget as standalone app."""
     import sys
+
     from PySide6.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
@@ -449,7 +449,6 @@ def main():
     # Demo state changes
     def demo_states():
         """Demonstrate state transitions."""
-        import time
 
         states = [
             (AvatarState.IDLE, "Idle", False, False, False),

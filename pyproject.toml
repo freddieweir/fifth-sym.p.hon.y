@@ -55,6 +55,13 @@ dependencies = [
     # TTS API Server
     "fastapi>=0.115.0",
     "uvicorn>=0.32.0",
+    "rich-click>=1.9.4",
+    # YouTube Subscriptions Integration
+    "google-auth-oauthlib>=1.0.0",
+    "google-api-python-client>=2.0.0",
+    "typer>=0.9.0",
+    "aiosqlite>=0.19.0",
+    "pydantic>=2.0.0",
 ]
 
 [tool.uv]
@@ -69,6 +76,8 @@ symphony = "cli:cli"
 voice-listener = "modules.voice_listener:main"
 dashboard = "modules.dashboard:main"
 claude-monitor = "modules.claude_monitor:main"
+agent-monitor = "modules.agent_monitor:main"
+youtube-subs = "modules.youtube_subscriptions:app"
 
 [project.optional-dependencies]
 dev = [

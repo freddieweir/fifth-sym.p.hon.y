@@ -17,15 +17,16 @@ Common folders:
 
 import asyncio
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional, Callable, Any
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
 try:
+    from watchdog.events import FileSystemEvent, FileSystemEventHandler
     from watchdog.observers import Observer
-    from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
     WATCHDOG_AVAILABLE = True
 except ImportError:
@@ -61,7 +62,7 @@ class FileEvent:
     path: Path
     is_directory: bool
     timestamp: datetime
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass
@@ -82,10 +83,10 @@ class FolderSummary:
     path: Path
     total_files: int
     total_size: int
-    file_types: Dict[str, int]
-    recent_files: List[Path]
-    old_files: List[Path]
-    large_files: List[Path]
+    file_types: dict[str, int]
+    recent_files: list[Path]
+    old_files: list[Path]
+    large_files: list[Path]
 
 
 class FolderWatcher(FileSystemEventHandler):
@@ -95,7 +96,7 @@ class FolderWatcher(FileSystemEventHandler):
     Integrates with watchdog for real-time monitoring.
     """
 
-    def __init__(self, folder_path: Path, callback: Optional[Callable[[FileEvent], None]] = None):
+    def __init__(self, folder_path: Path, callback: Callable[[FileEvent], None] | None = None):
         """
         Initialize folder watcher.
 
@@ -155,7 +156,7 @@ class FolderManager:
     - Quick file access
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """
         Initialize folder manager.
 
@@ -163,9 +164,9 @@ class FolderManager:
             config: Configuration dictionary
         """
         self.config = config or {}
-        self.watched_folders: Dict[str, Path] = {}
-        self.observers: Dict[str, Observer] = {}
-        self.event_callbacks: Dict[str, List[Callable]] = {}
+        self.watched_folders: dict[str, Path] = {}
+        self.observers: dict[str, Observer] = {}
+        self.event_callbacks: dict[str, list[Callable]] = {}
 
         # Load configured folders
         self._load_configured_folders()
@@ -218,7 +219,7 @@ class FolderManager:
             del self.watched_folders[name]
             logger.info(f"Removed folder: {name}")
 
-    def get_folder(self, name: str) -> Optional[Path]:
+    def get_folder(self, name: str) -> Path | None:
         """
         Get path to managed folder.
 
@@ -230,7 +231,7 @@ class FolderManager:
         """
         return self.watched_folders.get(name)
 
-    def list_folders(self) -> Dict[str, Path]:
+    def list_folders(self) -> dict[str, Path]:
         """
         Get all managed folders.
 
@@ -239,7 +240,7 @@ class FolderManager:
         """
         return self.watched_folders.copy()
 
-    def start_watching(self, name: str, callback: Optional[Callable[[FileEvent], None]] = None):
+    def start_watching(self, name: str, callback: Callable[[FileEvent], None] | None = None):
         """
         Start watching folder for changes.
 
@@ -313,10 +314,10 @@ class FolderManager:
         # Collect file statistics
         total_files = 0
         total_size = 0
-        file_types: Dict[str, int] = {}
-        recent_files: List[Path] = []
-        old_files: List[Path] = []
-        large_files: List[Path] = []
+        file_types: dict[str, int] = {}
+        recent_files: list[Path] = []
+        old_files: list[Path] = []
+        large_files: list[Path] = []
 
         recent_threshold = datetime.now() - timedelta(days=recent_days)
         old_threshold = datetime.now() - timedelta(days=old_days)
@@ -365,7 +366,7 @@ class FolderManager:
             large_files=large_files[:10],  # Top 10 largest
         )
 
-    async def find_files(self, name: str, pattern: str = "*", max_results: int = 100) -> List[Path]:
+    async def find_files(self, name: str, pattern: str = "*", max_results: int = 100) -> list[Path]:
         """
         Find files in folder matching pattern.
 
@@ -385,7 +386,7 @@ class FolderManager:
 
         return matches
 
-    async def organize_by_extension(self, name: str, dry_run: bool = True) -> Dict[str, List[Path]]:
+    async def organize_by_extension(self, name: str, dry_run: bool = True) -> dict[str, list[Path]]:
         """
         Organize files into folders by extension.
 
@@ -400,7 +401,7 @@ class FolderManager:
             raise ValueError(f"Unknown folder: {name}")
 
         folder_path = self.watched_folders[name]
-        organized: Dict[str, List[Path]] = {}
+        organized: dict[str, list[Path]] = {}
 
         for item in folder_path.iterdir():
             if item.is_file():
@@ -452,10 +453,10 @@ async def demo():
 
         # Get summary
         summary = await manager.get_folder_summary("downloads")
-        print(f"\n=== Downloads Summary ===")
+        print("\n=== Downloads Summary ===")
         print(f"Total files: {summary.total_files}")
         print(f"Total size: {manager.format_size(summary.total_size)}")
-        print(f"\nFile types:")
+        print("\nFile types:")
         for ext, count in sorted(summary.file_types.items(), key=lambda x: x[1], reverse=True)[:5]:
             print(f"  {ext}: {count} files")
 
