@@ -19,7 +19,7 @@ def launch_iterm():
 
     script_dir = Path(__file__).parent.absolute()
 
-    applescript = f'''
+    applescript = f"""
     tell application "iTerm"
         activate
 
@@ -64,7 +64,7 @@ def launch_iterm():
             select first tab
         end tell
     end tell
-    '''
+    """
 
     try:
         subprocess.run(
@@ -94,7 +94,7 @@ def launch_terminal():
 
     script_dir = Path(__file__).parent.absolute()
 
-    applescript = f'''
+    applescript = f"""
     tell application "Terminal"
         activate
 
@@ -120,7 +120,7 @@ def launch_terminal():
         do script "cd {script_dir} && uv run python -m agent_monitor.modules.system_status" in front window
         set custom title of front window to "System"
     end tell
-    '''
+    """
 
     try:
         subprocess.run(

@@ -1,25 +1,23 @@
 """Albedo Agent Monitor TUI using Rich library (no mouse issues)."""
 
 import os
-import sys
-import time
 import select
+import subprocess
+import sys
 import termios
+import time
 import tty
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
-import yaml
-import subprocess
-import threading
 
+import yaml
+from rich import box
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich import box
 
 from .utils.relative_time import relative_time
 from .utils.screenshot import take_screenshot
@@ -147,7 +145,7 @@ class AlbedoMonitorRich:
         for mcp_config_path in possible_paths:
             if mcp_config_path.exists():
                 try:
-                    with open(mcp_config_path, 'r') as f:
+                    with open(mcp_config_path) as f:
                         config = json.load(f)
 
                     for server_name, server_config in config.get("mcpServers", {}).items():
@@ -194,7 +192,7 @@ class AlbedoMonitorRich:
                     if file_mtime < cutoff_time:
                         continue
 
-                    with open(status_file, 'r') as f:
+                    with open(status_file) as f:
                         status = json.load(f)
 
                     agent_name = status.get("name")
@@ -435,7 +433,7 @@ class AlbedoMonitorRich:
                 project = parts[2] if len(parts) > 2 else "unknown"
 
                 # Read first line of content (Rich will handle truncation)
-                with open(audio_file, 'r') as f:
+                with open(audio_file) as f:
                     message = f.readline().strip()
 
                 # Highlight selected row
@@ -722,7 +720,7 @@ class AlbedoMonitorRich:
             return
 
         audio_file = self.audio_files[index]
-        mp3_path = audio_file.with_suffix('.mp3')
+        mp3_path = audio_file.with_suffix(".mp3")
 
         if mp3_path.exists():
             subprocess.Popen(
@@ -782,20 +780,9 @@ class AlbedoMonitorRich:
             title="Albedo Agent Monitor"
         )
 
-        if success:
-            if png_path:
-                # Both SVG and PNG saved
-                filename = png_path.name
-                msg = f"Screenshot saved: {filename} (+ SVG)"
-            elif svg_path:
-                # Only SVG saved (ImageMagick not available)
-                filename = svg_path.name
-                msg = f"Screenshot saved: {filename}"
-            # Note: We can't display notifications in Rich TUI easily,
-            # so this will just be logged if we add logging later
-        else:
-            # Screenshot failed
-            msg = "Screenshot failed!"
+        # Screenshot result: success indicates files saved (png_path and/or svg_path)
+        # Note: We can't display notifications in Rich TUI easily
+        _ = success  # Acknowledge result without displaying
 
     def get_key_press(self):
         """Get a single key press (non-blocking)."""
@@ -822,47 +809,47 @@ class AlbedoMonitorRich:
                     key = self.get_key_press()
 
                     if key:
-                        if key.lower() == 'q':
+                        if key.lower() == "q":
                             self.running = False
-                        elif key.lower() == 'r':
+                        elif key.lower() == "r":
                             self.last_refresh = datetime.now()
                             self.load_audio_history()
                             self.load_documentation()
                             self.load_active_agents()  # Reload active agents/skills
                             self.load_context_files()  # Reload context files
-                        elif key.lower() == 'a':
+                        elif key.lower() == "a":
                             # Focus audio panel
                             self.focused_panel = "audio"
                             self.selected_row = 0
-                        elif key.lower() == 'd':
+                        elif key.lower() == "d":
                             # Focus docs panel
                             self.focused_panel = "docs"
                             self.selected_row = 0
-                        elif key.lower() == 'c':
+                        elif key.lower() == "c":
                             # Focus context panel
                             self.focused_panel = "context"
                             self.selected_row = 0
-                        elif key.lower() == 'g':
+                        elif key.lower() == "g":
                             # Focus observatory panel
                             self.focused_panel = "observatory"
                             self.selected_row = 0
-                        elif key.lower() == 's':
+                        elif key.lower() == "s":
                             # Take screenshot
                             self.action_screenshot()
-                        elif key == '\x1b':  # Escape key
+                        elif key == "\x1b":  # Escape key
                             # Unfocus any panel
                             self.focused_panel = None
                             self.selected_row = 0
-                        elif key == '\n' or key == '\r':  # Enter key
+                        elif key == "\n" or key == "\r":  # Enter key
                             # Activate selected item
                             self.handle_selection()
                         elif self.focused_panel:
                             # Arrow key navigation (in focused panel)
-                            if key == 'j' or ord(key) == 66:  # j or Down arrow
+                            if key == "j" or ord(key) == 66:  # j or Down arrow
                                 self.move_selection_down()
-                            elif key == 'k' or ord(key) == 65:  # k or Up arrow
+                            elif key == "k" or ord(key) == 65:  # k or Up arrow
                                 self.move_selection_up()
-                        elif key == '?':
+                        elif key == "?":
                             # Show help
                             pass
 

@@ -5,20 +5,16 @@ Real-time TUI for monitoring and controlling automation services, scripts, and s
 Built with Textual for beautiful terminal interfaces.
 """
 
-import psutil
 import subprocess
+from datetime import datetime
 from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
-import json
 
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, ScrollableContainer
-from textual.widgets import Header, Footer, Static, DataTable, Log
-from textual.reactive import reactive
-from rich.text import Text
-from rich.panel import Panel
+import psutil
 from rich.table import Table
+from textual.app import App, ComposeResult
+from textual.containers import Container
+from textual.reactive import reactive
+from textual.widgets import Footer, Header, Log, Static
 
 
 class ServiceStatus:
@@ -40,7 +36,7 @@ class ServiceStatus:
         except:
             return False
 
-    def get_process_info(self, service_name: str) -> Optional[Dict]:
+    def get_process_info(self, service_name: str) -> dict | None:
         """Get process information for running service."""
         if not self.is_running(service_name):
             return None
@@ -78,7 +74,7 @@ class ServicePanel(Static):
         self.styles.border = ("heavy", "cyan")
         self.styles.height = "50%"
 
-    def watch_services(self, services: Dict) -> None:
+    def watch_services(self, services: dict) -> None:
         """Update service display when services change."""
         content = self.query_one("#service-content", Static)
 
@@ -119,7 +115,7 @@ class SystemStatsPanel(Static):
         self.styles.height = "50%"
         self.border_title = "System Status"
 
-    def watch_stats(self, stats: Dict) -> None:
+    def watch_stats(self, stats: dict) -> None:
         """Update stats display."""
         content = self.query_one("#stats-content", Static)
 
@@ -296,7 +292,7 @@ class DashboardApp(App):
         }
 
         # Disk
-        disk = psutil.disk_usage('/')
+        disk = psutil.disk_usage("/")
         disk_info = {
             "percent": disk.percent,
             "used_gb": disk.used / 1024**3,
@@ -318,7 +314,7 @@ class DashboardApp(App):
             else:
                 power = "🔋 Battery"
                 import re
-                match = re.search(r'(\d+)%', result.stdout)
+                match = re.search(r"(\d+)%", result.stdout)
                 battery_pct = int(match.group(1)) if match else None
         except:
             power = "Unknown"
@@ -361,7 +357,7 @@ class DashboardApp(App):
 
                 if age < 30:
                     # Check if we already alerted recently
-                    if not hasattr(self, '_last_claude_alert'):
+                    if not hasattr(self, "_last_claude_alert"):
                         self._last_claude_alert = None
 
                     if self._last_claude_alert is None or (datetime.now() - self._last_claude_alert).total_seconds() > 60:

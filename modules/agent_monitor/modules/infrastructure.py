@@ -4,25 +4,23 @@ Standalone module showing backend systems and observability infrastructure.
 Run with: uv run python -m agent_monitor.modules.infrastructure
 """
 
-import time
 import subprocess
+import time
 from datetime import datetime
-from pathlib import Path
 
+from agent_monitor.shared import (
+    Colors,
+    KeyboardHandler,
+    MCPManager,
+    ModuleConfig,
+    RichTableBuilder,
+    Symbols,
+)
+from agent_monitor.utils.screenshot import take_screenshot
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.text import Text
-
-from agent_monitor.shared import (
-    ModuleConfig,
-    KeyboardHandler,
-    RichTableBuilder,
-    MCPManager,
-    Colors,
-    Symbols
-)
-from agent_monitor.utils.screenshot import take_screenshot
 
 
 class InfrastructureMonitor:
@@ -244,30 +242,30 @@ class InfrastructureMonitor:
                     key = kbd.get_key()
 
                     if key:
-                        if key.lower() == 'q':
+                        if key.lower() == "q":
                             self.running = False
-                        elif key.lower() == 'r':
+                        elif key.lower() == "r":
                             self.mcp_manager.load_servers()
                             self.last_refresh = datetime.now()
-                        elif key.lower() == 's':
-                            screenshot_path = take_screenshot(self.console, "infrastructure")
+                        elif key.lower() == "s":
+                            take_screenshot(self.console, "infrastructure")
                             time.sleep(0.5)
-                        elif key.lower() == 'm':
+                        elif key.lower() == "m":
                             self.focused_panel = "mcp"
                             self.selected_row = 0
-                        elif key.lower() == 'o':
+                        elif key.lower() == "o":
                             self.focused_panel = "observatory"
                             self.selected_row = 0
-                        elif key == '\x1b':  # Escape
+                        elif key == "\x1b":  # Escape
                             self.focused_panel = None
                             self.selected_row = 0
-                        elif key == '\n' or key == '\r':  # Enter
+                        elif key == "\n" or key == "\r":  # Enter
                             self.handle_selection()
                         elif self.focused_panel:
                             # Navigation keys
-                            if key == 'j' or ord(key) == 66:  # j or Down arrow
+                            if key == "j" or ord(key) == 66:  # j or Down arrow
                                 self.move_selection_down()
-                            elif key == 'k' or ord(key) == 65:  # k or Up arrow
+                            elif key == "k" or ord(key) == 65:  # k or Up arrow
                                 self.move_selection_up()
 
                     # Update display

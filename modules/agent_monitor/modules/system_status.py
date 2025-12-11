@@ -9,22 +9,15 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+from agent_monitor.shared import Colors, KeyboardHandler, ModuleConfig, RichTableBuilder, Symbols
+from agent_monitor.utils.relative_time import relative_time
+from agent_monitor.utils.screenshot import take_screenshot
+from rich import box
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
-from rich.text import Text
 from rich.table import Table
-from rich import box
-
-from agent_monitor.shared import (
-    ModuleConfig,
-    KeyboardHandler,
-    RichTableBuilder,
-    Colors,
-    Symbols
-)
-from agent_monitor.utils.relative_time import relative_time
-from agent_monitor.utils.screenshot import take_screenshot
+from rich.text import Text
 
 
 class SystemStatusMonitor:
@@ -278,25 +271,25 @@ class SystemStatusMonitor:
                     key = kbd.get_key()
 
                     if key:
-                        if key.lower() == 'q':
+                        if key.lower() == "q":
                             self.running = False
-                        elif key.lower() == 'r':
+                        elif key.lower() == "r":
                             self.load_context_files()
                             self.last_refresh = datetime.now()
-                        elif key.lower() == 's':
-                            screenshot_path = take_screenshot(self.console, "system_status")
+                        elif key.lower() == "s":
+                            take_screenshot(self.console, "system_status")
                             time.sleep(0.5)
-                        elif key.lower() == 'c':
+                        elif key.lower() == "c":
                             self.focused_panel = "context"
                             self.selected_row = 0
-                        elif key == '\x1b':  # Escape
+                        elif key == "\x1b":  # Escape
                             self.focused_panel = None
                             self.selected_row = 0
                         elif self.focused_panel:
                             # Navigation keys
-                            if key == 'j' or ord(key) == 66:  # j or Down arrow
+                            if key == "j" or ord(key) == 66:  # j or Down arrow
                                 self.move_selection_down()
-                            elif key == 'k' or ord(key) == 65:  # k or Up arrow
+                            elif key == "k" or ord(key) == 65:  # k or Up arrow
                                 self.move_selection_up()
 
                     # Update display

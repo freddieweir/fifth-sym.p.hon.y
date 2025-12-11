@@ -20,7 +20,6 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -405,7 +404,7 @@ class WorkspaceMaid:
             lines = gitignore.read_text().splitlines()
 
         if path not in lines and f"/{path}" not in lines:
-            lines.append(f"\n# Uncategorized markdown (maid cleanup)")
+            lines.append("\n# Uncategorized markdown (maid cleanup)")
             lines.append(path)
             gitignore.write_text("\n".join(lines) + "\n")
 
@@ -490,7 +489,6 @@ class WorkspaceMaid:
                 print()
 
         # Summary
-        total_move = len(plan.matches)
         total_delete = len(plan.ds_store_files)
 
         print("Summary:")
@@ -654,7 +652,7 @@ class WorkspaceMaid:
             body_lines.append("")
 
         if deleted_count:
-            body_lines.append(f"### Cleanup")
+            body_lines.append("### Cleanup")
             body_lines.append(f"- Removed {deleted_count} .DS_Store files")
             body_lines.append("")
 
@@ -773,9 +771,7 @@ Examples:
 
         # Create branch if committing
         branch_name = ""
-        original_branch = ""
         if args.commit:
-            original_branch = maid.get_current_branch()
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             branch_name = f"chore/maid-cleanup-{timestamp}"
 

@@ -5,25 +5,18 @@ Run with: uv run python -m agent_monitor.modules.content
 """
 
 import os
-import time
 import subprocess
+import time
 from datetime import datetime
 from pathlib import Path
 
+from agent_monitor.shared import Colors, KeyboardHandler, ModuleConfig, RichTableBuilder
+from agent_monitor.utils.relative_time import relative_time
+from agent_monitor.utils.screenshot import take_screenshot
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.text import Text
-
-from agent_monitor.shared import (
-    ModuleConfig,
-    KeyboardHandler,
-    RichTableBuilder,
-    Colors,
-    Symbols
-)
-from agent_monitor.utils.relative_time import relative_time
-from agent_monitor.utils.screenshot import take_screenshot
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -201,12 +194,7 @@ class ContentMonitor:
         if index < len(self.audio_files):
             audio_file = self.audio_files[index]
             try:
-                # Read audio summary
-                with open(audio_file) as f:
-                    content = f.read().strip()
-
-                # Play using afplay (macOS text-to-speech could be added here)
-                # For now, just open the file
+                # Open the audio file (macOS will handle playback)
                 subprocess.run(["open", str(audio_file)], check=False)
             except Exception:
                 pass
@@ -322,31 +310,31 @@ class ContentMonitor:
                     key = kbd.get_key()
 
                     if key:
-                        if key.lower() == 'q':
+                        if key.lower() == "q":
                             self.running = False
-                        elif key.lower() == 'r':
+                        elif key.lower() == "r":
                             self.load_audio_history()
                             self.load_documentation()
                             self.last_refresh = datetime.now()
-                        elif key.lower() == 's':
-                            screenshot_path = take_screenshot(self.console, "content")
+                        elif key.lower() == "s":
+                            take_screenshot(self.console, "content")
                             time.sleep(0.5)
-                        elif key.lower() == 'a':
+                        elif key.lower() == "a":
                             self.focused_panel = "audio"
                             self.selected_row = 0
-                        elif key.lower() == 'd':
+                        elif key.lower() == "d":
                             self.focused_panel = "docs"
                             self.selected_row = 0
-                        elif key == '\x1b':  # Escape
+                        elif key == "\x1b":  # Escape
                             self.focused_panel = None
                             self.selected_row = 0
-                        elif key == '\n' or key == '\r':  # Enter
+                        elif key == "\n" or key == "\r":  # Enter
                             self.handle_selection()
                         elif self.focused_panel:
                             # Navigation keys
-                            if key == 'j' or ord(key) == 66:  # j or Down arrow
+                            if key == "j" or ord(key) == 66:  # j or Down arrow
                                 self.move_selection_down()
-                            elif key == 'k' or ord(key) == 65:  # k or Up arrow
+                            elif key == "k" or ord(key) == 65:  # k or Up arrow
                                 self.move_selection_up()
 
                     # Update display

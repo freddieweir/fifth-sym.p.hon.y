@@ -8,21 +8,20 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from agent_monitor.shared import (
+    AgentTracker,
+    Colors,
+    KeyboardHandler,
+    ModuleConfig,
+    RichTableBuilder,
+    Symbols,
+)
+from agent_monitor.utils.relative_time import relative_time
+from agent_monitor.utils.screenshot import take_screenshot
 from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.text import Text
-
-from agent_monitor.shared import (
-    ModuleConfig,
-    KeyboardHandler,
-    RichTableBuilder,
-    AgentTracker,
-    Colors,
-    Symbols
-)
-from agent_monitor.utils.relative_time import relative_time
-from agent_monitor.utils.screenshot import take_screenshot
 
 
 class AgentActivityMonitor:
@@ -180,13 +179,13 @@ class AgentActivityMonitor:
                     key = kbd.get_key()
 
                     if key:
-                        if key.lower() == 'q':
+                        if key.lower() == "q":
                             self.running = False
-                        elif key.lower() == 'r':
+                        elif key.lower() == "r":
                             self.tracker.load_status()
                             self.last_refresh = datetime.now()
-                        elif key.lower() == 's':
-                            screenshot_path = take_screenshot(self.console, "agent_activity")
+                        elif key.lower() == "s":
+                            take_screenshot(self.console, "agent_activity")
                             # Brief pause to show screenshot was taken
                             time.sleep(0.5)
 

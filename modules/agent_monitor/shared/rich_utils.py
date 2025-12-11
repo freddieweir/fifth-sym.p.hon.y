@@ -1,9 +1,10 @@
 """Rich library helpers for consistent styling across modules."""
 
-from rich.table import Table
-from rich.panel import Panel
+from typing import Any
+
 from rich import box
-from typing import List, Tuple, Any, Dict
+from rich.panel import Panel
+from rich.table import Table
 
 
 class RichTableBuilder:
@@ -12,7 +13,7 @@ class RichTableBuilder:
     @staticmethod
     def create_table(
         border_style: str = "cyan",
-        columns: List[Tuple[str, Dict[str, Any]]] = None,
+        columns: list[tuple[str, dict[str, Any]]] = None,
         **kwargs
     ) -> Table:
         """Create table with standard styling.
@@ -26,11 +27,11 @@ class RichTableBuilder:
             Configured Rich Table instance
         """
         defaults = {
-            'box': box.SIMPLE,
-            'show_header': True,
-            'expand': True,
-            'padding': (0, 0),
-            'collapse_padding': True
+            "box": box.SIMPLE,
+            "show_header": True,
+            "expand": True,
+            "padding": (0, 0),
+            "collapse_padding": True
         }
         defaults.update(kwargs)
 
@@ -61,8 +62,8 @@ class RichTableBuilder:
             Configured Rich Panel instance
         """
         defaults = {
-            'padding': (0, 0),
-            'box': box.SIMPLE
+            "padding": (0, 0),
+            "box": box.SIMPLE
         }
         defaults.update(kwargs)
 

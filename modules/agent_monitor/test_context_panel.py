@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Quick test to display Context panel data without full TUI."""
 
-from pathlib import Path
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+
 
 def relative_time(timestamp):
     """Convert timestamp to relative time string."""

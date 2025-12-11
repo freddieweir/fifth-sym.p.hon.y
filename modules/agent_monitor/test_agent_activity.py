@@ -3,6 +3,7 @@
 
 from agent_monitor.modules.agent_activity import AgentActivityMonitor
 
+
 def main():
     print("🎭 Agent Activity Monitor Test\n")
 
@@ -21,7 +22,7 @@ def main():
         if agent in monitor.tracker.active_agents:
             status = "● Active"
         elif agent in monitor.tracker.agent_last_used:
-            status = f"○ Last used recently"
+            status = "○ Last used recently"
         else:
             status = "○ Never used"
         print(f"  {agent:30} {status}")
@@ -31,7 +32,7 @@ def main():
         if skill in monitor.tracker.active_skills:
             status = "● Active"
         elif skill in monitor.tracker.skill_last_used:
-            status = f"● Last used recently"
+            status = "● Last used recently"
         else:
             status = "○ Never used"
         print(f"  {skill:30} {status}")

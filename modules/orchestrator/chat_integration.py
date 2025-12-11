@@ -4,10 +4,9 @@ Chat integration for orchestrator agent.
 Posts updates, permission requests, and approval decisions to shared chat.
 """
 
-import asyncio
 import json
 import logging
-from typing import Optional
+
 import websockets
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ class OrchestratorChatClient:
         """
         self.server_url = server_url
         self.username = username
-        self.websocket: Optional[websockets.WebSocketClientProtocol] = None
+        self.websocket: websockets.WebSocketClientProtocol | None = None
         self.connected = False
 
     async def connect(self):

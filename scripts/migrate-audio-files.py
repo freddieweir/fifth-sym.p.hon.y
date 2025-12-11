@@ -19,10 +19,10 @@ Naming convention: YYYYMMDD-HHMMSS-{project}-{environment}.{txt|mp3}
 """
 
 import os
-import shutil
-from pathlib import Path
-from datetime import datetime
 import re
+import shutil
+from datetime import datetime
+from pathlib import Path
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -86,19 +86,19 @@ class AudioMigrator:
         - 'tui-migrated-to-fifth-symphony.txt' -> 'fifth-symphony'
         """
         # Remove extension
-        name_without_ext = filename.rsplit('.', 1)[0]
+        name_without_ext = filename.rsplit(".", 1)[0]
 
         # Try to extract timestamp and project
         # Pattern: YYYYMMDD-HHMMSS-project-name or just project-name
-        match = re.match(r'^\d{8}-\d{6}-(.+)$', name_without_ext)
+        match = re.match(r"^\d{8}-\d{6}-(.+)$", name_without_ext)
         if match:
             return match.group(1)
 
         # If no timestamp, use the whole filename (minus extension)
         # Take last part if multiple hyphens exist
-        parts = name_without_ext.split('-')
+        parts = name_without_ext.split("-")
         if len(parts) > 2:
-            return '-'.join(parts[-2:])  # Last 2 parts as project name
+            return "-".join(parts[-2:])  # Last 2 parts as project name
 
         return name_without_ext
 
@@ -117,7 +117,7 @@ class AudioMigrator:
         project = self.extract_project_name(filename)
 
         # Check if already has timestamp
-        timestamp_match = re.match(r'^(\d{8}-\d{6})', filename)
+        timestamp_match = re.match(r"^(\d{8}-\d{6})", filename)
         if timestamp_match:
             timestamp = timestamp_match.group(1)
         else:
@@ -140,10 +140,10 @@ class AudioMigrator:
         txt_files = list(directory.glob("*.txt"))
 
         for txt_file in txt_files:
-            mp3_file = txt_file.with_suffix('.mp3')
+            mp3_file = txt_file.with_suffix(".mp3")
             pairs.append({
-                'txt': txt_file,
-                'mp3': mp3_file if mp3_file.exists() else None
+                "txt": txt_file,
+                "mp3": mp3_file if mp3_file.exists() else None
             })
 
         return pairs
@@ -183,8 +183,8 @@ class AudioMigrator:
         print(f"  Found {len(pairs)} audio file(s)")
 
         for pair in pairs:
-            txt_file = pair['txt']
-            mp3_file = pair['mp3']
+            txt_file = pair["txt"]
+            mp3_file = pair["mp3"]
 
             # Generate standardized filename
             new_filename = self.standardize_filename(txt_file)
@@ -194,7 +194,7 @@ class AudioMigrator:
             self.migrate_file(txt_file, txt_dest, dry_run)
 
             if mp3_file:
-                mp3_dest = self.new_processed / new_filename.replace('.txt', '.mp3')
+                mp3_dest = self.new_processed / new_filename.replace(".txt", ".mp3")
                 self.migrate_file(mp3_file, mp3_dest, dry_run)
 
     def run(self, dry_run: bool = False):
@@ -227,7 +227,7 @@ class AudioMigrator:
         if dry_run:
             print("\n💡 Run without --dry-run to perform actual migration")
         else:
-            print(f"\n✓ Migration complete!")
+            print("\n✓ Migration complete!")
             print(f"📁 New location: {self.new_base}")
             print(f"📁 Archived files: {self.new_processed}")
             print(f"📁 Active files: {self.new_active}")
@@ -247,12 +247,12 @@ class AudioMigrator:
                 print(f"📁 Empty directory: {old_location}")
                 try:
                     old_location.rmdir()
-                    print(f"  ✓ Removed")
+                    print("  ✓ Removed")
                 except Exception as e:
                     print(f"  ✗ Could not remove: {e}")
             else:
                 print(f"📁 Not empty: {old_location} ({len(files_remaining)} files)")
-                print(f"  ⊗ Manual cleanup required")
+                print("  ⊗ Manual cleanup required")
 
 
 def main():
@@ -280,7 +280,7 @@ def main():
 
     if args.cleanup and not args.dry_run:
         response = input("\n⚠️  Remove empty old directories? [y/N]: ")
-        if response.lower() == 'y':
+        if response.lower() == "y":
             migrator.cleanup_old_locations()
 
 

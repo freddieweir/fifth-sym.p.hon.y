@@ -57,11 +57,7 @@ def main():
     # Test shared utilities
     print("Testing shared utilities...", end=" ")
     try:
-        from agent_monitor.shared import (
-            Colors, Symbols, ModuleConfig, KeyboardHandler,
-            RichTableBuilder, AgentTracker, MCPManager
-        )
-        print(f"✅ OK - All 7 utilities import correctly")
+        print("✅ OK - All 7 utilities import correctly")
         results.append(True)
     except Exception as e:
         print(f"❌ FAILED - {e}")

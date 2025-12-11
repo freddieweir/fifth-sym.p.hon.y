@@ -5,9 +5,8 @@ Tests without importing the full modules package.
 """
 
 import os
-import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))

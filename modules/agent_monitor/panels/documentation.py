@@ -1,11 +1,11 @@
 """Documentation browser panel for quick access to markdown files."""
 
-from pathlib import Path
-from datetime import datetime, timedelta
-from textual.widgets import Static, DataTable
-from textual.app import ComposeResult
 import subprocess
-import os
+from datetime import datetime
+from pathlib import Path
+
+from textual.app import ComposeResult
+from textual.widgets import DataTable, Static
 
 
 class DocumentationPanel(Static):
@@ -38,10 +38,10 @@ class DocumentationPanel(Static):
         if official_docs.exists():
             for md_file in official_docs.rglob("*.md"):
                 self.doc_files.append({
-                    'type': '📚 Official',
-                    'name': md_file.stem,
-                    'location': self._relative_path(md_file),
-                    'path': md_file
+                    "type": "📚 Official",
+                    "name": md_file.stem,
+                    "location": self._relative_path(md_file),
+                    "path": md_file
                 })
 
         # 2. Repo-specific documentation patterns
@@ -58,7 +58,7 @@ class DocumentationPanel(Static):
         for pattern in doc_patterns:
             for md_file in self.git_root.glob(pattern):
                 # Skip if already indexed
-                if any(d['path'] == md_file for d in self.doc_files):
+                if any(d["path"] == md_file for d in self.doc_files):
                     continue
 
                 # Determine type
@@ -80,14 +80,14 @@ class DocumentationPanel(Static):
                     doc_type = "📄 Doc"
 
                 self.doc_files.append({
-                    'type': doc_type,
-                    'name': md_file.stem,
-                    'location': self._relative_path(md_file),
-                    'path': md_file
+                    "type": doc_type,
+                    "name": md_file.stem,
+                    "location": self._relative_path(md_file),
+                    "path": md_file
                 })
 
         # Sort by type, then name
-        self.doc_files.sort(key=lambda x: (x['type'], x['name']))
+        self.doc_files.sort(key=lambda x: (x["type"], x["name"]))
 
         # Limit to most recent 30 for performance (prevent rendering issues)
         self.doc_files = self.doc_files[:30]
@@ -111,9 +111,9 @@ class DocumentationPanel(Static):
         for idx, doc in enumerate(self.doc_files):
             # Don't truncate - let table handle wrapping
             table.add_row(
-                doc['type'],
-                doc['name'],
-                doc['location'],
+                doc["type"],
+                doc["name"],
+                doc["location"],
                 key=str(idx)
             )
 
@@ -126,16 +126,16 @@ class DocumentationPanel(Static):
 
             # Log to activity log
             log = self.app.query_one("#activity-log")
-            timestamp = datetime.now().strftime('%H:%M:%S')
+            timestamp = datetime.now().strftime("%H:%M:%S")
             log.write_line(f"[dim][{timestamp}][/dim] Opening: {doc['name']}")
 
             # Try Apple Notes first, fallback to VSCodium
-            success = self.open_in_apple_notes(doc['path'])
+            success = self.open_in_apple_notes(doc["path"])
             if success:
                 log.write_line(f"[green]✓[/green] Imported to Apple Notes: {doc['name']}")
             else:
                 # Fallback to VSCodium
-                self.open_in_vscodium(doc['path'])
+                self.open_in_vscodium(doc["path"])
                 log.write_line(f"[green]✓[/green] Opened in VSCodium: {doc['name']}")
 
         except Exception as e:
@@ -174,7 +174,7 @@ class DocumentationPanel(Static):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-        except Exception as e:
+        except Exception:
             # Try alternative command
             subprocess.Popen(
                 ["code", str(md_path)],

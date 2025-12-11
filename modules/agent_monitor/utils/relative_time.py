@@ -1,10 +1,9 @@
 """Relative time formatting utilities."""
 
 from datetime import datetime, timedelta
-from typing import Union
 
 
-def relative_time(dt: Union[datetime, float]) -> str:
+def relative_time(dt: datetime | float) -> str:
     """
     Convert datetime or timestamp to human-readable relative time.
 
@@ -25,7 +24,7 @@ def relative_time(dt: Union[datetime, float]) -> str:
         '3d ago'
     """
     # Convert timestamp to datetime if needed
-    if isinstance(dt, (int, float)):
+    if isinstance(dt, int | float):
         dt = datetime.fromtimestamp(dt)
 
     now = datetime.now()
@@ -69,7 +68,7 @@ def relative_time(dt: Union[datetime, float]) -> str:
         return dt.strftime("%Y-%m-%d")
 
 
-def format_relative_time(dt: Union[datetime, float], include_absolute: bool = False) -> str:
+def format_relative_time(dt: datetime | float, include_absolute: bool = False) -> str:
     """
     Format relative time with optional absolute timestamp.
 
@@ -89,7 +88,7 @@ def format_relative_time(dt: Union[datetime, float], include_absolute: bool = Fa
     relative = relative_time(dt)
 
     if include_absolute:
-        if isinstance(dt, (int, float)):
+        if isinstance(dt, int | float):
             dt = datetime.fromtimestamp(dt)
         absolute = dt.strftime("%H:%M")
         return f"{relative} ({absolute})"
@@ -98,6 +97,6 @@ def format_relative_time(dt: Union[datetime, float], include_absolute: bool = Fa
 
 
 # For backwards compatibility
-def humanize_time(dt: Union[datetime, float]) -> str:
+def humanize_time(dt: datetime | float) -> str:
     """Alias for relative_time() for backwards compatibility."""
     return relative_time(dt)

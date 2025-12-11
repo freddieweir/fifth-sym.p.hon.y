@@ -7,14 +7,11 @@ Attention-optimized with visual indicators and real-time stats.
 
 import asyncio
 from datetime import datetime
-from typing import Optional, Dict
 
-from textual.widget import Widget
-from textual.widgets import Static
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.console import Group
+from textual.widget import Widget
 
 
 class SystemHUD(Widget):

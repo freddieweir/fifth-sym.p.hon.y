@@ -1,10 +1,9 @@
 """Track active agents and skills from status files."""
 
-import os
-from pathlib import Path
-from datetime import datetime, timedelta
 import json
-from typing import Set, Dict
+import os
+from datetime import datetime, timedelta
+from pathlib import Path
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -15,10 +14,10 @@ class AgentTracker:
 
     def __init__(self):
         self.status_dir = ALBEDO_ROOT / "communications" / ".agent-status"
-        self.active_agents: Set[str] = set()
-        self.active_skills: Set[str] = set()
-        self.agent_last_used: Dict[str, datetime] = {}
-        self.skill_last_used: Dict[str, datetime] = {}
+        self.active_agents: set[str] = set()
+        self.active_skills: set[str] = set()
+        self.agent_last_used: dict[str, datetime] = {}
+        self.skill_last_used: dict[str, datetime] = {}
 
     def load_status(self):
         """Load current agent/skill status from JSON files.

@@ -1,9 +1,9 @@
 """MCP server configuration utilities."""
 
+import json
 import os
 from pathlib import Path
-import json
-from typing import List, Dict, Any
+from typing import Any
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -13,7 +13,7 @@ class MCPManager:
     """Load and manage MCP server configurations."""
 
     def __init__(self):
-        self.servers: List[Dict[str, Any]] = []
+        self.servers: list[dict[str, Any]] = []
 
     def load_servers(self):
         """Load MCP servers from .mcp.json configuration.

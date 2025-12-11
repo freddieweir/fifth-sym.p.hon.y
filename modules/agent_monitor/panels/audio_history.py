@@ -1,13 +1,12 @@
 """Audio History panel for playing back previous audio summaries."""
 
 import os
-from pathlib import Path
-from datetime import datetime
-from textual.widgets import Static, DataTable
-from textual.app import ComposeResult
-from textual.containers import Container, Vertical
-from textual import events
 import subprocess
+from datetime import datetime
+from pathlib import Path
+
+from textual.app import ComposeResult
+from textual.widgets import DataTable, Static
 
 # Dynamic path resolution for ai-bedo repository
 ALBEDO_ROOT = Path(os.getenv("ALBEDO_ROOT", Path.home() / "git" / "internal" / "repos" / "ai-bedo"))
@@ -82,7 +81,7 @@ class AudioHistoryPanel(Static):
             try:
                 # Parse filename: YYYYMMDD-HHMMSS-project-environment.txt
                 filename = txt_file.stem
-                parts = filename.split('-')
+                parts = filename.split("-")
 
                 if len(parts) >= 2:
                     # Extract timestamp
@@ -92,7 +91,7 @@ class AudioHistoryPanel(Static):
 
                     # Extract project and environment
                     if len(parts) >= 4:
-                        project = '-'.join(parts[2:-1])
+                        project = "-".join(parts[2:-1])
                         environment = parts[-1]
                         source = f"{project} ({environment})"
                     elif len(parts) >= 3:
@@ -102,22 +101,22 @@ class AudioHistoryPanel(Static):
                         source = "unknown"
 
                     # Read message content (first 60 chars)
-                    with open(txt_file, 'r') as f:
+                    with open(txt_file) as f:
                         content = f.read().strip()
                         message = content[:60] + "..." if len(content) > 60 else content
 
                     # Check if mp3 exists
-                    mp3_file = txt_file.with_suffix('.mp3')
+                    mp3_file = txt_file.with_suffix(".mp3")
 
                     self.audio_files.append({
-                        'timestamp': timestamp,
-                        'source': source,
-                        'message': message,
-                        'txt_path': txt_file,
-                        'mp3_path': mp3_file if mp3_file.exists() else None,
-                        'full_content': content
+                        "timestamp": timestamp,
+                        "source": source,
+                        "message": message,
+                        "txt_path": txt_file,
+                        "mp3_path": mp3_file if mp3_file.exists() else None,
+                        "full_content": content
                     })
-            except Exception as e:
+            except Exception:
                 # Skip files that don't match expected format
                 continue
 
@@ -133,22 +132,22 @@ class AudioHistoryPanel(Static):
         for idx, audio in enumerate(self.audio_files):
             # Format timestamp as HH:MM
             try:
-                date_str, time_str = audio['timestamp'].split('-')
+                date_str, time_str = audio["timestamp"].split("-")
                 hour = time_str[:2]
                 minute = time_str[2:4]
                 display_time = f"{hour}:{minute}"
             except:
-                display_time = audio['timestamp']
+                display_time = audio["timestamp"]
 
             # Add indicator if mp3 is available
-            source_display = audio['source']
-            if audio['mp3_path']:
+            source_display = audio["source"]
+            if audio["mp3_path"]:
                 source_display = f"🔊 {source_display}"
 
             table.add_row(
                 display_time,
                 source_display,
-                audio['message'],
+                audio["message"],
                 key=str(idx)
             )
 
@@ -162,18 +161,18 @@ class AudioHistoryPanel(Static):
             # Log to activity log
             try:
                 log = self.app.query_one("#activity-log")
-                timestamp = datetime.now().strftime('%H:%M:%S')
+                timestamp = datetime.now().strftime("%H:%M:%S")
                 log.write_line(f"[dim][{timestamp}][/dim] Playing: {audio['source']}")
                 log.write_line(f"[cyan]{audio['full_content']}[/cyan]")
             except Exception:
                 pass  # Activity log not available
 
             # Play mp3 if available
-            if audio['mp3_path'] and audio['mp3_path'].exists():
+            if audio["mp3_path"] and audio["mp3_path"].exists():
                 try:
                     # Use afplay to play audio (non-blocking)
                     subprocess.Popen(
-                        ["afplay", str(audio['mp3_path'])],
+                        ["afplay", str(audio["mp3_path"])],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL
                     )
@@ -191,7 +190,7 @@ class AudioHistoryPanel(Static):
             else:
                 try:
                     log = self.app.query_one("#activity-log")
-                    log.write_line(f"[yellow]⊗[/yellow] No audio file available")
+                    log.write_line("[yellow]⊗[/yellow] No audio file available")
                 except Exception:
                     pass
 

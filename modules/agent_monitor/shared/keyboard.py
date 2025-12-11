@@ -1,10 +1,9 @@
 """Keyboard input handling for all modules."""
 
-import sys
 import select
+import sys
 import termios
 import tty
-from typing import Optional
 
 
 class KeyboardHandler:
@@ -33,7 +32,7 @@ class KeyboardHandler:
         if self.old_settings:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.old_settings)
 
-    def get_key(self, timeout: float = 0.1) -> Optional[str]:
+    def get_key(self, timeout: float = 0.1) -> str | None:
         """Get single key press (non-blocking).
 
         Args:

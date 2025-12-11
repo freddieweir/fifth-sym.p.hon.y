@@ -1,8 +1,9 @@
 """Shared configuration loading for all modules."""
 
 from pathlib import Path
+from typing import Any
+
 import yaml
-from typing import Dict, Any, Optional
 
 
 class ModuleConfig:
@@ -12,7 +13,7 @@ class ModuleConfig:
         self.config_path = Path(__file__).parent.parent / "config.yaml"
         self.config = self.load_config()
 
-    def load_config(self) -> Dict[str, Any]:
+    def load_config(self) -> dict[str, Any]:
         """Load YAML config with fallback defaults."""
         try:
             with open(self.config_path) as f:
@@ -24,7 +25,7 @@ class ModuleConfig:
                 "integrations": {}
             }
 
-    def get(self, key_path: str, default: Optional[Any] = None) -> Any:
+    def get(self, key_path: str, default: Any | None = None) -> Any:
         """Get nested config value via dot notation.
 
         Args:
@@ -34,7 +35,7 @@ class ModuleConfig:
         Returns:
             Config value or default
         """
-        keys = key_path.split('.')
+        keys = key_path.split(".")
         value = self.config
 
         for key in keys:
@@ -48,11 +49,11 @@ class ModuleConfig:
     @property
     def refresh_interval(self) -> int:
         """Get display refresh interval in seconds."""
-        return self.get('display.refresh_interval', 2)
+        return self.get("display.refresh_interval", 2)
 
     @property
     def screenshot_dir(self) -> Path:
         """Get screenshot directory path."""
         default_dir = Path.home() / "git" / "ai-bedo" / "screenshots"
-        screenshot_path = self.get('display.screenshot_dir', str(default_dir))
+        screenshot_path = self.get("display.screenshot_dir", str(default_dir))
         return Path(screenshot_path)

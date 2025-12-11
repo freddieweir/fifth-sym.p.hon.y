@@ -3,10 +3,9 @@
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Tuple
 
 
-def take_screenshot(console, screenshot_dir: Path, title: str = "Albedo Agent Monitor") -> Tuple[bool, Optional[Path], Optional[Path]]:
+def take_screenshot(console, screenshot_dir: Path, title: str = "Albedo Agent Monitor") -> tuple[bool, Path | None, Path | None]:
     """
     Take a screenshot of the current Rich console state.
 
@@ -35,7 +34,7 @@ def take_screenshot(console, screenshot_dir: Path, title: str = "Albedo Agent Mo
         png_converted = False
         if check_imagemagick_available():
             try:
-                result = subprocess.run(
+                subprocess.run(
                     [
                         "convert",
                         "-background", "black",
@@ -56,7 +55,7 @@ def take_screenshot(console, screenshot_dir: Path, title: str = "Albedo Agent Mo
         else:
             return True, svg_path, None
 
-    except Exception as e:
+    except Exception:
         return False, None, None
 
 

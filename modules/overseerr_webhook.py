@@ -8,10 +8,9 @@ Integrates with existing AudioTTS module and audio monitor service.
 
 import logging
 import os
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -58,7 +57,7 @@ app = FastAPI(title="Overseerr Audio Notifier", version="1.0.0")
 
 
 def format_notification(
-    event_type: str, subject: str, message: str, payload: Dict[str, Any]
+    event_type: str, subject: str, message: str, payload: dict[str, Any]
 ) -> str:
     """
     Format notification text based on event type and payload.
@@ -206,7 +205,6 @@ async def handle_overseerr_webhook(request: Request):
 
         # Extract key fields
         notification_type = payload.get("notification_type", "UNKNOWN")
-        event = payload.get("event", "")
         subject = payload.get("subject", "")
         message = payload.get("message", "")
 
@@ -244,7 +242,7 @@ async def handle_overseerr_webhook(request: Request):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to process webhook: {str(e)}",
-        )
+        ) from e
 
 
 @app.post("/webhook/test")
@@ -273,7 +271,7 @@ async def test_webhook():
         raise HTTPException(
             status_code=500,
             detail=f"Test failed: {str(e)}",
-        )
+        ) from e
 
 
 def main():

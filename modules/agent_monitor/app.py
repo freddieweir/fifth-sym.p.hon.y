@@ -1,13 +1,12 @@
 """Main Albedo TUI application using Textual."""
 
-from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical, ScrollableContainer
-from textual.widgets import Header, Footer, Static, DataTable, Log
-from textual.binding import Binding
 from datetime import datetime
-import yaml
 from pathlib import Path
-import asyncio
+
+import yaml
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.widgets import DataTable, Footer, Header, Log, Static
 
 # Import new panel components
 from .panels import AudioHistoryPanel, DocumentationPanel, ObservatoryPanel
@@ -402,24 +401,24 @@ class AlbedoMonitor(App):
         # Disable mouse support immediately
         try:
             driver = self._driver
-            if hasattr(driver, 'write'):
+            if hasattr(driver, "write"):
                 # Send disable sequences directly to terminal
-                driver.write('\033[?1000l')  # Disable X10 mouse
-                driver.write('\033[?1002l')  # Disable cell motion
-                driver.write('\033[?1003l')  # Disable all motion
-                driver.write('\033[?1006l')  # Disable SGR extended
-                driver.write('\033[?1015l')  # Disable urxvt
-                driver.write('\033[?1004l')  # Disable focus events
+                driver.write("\033[?1000l")  # Disable X10 mouse
+                driver.write("\033[?1002l")  # Disable cell motion
+                driver.write("\033[?1003l")  # Disable all motion
+                driver.write("\033[?1006l")  # Disable SGR extended
+                driver.write("\033[?1015l")  # Disable urxvt
+                driver.write("\033[?1004l")  # Disable focus events
                 driver.flush()
         except Exception:
             pass
 
         log = self.query_one("#activity-log", Log)
-        log.write_line(f"[green]✓[/green] Floor Guardians MCP connected")
-        log.write_line(f"[green]✓[/green] Pleiades Skills loaded (20)")
+        log.write_line("[green]✓[/green] Floor Guardians MCP connected")
+        log.write_line("[green]✓[/green] Pleiades Skills loaded (20)")
         log.write_line(f"[dim]Auto-refresh: {self.config.get('display', {}).get('refresh_interval', 2)}s[/dim]")
-        log.write_line(f"[dim]Waiting for agent activity...[/dim]")
-        log.write_line(f"[dim]Mouse support disabled[/dim]")
+        log.write_line("[dim]Waiting for agent activity...[/dim]")
+        log.write_line("[dim]Mouse support disabled[/dim]")
 
         # Set up auto-refresh
         refresh_interval = self.config.get("display", {}).get("refresh_interval", 2)
@@ -483,7 +482,7 @@ class AlbedoMonitor(App):
 if __name__ == "__main__":
     import os
     # Disable mouse capture to prevent escape sequences
-    os.environ['TEXTUAL_MOUSE'] = '0'
+    os.environ["TEXTUAL_MOUSE"] = "0"
 
     app = AlbedoMonitor()
     app.run()

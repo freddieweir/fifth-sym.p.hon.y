@@ -1,11 +1,12 @@
 """Carian Observatory monitoring integration panel."""
 
-from pathlib import Path
-from datetime import datetime
-from textual.widgets import Static, DataTable
-from textual.app import ComposeResult
 import subprocess
+from datetime import datetime
+from pathlib import Path
+
 import yaml
+from textual.app import ComposeResult
+from textual.widgets import DataTable, Static
 
 
 class ObservatoryPanel(Static):
@@ -49,70 +50,70 @@ class ObservatoryPanel(Static):
 
         if monitoring_compose.exists():
             try:
-                with open(monitoring_compose, 'r') as f:
+                with open(monitoring_compose) as f:
                     compose_data = yaml.safe_load(f)
 
-                services = compose_data.get('services', {})
+                services = compose_data.get("services", {})
 
                 # Add Grafana
-                if 'grafana' in services:
+                if "grafana" in services:
                     self.services.append({
-                        'name': 'Grafana',
-                        'type': 'dashboard',
-                        'url': f"{self.grafana_url}" if self.grafana_url else None,
-                        'status': self._check_docker_service('grafana')
+                        "name": "Grafana",
+                        "type": "dashboard",
+                        "url": f"{self.grafana_url}" if self.grafana_url else None,
+                        "status": self._check_docker_service("grafana")
                     })
 
                 # Add Prometheus
-                if 'prometheus' in services:
+                if "prometheus" in services:
                     self.services.append({
-                        'name': 'Prometheus',
-                        'type': 'metrics',
-                        'url': f"{self.grafana_url}/prometheus" if self.grafana_url else None,
-                        'status': self._check_docker_service('prometheus')
+                        "name": "Prometheus",
+                        "type": "metrics",
+                        "url": f"{self.grafana_url}/prometheus" if self.grafana_url else None,
+                        "status": self._check_docker_service("prometheus")
                     })
 
                 # Add Loki
-                if 'loki' in services:
+                if "loki" in services:
                     self.services.append({
-                        'name': 'Loki',
-                        'type': 'logs',
-                        'url': f"{self.grafana_url}/loki" if self.grafana_url else None,
-                        'status': self._check_docker_service('loki')
+                        "name": "Loki",
+                        "type": "logs",
+                        "url": f"{self.grafana_url}/loki" if self.grafana_url else None,
+                        "status": self._check_docker_service("loki")
                     })
 
                 # Add Alertmanager
-                if 'alertmanager' in services:
+                if "alertmanager" in services:
                     self.services.append({
-                        'name': 'Alertmanager',
-                        'type': 'alerts',
-                        'url': f"{self.grafana_url}/alertmanager" if self.grafana_url else None,
-                        'status': self._check_docker_service('alertmanager')
+                        "name": "Alertmanager",
+                        "type": "alerts",
+                        "url": f"{self.grafana_url}/alertmanager" if self.grafana_url else None,
+                        "status": self._check_docker_service("alertmanager")
                     })
 
-            except Exception as e:
+            except Exception:
                 pass
 
         # Fallback: add basic services if compose parsing failed
         if not self.services:
             self.services = [
-                {'name': 'Grafana', 'type': 'dashboard', 'url': self.grafana_url, 'status': 'unknown'},
-                {'name': 'Prometheus', 'type': 'metrics', 'url': None, 'status': 'unknown'},
-                {'name': 'Loki', 'type': 'logs', 'url': None, 'status': 'unknown'},
+                {"name": "Grafana", "type": "dashboard", "url": self.grafana_url, "status": "unknown"},
+                {"name": "Prometheus", "type": "metrics", "url": None, "status": "unknown"},
+                {"name": "Loki", "type": "logs", "url": None, "status": "unknown"},
             ]
 
     def _parse_grafana_url(self, env_file: Path) -> str:
         """Parse Grafana URL from .env file."""
         try:
-            with open(env_file, 'r') as f:
+            with open(env_file) as f:
                 for line in f:
                     line = line.strip()
                     # Look for DOMAIN or GRAFANA_URL
-                    if line.startswith('DOMAIN='):
-                        domain = line.split('=', 1)[1].strip().strip('"\'')
+                    if line.startswith("DOMAIN="):
+                        domain = line.split("=", 1)[1].strip().strip('"\'')
                         return f"https://observatory.{domain}"
-                    elif line.startswith('GRAFANA_URL='):
-                        url = line.split('=', 1)[1].strip().strip('"\'')
+                    elif line.startswith("GRAFANA_URL="):
+                        url = line.split("=", 1)[1].strip().strip('"\'')
                         return url
         except Exception:
             pass
@@ -152,21 +153,21 @@ class ObservatoryPanel(Static):
 
         for idx, service in enumerate(self.services):
             # Status indicator
-            if service['status'] == 'running':
+            if service["status"] == "running":
                 status = "●"  # Cyan (running)
-            elif service['status'] == 'stopped':
+            elif service["status"] == "stopped":
                 status = "○"  # Purple (idle)
             else:
                 status = "⊗"  # Yellow (unknown)
 
             # Dashboard type
             dashboard = f"{service['type']}"
-            if service['url']:
+            if service["url"]:
                 dashboard += " [link]"
 
             table.add_row(
                 status,
-                service['name'],
+                service["name"],
                 dashboard,
                 key=str(idx)
             )
@@ -180,11 +181,11 @@ class ObservatoryPanel(Static):
 
             # Log to activity log
             log = self.app.query_one("#activity-log")
-            timestamp = datetime.now().strftime('%H:%M:%S')
+            timestamp = datetime.now().strftime("%H:%M:%S")
 
-            if service['url']:
+            if service["url"]:
                 log.write_line(f"[dim][{timestamp}][/dim] Opening: {service['name']}")
-                self.open_url(service['url'])
+                self.open_url(service["url"])
                 log.write_line(f"[green]✓[/green] Opened: {service['url']}")
             else:
                 log.write_line(f"[yellow]⊗[/yellow] No URL configured for {service['name']}")
@@ -202,7 +203,7 @@ class ObservatoryPanel(Static):
                 stderr=subprocess.DEVNULL
             )
         except Exception as e:
-            raise Exception(f"Could not open browser: {e}")
+            raise Exception(f"Could not open browser: {e}") from e
 
     def refresh_data(self):
         """Refresh observatory services."""

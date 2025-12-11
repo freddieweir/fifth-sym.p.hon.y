@@ -31,9 +31,9 @@ try:
     from tengen_tts.core.voice_selection import (
         VOICE_ALBEDO_V1,
         VOICE_ALBEDO_V2,
+        censor_voice_id,
         detect_environment,
         get_voice_id_for_environment,
-        censor_voice_id,
     )
 except ImportError as e:
     raise ImportError(
