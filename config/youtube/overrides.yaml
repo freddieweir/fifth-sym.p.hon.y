@@ -1,0 +1,31 @@
+# YouTube Channel Category Overrides
+# Manual mappings that override auto-detection
+# Format: channel_id: CategoryName
+
+# Channel overrides
+# These take precedence over auto-detected topic categories
+channel_overrides:
+  # Example: Fireship (might be detected as Entertainment, but it's Tech)
+  UCsBjURrPoezykLs9EqgamOA: Tech
+
+  # Example: Shoe0nHead (commentary)
+  # UC0aanx5rpr7D1M7KCFYzrLQ: Commentary
+
+# Channels to always exclude from output
+# Useful for filtering out inactive or unwanted channels
+excluded_channels: []
+  # - UCxxxxxxxxxxxxxx
+
+# Priority channels
+# These bypass filtering (always included regardless of activity/subscriber count)
+priority_channels:
+  - UCsBjURrPoezykLs9EqgamOA  # Fireship
+
+# Custom categories
+# Add categories not in the default settings.yaml
+# These will be appended to the category list
+custom_categories: {}
+  # Commentary:
+  #   emoji: "💬"
+  #   topic_ids: []
+  #   priority: 10

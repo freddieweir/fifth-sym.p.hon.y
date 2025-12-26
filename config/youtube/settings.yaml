@@ -1,0 +1,120 @@
+# YouTube Subscriptions → Glance Integration Settings
+# Configure categorization, filtering, and display options
+
+youtube:
+  # 1Password item containing OAuth credentials JSON
+  credentials_item: "YouTube API Credentials"
+  credentials_vault: "API"
+
+  # Token storage (refresh token after OAuth flow)
+  token_path: "~/.config/youtube-glance/token.json"
+
+  # SQLite cache for subscriptions
+  cache_path: "~/.config/youtube-glance/cache.db"
+  cache_duration_hours: 24
+
+# Category definitions
+# Maps YouTube topic IDs to human-readable categories
+# Topic ID reference: https://developers.google.com/youtube/v3/docs/videoCategories
+categories:
+  Gaming:
+    emoji: "🎮"
+    topic_ids:
+      - "/m/0bzvm2"  # Gaming
+    priority: 1
+
+  Tech:
+    emoji: "💻"
+    topic_ids:
+      - "/m/07c1v"   # Technology
+      - "/m/01k8wb"  # Knowledge (tech-adjacent)
+    priority: 2
+
+  Music:
+    emoji: "🎵"
+    topic_ids:
+      - "/m/04rlf"   # Music
+    priority: 3
+
+  Education:
+    emoji: "📚"
+    topic_ids:
+      - "/m/01k8wb"  # Knowledge
+      - "/m/098wr"   # Society
+    priority: 4
+
+  Entertainment:
+    emoji: "🎬"
+    topic_ids:
+      - "/m/02jjt"   # Entertainment
+      - "/m/09kqc"   # Hobby
+    priority: 5
+
+  News:
+    emoji: "📰"
+    topic_ids:
+      - "/m/05qt0"   # News
+    priority: 6
+
+  Comedy:
+    emoji: "😂"
+    topic_ids:
+      - "/m/09kqc"   # Hobby (comedy often categorized here)
+    priority: 7
+
+  Sports:
+    emoji: "⚽"
+    topic_ids:
+      - "/m/06ntj"   # Sports
+    priority: 8
+
+  Lifestyle:
+    emoji: "🏠"
+    topic_ids:
+      - "/m/019_rr"  # Lifestyle
+      - "/m/032tl"   # Fashion
+    priority: 9
+
+  Other:
+    emoji: "📺"
+    topic_ids: []    # Catch-all for uncategorized
+    priority: 99
+
+# Filtering options for large subscription counts
+filtering:
+  # Maximum channels to include per category
+  max_channels_per_category: 25
+
+  # Minimum subscriber count to include (filters out dead channels)
+  min_subscriber_count: 1000
+
+  # Include channels with no recent videos?
+  include_inactive_channels: false
+
+  # Days since last video to consider "active"
+  inactive_threshold_days: 90
+
+# Glance widget display settings
+display:
+  # Videos to show per category widget
+  videos_per_category: 12
+
+  # Collapse after N videos (show "more" link)
+  collapse_after: 4
+
+  # Grid columns for video thumbnails
+  grid_columns: 3
+
+  # Layout: "single_column" or "two_column"
+  layout: "two_column"
+
+# Output settings
+output:
+  # Where to save generated Glance config
+  glance_yaml_path: "generated/glance_youtube.yaml"
+
+  # Add timestamp header to generated file
+  include_timestamp: true
+
+  # Add channel count summary
+  include_summary: true
