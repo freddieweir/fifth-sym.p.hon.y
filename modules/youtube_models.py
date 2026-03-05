@@ -131,3 +131,21 @@ class SyncStats(BaseModel):
     filtered_out: int = 0
     categories_with_content: int = 0
     duration_seconds: float = 0.0
+
+
+class InvidiousSyncResult(BaseModel):
+    """Result from an Invidious sync operation."""
+
+    youtube_count: int = Field(default=0, description="Number of YouTube subscriptions")
+    invidious_count_before: int = Field(default=0, description="Invidious subs before sync")
+    invidious_count_after: int = Field(default=0, description="Invidious subs after sync")
+    added: list[str] = Field(default_factory=list, description="Channel IDs successfully added")
+    removed: list[str] = Field(
+        default_factory=list, description="Channel IDs removed from Invidious (stale)"
+    )
+    already_present: list[str] = Field(
+        default_factory=list, description="Channel IDs already in Invidious"
+    )
+    failed: list[str] = Field(default_factory=list, description="Channel IDs that failed to add")
+    dry_run: bool = Field(default=False, description="Whether this was a dry run")
+    duration_seconds: float = Field(default=0.0, description="Total sync duration")
