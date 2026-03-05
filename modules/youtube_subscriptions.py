@@ -17,10 +17,12 @@ import os
 import sqlite3
 import subprocess
 import tempfile
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import requests
 import typer
 import yaml
 from rich.console import Console
@@ -34,6 +36,7 @@ from .youtube_models import (
     GlanceColumn,
     GlancePage,
     GlanceVideoWidget,
+    InvidiousSyncResult,
     SyncStats,
 )
 
@@ -105,13 +108,21 @@ class YouTubeAuth:
         self._credentials = None
 
     def _get_credentials_json(self) -> dict[str, Any] | None:
-        """Retrieve OAuth credentials JSON from 1Password."""
+        """Retrieve OAuth credentials JSON from 1Password.
+
+        Tries in order:
+        1. File attachment on the item (via op item get --format json to find file ID,
+           then op read to fetch it)
+        2. Document type item (op document get)
+        3. Field named 'credential' containing JSON
+        """
         try:
-            # First, try to get the document/attachment
+            # Try to find a file attachment containing the OAuth JSON
             result = subprocess.run(
                 [
-                    "op", "document", "get", self.credentials_item,
+                    "op", "item", "get", self.credentials_item,
                     "--vault", self.credentials_vault,
+                    "--format", "json",
                 ],
                 capture_output=True,
                 text=True,
@@ -119,15 +130,25 @@ class YouTubeAuth:
             )
 
             if result.returncode == 0 and result.stdout.strip():
-                return json.loads(result.stdout.strip())
+                item_data = json.loads(result.stdout.strip())
+                files = item_data.get("files", [])
+                for f in files:
+                    if f.get("name", "").endswith(".json"):
+                        file_ref = f"op://{self.credentials_vault}/{self.credentials_item}/{f['id']}"
+                        file_result = subprocess.run(
+                            ["op", "read", file_ref],
+                            capture_output=True,
+                            text=True,
+                            check=False,
+                        )
+                        if file_result.returncode == 0 and file_result.stdout.strip():
+                            return json.loads(file_result.stdout.strip())
 
-            # Fallback: try as a field with JSON content
+            # Fallback: try as a document type item
             result = subprocess.run(
                 [
-                    "op", "item", "get", self.credentials_item,
+                    "op", "document", "get", self.credentials_item,
                     "--vault", self.credentials_vault,
-                    "--fields", "credential",
-                    "--reveal",
                 ],
                 capture_output=True,
                 text=True,
@@ -766,6 +787,265 @@ class GlanceConfigGenerator:
         return output_path
 
 
+class InvidiousClient:
+    """
+    Client for Invidious API subscription management.
+
+    Handles:
+    - Token retrieval from 1Password
+    - Fetching current Invidious subscriptions
+    - Subscribing to channels
+    - Diff-based sync from YouTube subscriptions
+    """
+
+    def __init__(self, settings: dict[str, Any] | None = None):
+        all_settings = settings or load_settings()
+        self.settings = all_settings.get("invidious", {})
+        self.base_url = self.settings.get("base_url", "").rstrip("/")
+        self.token_op_item = self.settings.get("token_op_item", "Invidious API Token")
+        self.token_op_vault = self.settings.get("token_op_vault", "API")
+        self.token_op_field = self.settings.get("token_op_field", "credential")
+        self.request_delay = self.settings.get("request_delay_seconds", 0.5)
+        self.batch_size = self.settings.get("batch_size", 10)
+        self.batch_pause = self.settings.get("batch_pause_seconds", 2)
+        self._token: str | None = None
+
+        # SSL verification: True, False, or path to CA cert
+        verify_ssl = self.settings.get("verify_ssl", True)
+        if isinstance(verify_ssl, str) and verify_ssl.lower() not in ("true", "false"):
+            self.verify_ssl: bool | str = os.path.expanduser(verify_ssl)
+        elif isinstance(verify_ssl, str):
+            self.verify_ssl = verify_ssl.lower() == "true"
+        else:
+            self.verify_ssl = verify_ssl
+
+        if not self.base_url:
+            raise ValueError("invidious.base_url not configured in settings.yaml")
+
+        # Suppress InsecureRequestWarning when verify_ssl is explicitly disabled
+        if self.verify_ssl is False:
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    def _get_token(self) -> str:
+        """Retrieve Invidious API token from 1Password."""
+        if self._token:
+            return self._token
+
+        try:
+            result = subprocess.run(
+                [
+                    "op", "item", "get", self.token_op_item,
+                    "--vault", self.token_op_vault,
+                    "--fields", self.token_op_field,
+                    "--reveal",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"Failed to get Invidious token from 1Password: {result.stderr.strip()}"
+                )
+
+            token = result.stdout.strip()
+            # 1Password returns JSON fields with CSV-style escaping:
+            # outer wrapping quotes and doubled inner quotes ("" → ")
+            if token.startswith('"') and token.endswith('"'):
+                token = token[1:-1].replace('""', '"')
+            self._token = token
+            return self._token
+
+        except FileNotFoundError:
+            raise RuntimeError("1Password CLI not found. Install: brew install --cask 1password-cli")
+
+    def _headers(self) -> dict[str, str]:
+        """Build request headers with auth token."""
+        return {"Authorization": f"Bearer {self._get_token()}"}
+
+    def get_subscriptions(self) -> list[str]:
+        """Fetch current Invidious subscription channel IDs.
+
+        Returns:
+            List of channel IDs (UCxxxx format).
+        """
+        url = f"{self.base_url}/api/v1/auth/subscriptions"
+        resp = requests.get(url, headers=self._headers(), timeout=30, verify=self.verify_ssl)
+
+        if resp.status_code == 403:
+            raise RuntimeError(
+                "Invidious API returned 403 Forbidden. "
+                "Check that your API token is valid and not expired. "
+                "Generate a new one at: "
+                f"{self.base_url}/authorize_token"
+            )
+        resp.raise_for_status()
+
+        data = resp.json()
+        return [item.get("authorId", "") for item in data if item.get("authorId")]
+
+    def subscribe(self, channel_id: str) -> bool:
+        """Subscribe to a channel on Invidious.
+
+        Args:
+            channel_id: YouTube channel ID (UCxxxx format).
+
+        Returns:
+            True if successful.
+        """
+        url = f"{self.base_url}/api/v1/auth/subscriptions/{channel_id}"
+        resp = requests.post(url, headers=self._headers(), timeout=30, verify=self.verify_ssl)
+
+        if resp.status_code in (200, 204):
+            return True
+
+        logger.warning(f"Failed to subscribe to {channel_id}: {resp.status_code} {resp.text}")
+        return False
+
+    def unsubscribe(self, channel_id: str) -> bool:
+        """Unsubscribe from a channel on Invidious.
+
+        Args:
+            channel_id: YouTube channel ID (UCxxxx format).
+
+        Returns:
+            True if successful.
+        """
+        url = f"{self.base_url}/api/v1/auth/subscriptions/{channel_id}"
+        resp = requests.delete(url, headers=self._headers(), timeout=30, verify=self.verify_ssl)
+
+        if resp.status_code in (200, 204):
+            return True
+
+        logger.warning(f"Failed to unsubscribe from {channel_id}: {resp.status_code} {resp.text}")
+        return False
+
+    def sync_from_youtube(
+        self,
+        channel_ids: list[str],
+        dry_run: bool = False,
+        remove_stale: bool = False,
+    ) -> InvidiousSyncResult:
+        """Sync YouTube subscriptions to Invidious.
+
+        Args:
+            channel_ids: YouTube channel IDs to sync.
+            dry_run: If True, compute diff but don't make changes.
+            remove_stale: If True, unsubscribe from Invidious channels not in YouTube.
+
+        Returns:
+            InvidiousSyncResult with sync details.
+        """
+        start = time.monotonic()
+
+        # Get current Invidious subscriptions
+        console.print("[dim]Fetching current Invidious subscriptions...[/dim]")
+        existing = set(self.get_subscriptions())
+        invidious_before = len(existing)
+
+        # Compute diffs
+        youtube_set = set(channel_ids)
+        missing = youtube_set - existing
+        already_present = youtube_set & existing
+        stale = existing - youtube_set if remove_stale else set()
+
+        status_parts = [
+            f"YouTube: {len(youtube_set)}",
+            f"Invidious: {invidious_before}",
+            f"To add: {len(missing)}",
+        ]
+        if remove_stale:
+            status_parts.append(f"To remove: {len(stale)}")
+        console.print(" | ".join(status_parts))
+
+        if dry_run:
+            duration = time.monotonic() - start
+            return InvidiousSyncResult(
+                youtube_count=len(youtube_set),
+                invidious_count_before=invidious_before,
+                invidious_count_after=invidious_before,
+                added=[],
+                removed=list(stale),
+                already_present=list(already_present),
+                failed=[],
+                dry_run=True,
+                duration_seconds=duration,
+            )
+
+        added = []
+        failed = []
+
+        if missing:
+            sorted_missing = sorted(missing)
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    f"Subscribing to {len(sorted_missing)} channels...", total=len(sorted_missing)
+                )
+
+                for i, channel_id in enumerate(sorted_missing):
+                    if self.subscribe(channel_id):
+                        added.append(channel_id)
+                    else:
+                        failed.append(channel_id)
+
+                    progress.update(task, advance=1)
+                    time.sleep(self.request_delay)
+
+                    # Batch pause
+                    if (i + 1) % self.batch_size == 0 and (i + 1) < len(sorted_missing):
+                        progress.update(
+                            task,
+                            description=f"Batch pause ({i + 1}/{len(sorted_missing)})...",
+                        )
+                        time.sleep(self.batch_pause)
+                        progress.update(
+                            task,
+                            description=f"Subscribing to {len(sorted_missing)} channels...",
+                        )
+
+        # Remove stale subscriptions
+        removed = []
+        if stale:
+            sorted_stale = sorted(stale)
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    f"Removing {len(sorted_stale)} stale subscriptions...", total=len(sorted_stale)
+                )
+
+                for i, channel_id in enumerate(sorted_stale):
+                    if self.unsubscribe(channel_id):
+                        removed.append(channel_id)
+
+                    progress.update(task, advance=1)
+                    time.sleep(self.request_delay)
+
+                    if (i + 1) % self.batch_size == 0 and (i + 1) < len(sorted_stale):
+                        time.sleep(self.batch_pause)
+
+        duration = time.monotonic() - start
+        return InvidiousSyncResult(
+            youtube_count=len(youtube_set),
+            invidious_count_before=invidious_before,
+            invidious_count_after=invidious_before + len(added) - len(removed),
+            added=added,
+            removed=removed,
+            already_present=list(already_present),
+            failed=failed,
+            dry_run=False,
+            duration_seconds=duration,
+        )
+
+
 # ============================================================================
 # CLI Commands
 # ============================================================================
@@ -988,6 +1268,98 @@ def move(
 
     console.print(f"[green]✓ Moved {channel_id} to {to}[/green]")
     console.print("[dim]Run 'youtube-subs generate' to update Glance config.[/dim]")
+
+
+@app.command("invidious-sync")
+def invidious_sync(
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview changes without subscribing"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Force fresh fetch from YouTube API"),
+    remove_stale: bool = typer.Option(
+        False, "--remove-stale", help="Remove Invidious subs not in YouTube"
+    ),
+):
+    """Sync YouTube subscriptions to Invidious."""
+    console.print("[bold]YouTube → Invidious Sync[/bold]")
+    console.print()
+
+    # Fetch YouTube subscriptions
+    auth_handler = YouTubeAuth()
+    if not auth_handler.is_authenticated():
+        console.print("[red]Not authenticated with YouTube. Run: youtube-subs auth[/red]")
+        raise typer.Exit(1)
+
+    fetcher = SubscriptionFetcher(auth_handler)
+    channels = fetcher.fetch_subscriptions(use_cache=not no_cache)
+
+    if not channels:
+        console.print("[red]No YouTube subscriptions found.[/red]")
+        raise typer.Exit(1)
+
+    channel_ids = [ch.id for ch in channels]
+
+    # Sync to Invidious
+    try:
+        client = InvidiousClient()
+    except (ValueError, RuntimeError) as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+
+    result = client.sync_from_youtube(channel_ids, dry_run=dry_run, remove_stale=remove_stale)
+
+    # Display results
+    console.print()
+    if dry_run:
+        console.print("[yellow]DRY RUN — no changes made[/yellow]")
+
+    table = Table(title="Invidious Sync Results")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", justify="right")
+
+    table.add_row("YouTube subscriptions", str(result.youtube_count))
+    table.add_row("Invidious before", str(result.invidious_count_before))
+    table.add_row("Already present", str(len(result.already_present)))
+    table.add_row("Added", str(len(result.added)))
+    if remove_stale:
+        table.add_row("Removed", str(len(result.removed)))
+    table.add_row("Failed", str(len(result.failed)))
+    table.add_row("Invidious after", str(result.invidious_count_after))
+    table.add_row("Duration", f"{result.duration_seconds:.1f}s")
+
+    console.print(table)
+
+    if result.failed:
+        console.print()
+        console.print("[red]Failed channels:[/red]")
+        for cid in result.failed:
+            console.print(f"  - {cid}")
+
+    if not dry_run and result.added:
+        console.print()
+        console.print(f"[green]Successfully added {len(result.added)} channels to Invidious[/green]")
+
+    if not dry_run and result.removed:
+        console.print(f"[yellow]Removed {len(result.removed)} stale subscriptions from Invidious[/yellow]")
+
+
+@app.command("invidious-status")
+def invidious_status():
+    """Show Invidious subscription count and connection status."""
+    console.print("[bold]Invidious Status[/bold]")
+    console.print()
+
+    try:
+        client = InvidiousClient()
+    except (ValueError, RuntimeError) as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        subs = client.get_subscriptions()
+        console.print(f"[green]Connected to {client.base_url}[/green]")
+        console.print(f"Subscriptions: {len(subs)}")
+    except requests.RequestException as e:
+        console.print(f"[red]Connection failed: {e}[/red]")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
