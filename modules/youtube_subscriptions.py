@@ -858,8 +858,8 @@ class InvidiousClient:
             self._token = token
             return self._token
 
-        except FileNotFoundError:
-            raise RuntimeError("1Password CLI not found. Install: brew install --cask 1password-cli")
+        except FileNotFoundError as err:
+            raise RuntimeError("1Password CLI not found. Install: brew install --cask 1password-cli") from err
 
     def _headers(self) -> dict[str, str]:
         """Build request headers with auth token."""
@@ -1302,7 +1302,7 @@ def invidious_sync(
         client = InvidiousClient()
     except (ValueError, RuntimeError) as e:
         console.print(f"[red]{e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     result = client.sync_from_youtube(channel_ids, dry_run=dry_run, remove_stale=remove_stale)
 
@@ -1351,7 +1351,7 @@ def invidious_status():
         client = InvidiousClient()
     except (ValueError, RuntimeError) as e:
         console.print(f"[red]{e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     try:
         subs = client.get_subscriptions()
@@ -1359,7 +1359,7 @@ def invidious_status():
         console.print(f"Subscriptions: {len(subs)}")
     except requests.RequestException as e:
         console.print(f"[red]Connection failed: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
 
 if __name__ == "__main__":
