@@ -3,7 +3,8 @@
 
 youtube:
   # 1Password item containing OAuth credentials JSON
-  credentials_item: "YouTube API Credentials"
+  # Override via env: YOUTUBE_OP_ITEM, YOUTUBE_OP_VAULT
+  credentials_item: ""
   credentials_vault: "API"
 
   # Token storage (refresh token after OAuth flow)
@@ -107,6 +108,20 @@ display:
 
   # Layout: "single_column" or "two_column"
   layout: "two_column"
+
+# Invidious sync settings
+invidious:
+  # Override via env: INVIDIOUS_BASE_URL, INVIDIOUS_OP_ITEM, INVIDIOUS_OP_VAULT, INVIDIOUS_OP_FIELD
+  base_url: ""
+  token_op_item: ""
+  token_op_vault: "API"
+  token_op_field: "credential"
+  request_delay_seconds: 0.5
+  batch_size: 10
+  batch_pause_seconds: 2
+  # SSL verification: true (default), false (disable), or path to CA cert file
+  # SSL verification: set false for self-signed certs
+  verify_ssl: false
 
 # Output settings
 output:
