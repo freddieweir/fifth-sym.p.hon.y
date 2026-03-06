@@ -100,8 +100,12 @@ class YouTubeAuth:
 
     def __init__(self, settings: dict[str, Any] | None = None):
         self.settings = settings or load_settings().get("youtube", {})
-        self.credentials_item = self.settings.get("credentials_item", "YouTube API Credentials")
-        self.credentials_vault = self.settings.get("credentials_vault", "API")
+        self.credentials_item = os.environ.get(
+            "YOUTUBE_OP_ITEM", self.settings.get("credentials_item", "YouTube API Credentials")
+        )
+        self.credentials_vault = os.environ.get(
+            "YOUTUBE_OP_VAULT", self.settings.get("credentials_vault", "API")
+        )
         self.token_path = Path(
             os.path.expanduser(self.settings.get("token_path", "~/.config/youtube-glance/token.json"))
         )
@@ -801,10 +805,18 @@ class InvidiousClient:
     def __init__(self, settings: dict[str, Any] | None = None):
         all_settings = settings or load_settings()
         self.settings = all_settings.get("invidious", {})
-        self.base_url = self.settings.get("base_url", "").rstrip("/")
-        self.token_op_item = self.settings.get("token_op_item", "Invidious API Token")
-        self.token_op_vault = self.settings.get("token_op_vault", "API")
-        self.token_op_field = self.settings.get("token_op_field", "credential")
+        self.base_url = os.environ.get(
+            "INVIDIOUS_BASE_URL", self.settings.get("base_url", "")
+        ).rstrip("/")
+        self.token_op_item = os.environ.get(
+            "INVIDIOUS_OP_ITEM", self.settings.get("token_op_item", "Invidious API Token")
+        )
+        self.token_op_vault = os.environ.get(
+            "INVIDIOUS_OP_VAULT", self.settings.get("token_op_vault", "API")
+        )
+        self.token_op_field = os.environ.get(
+            "INVIDIOUS_OP_FIELD", self.settings.get("token_op_field", "credential")
+        )
         self.request_delay = self.settings.get("request_delay_seconds", 0.5)
         self.batch_size = self.settings.get("batch_size", 10)
         self.batch_pause = self.settings.get("batch_pause_seconds", 2)

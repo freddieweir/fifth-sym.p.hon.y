@@ -3,7 +3,8 @@
 
 youtube:
   # 1Password item containing OAuth credentials JSON
-  credentials_item: "your-youtube-creds"
+  # Override via env: YOUTUBE_OP_ITEM, YOUTUBE_OP_VAULT
+  credentials_item: ""
   credentials_vault: "API"
 
   # Token storage (refresh token after OAuth flow)
@@ -110,8 +111,9 @@ display:
 
 # Invidious sync settings
 invidious:
-  base_url: "https://invidious.yourdomain.com"
-  token_op_item: "your-invidious-token"
+  # Override via env: INVIDIOUS_BASE_URL, INVIDIOUS_OP_ITEM, INVIDIOUS_OP_VAULT, INVIDIOUS_OP_FIELD
+  base_url: ""
+  token_op_item: ""
   token_op_vault: "API"
   token_op_field: "credential"
   request_delay_seconds: 0.5
