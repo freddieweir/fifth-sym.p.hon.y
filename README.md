@@ -24,6 +24,11 @@ AI-powered distributed automation conductor with real-time monitoring, voice con
 - Multi-modal alerts (audio + Stream Deck LED)
 - Configurable thresholds and intervals
 
+**Agent Monitoring Dashboard** (`agent-monitor`):
+- Multi-panel Rich TUI for monitoring agent activity
+- Infrastructure, system status, and observatory panels
+- Audio history tracking and documentation viewer
+
 **Modular Architecture**: Reusable components with clean APIs, dependency injection, and separation of concerns.
 
 ## Core Features
@@ -34,6 +39,10 @@ AI-powered distributed automation conductor with real-time monitoring, voice con
 - **1Password integration** - Secure credential management via CLI
 - **Output translation** - Convert technical output to conversational speech
 - **Script monitoring** - Detect when scripts need user input
+- **Docker monitoring** - Container status tracking and health checks
+- **YouTube/Invidious sync** - Subscription management and sync
+- **Multi-agent chat** - WebSocket-based chat client and server
+- **MCP integrations** - PostgreSQL and custom tool servers
 - **uv package management** - Modern Python dependency handling
 
 ## Quick Start
