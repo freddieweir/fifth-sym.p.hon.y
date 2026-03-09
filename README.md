@@ -169,10 +169,9 @@ Focus-friendly attention management:
 
 ## Example Scripts
 
-Fifth Symphony includes example scripts:
+Fifth Symphony includes example scripts in `scripts/user-scripts/`:
 
 - `quick_test.py` - Fast completion demo
-- `example_long_task.py` - Long-running task with interactions
 - `error_demo.py` - Error handling demonstration
 
 ## Architecture
