@@ -233,6 +233,12 @@ The `modules/` directory contains reusable components that can be imported into 
   - Live event log with severity colors
   - Reactive UI with 1-second refresh intervals
 
+- **agent_monitor/** - Multi-panel agent monitoring dashboard
+  - Rich TUI and Textual-based app variants
+  - Module panels: agent activity, infrastructure, system status
+  - Observatory, audio history, and documentation panels
+  - Modular launch system for individual panels
+
 - **voice_listener.py** - Voice-activated controls with speech recognition
   - Power-aware model selection (AC vs Battery vs Low Battery)
   - MLX-Whisper integration for offline recognition
@@ -256,6 +262,11 @@ The `modules/` directory contains reusable components that can be imported into 
   - 1Password API key integration
   - Simple usage: `AudioTTS(auto_play=True).generate_speech("Hello!")`
 
+- **docker_monitor.py** - Docker container monitoring and status tracking
+- **youtube_subscriptions.py** - YouTube/Invidious subscription sync
+- **orchestrator/** - Permission engine, MCP client, and prompt management
+- **chat/** - Multi-agent WebSocket chat client and server
+- **mcp/** - MCP server integrations (PostgreSQL, chat tools)
 - **onepassword_manager.py** - Secure credential retrieval from 1Password CLI
 - **voice_handler.py** - Voice synthesis coordination
 - **script_runner.py** - Execute and monitor scripts across the network
