@@ -184,16 +184,32 @@ fifth-symphony/
 ├── modules/               # Core functionality modules (Python-only)
 │   ├── audio_tts.py      # Text-to-speech with ElevenLabs
 │   ├── onepassword_manager.py  # Secure credential management
-│   ├── voice_handler.py
-│   ├── script_runner.py
-│   ├── output_translator.py
-│   └── reminder_system.py
+│   ├── voice_handler.py  # Voice synthesis coordination
+│   ├── script_runner.py  # Script execution and monitoring
+│   ├── output_translator.py  # Technical→conversational output
+│   ├── reminder_system.py    # Proactive attention alerts
+│   ├── dashboard.py      # Real-time TUI monitoring
+│   ├── voice_listener.py # Voice-activated controls
+│   ├── claude_monitor.py # Claude Code response detection
+│   ├── docker_monitor.py # Docker container monitoring
+│   ├── youtube_subscriptions.py  # YouTube/Invidious sync
+│   ├── agent_monitor/    # Multi-panel agent monitoring dashboard
+│   ├── orchestrator/     # Permission engine and prompt management
+│   ├── mcp/             # MCP server integrations
+│   └── chat/            # Multi-agent chat client/server
 ├── config/               # Configuration files
-│   ├── settings.yaml
+│   ├── settings.yaml    # Main system config
 │   ├── prompts/         # Voice message templates
-│   └── templates/       # Output formatting
-├── scripts/             # Your Python scripts go here
-├── *.sh                 # Project-specific bash launchers
+│   ├── templates/       # Output formatting
+│   └── onepassword/     # Credential management settings
+├── scripts/             # Launchers, CLI, and user scripts
+│   ├── cli/            # CLI and GUI entry points
+│   ├── launchers/      # Shell launcher scripts
+│   ├── user-scripts/   # Your Python scripts go here
+│   └── services/       # Chat client/server launchers
+├── database/            # PostgreSQL schema and migrations
+├── run.sh               # Main CLI launcher
+├── docker-compose.yml   # PostgreSQL, Redis, MCP services
 └── pyproject.toml       # uv package configuration
 ```
 
