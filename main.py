@@ -21,7 +21,6 @@ from modules.reminder_system import ReminderSystem
 from modules.script_runner import ScriptRunner
 from modules.symlink_manager import SymlinkManager
 from modules.voice_handler import VoiceHandler
-from modules.yubikey_auth import YubiKeyAuth
 
 # Add modules to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -465,18 +464,9 @@ class NeuralOrchestra:
             )
 
         try:
-            # YubiKey authentication (first startup only)
-            yubikey_config = self.config.get("security", {}).get("yubikey", {})
-            if yubikey_config.get("enabled", False):
-                yubikey_auth = YubiKeyAuth(
-                    session_duration_hours=yubikey_config.get("session_duration_hours", 24)
-                )
-                try:
-                    await yubikey_auth.require_yubikey_tap("fifth-symphony-orchestrator")
-                    self.console.print("[green]🔐 YubiKey authentication successful[/green]")
-                except PermissionError as e:
-                    self.console.print(f"[red]🔐 YubiKey authentication failed: {e}[/red]")
-                    return
+            # TODO: Re-add YubiKey authentication once modules/yubikey_auth.py is implemented
+            # See: https://github.com/freddieweir/fifth-sym.p.hon.y — yubikey_auth was referenced
+            # but never created. Needs a YubiKeyAuth class with require_yubikey_tap() method.
 
             # Connect to chat if enabled
             if chat_context:
