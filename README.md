@@ -55,8 +55,13 @@ uv run voice-listener
 # Claude instance monitoring
 uv run claude-monitor
 
+# Agent monitoring dashboard
+uv run agent-monitor
+
+# YouTube subscription sync
+uv run youtube-subs
+
 # Main automation conductor
-./run_gui.sh  # Visual interface
 ./run.sh      # CLI mode
 ```
 
@@ -76,14 +81,13 @@ uv run claude-monitor
 
 ### GUI Mode (Visual Interface)
 ```bash
-./run_gui.sh
+scripts/launchers/run_gui.sh
 ```
-Launches the beautiful dark-themed visual interface with:
+Launches the PySide6 dark-themed visual interface with:
 - **Script Library**: Visual cards showing all your scripts with descriptions
-- **Live Terminal**: Real-time output display with syntax highlighting  
+- **Live Terminal**: Real-time output display with syntax highlighting
 - **Control Panel**: Easy start/stop buttons and voice/reminder toggles
 - **Status Panel**: System status, active scripts, and performance monitoring
-- **System Tray**: Minimize to background and quick access
 
 ### CLI Mode (Terminal Interface)
 ```bash
@@ -94,7 +98,6 @@ Shows a text menu of available scripts and lets you choose what to run.
 ### Direct Script Execution
 ```bash
 uv run main.py script_name
-uv run main.py example_long_task
 ```
 
 ### Command Line Options
