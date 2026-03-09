@@ -127,7 +127,7 @@ The system is configured via YAML files in the `config/` directory:
 
 ## Adding Your Scripts
 
-1. Place Python scripts in the `scripts/` directory
+1. Place Python scripts in the `scripts/user-scripts/` directory
 2. Scripts will be auto-discovered and added to the menu
 3. Add docstrings for better descriptions in the interface
 
@@ -303,7 +303,7 @@ The `modules/` directory contains reusable components that can be imported into 
 - Check item names match configuration
 
 ### Script Discovery Issues
-- Ensure scripts are in `scripts/` directory
+- Ensure scripts are in `scripts/user-scripts/` directory
 - Check file permissions (executable recommended)
 - Verify Python syntax with `python -m py_compile script.py`
 
@@ -311,7 +311,7 @@ The `modules/` directory contains reusable components that can be imported into 
 
 Fifth Symphony is designed to be your personal automation command center. Add your own:
 
-- Scripts in the `scripts/` directory
+- Scripts in the `scripts/user-scripts/` directory
 - Voice message templates in `config/prompts/`
 - Output formatting rules in `config/templates/`
 - Custom reminder messages and escalation levels
